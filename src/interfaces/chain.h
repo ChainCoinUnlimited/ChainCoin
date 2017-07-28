@@ -144,6 +144,9 @@ public:
     //! Check if transaction is RBF opt in.
     virtual RBFTransactionState isRBFOptIn(const CTransaction& tx) = 0;
 
+    //! Check if transaction has descendants in mempool.
+    virtual bool hasDescendantsInMempool(const uint256& txid) = 0;
+
     //! Synchronously send TransactionAddedToMempool notifications about all
     //! current mempool transactions to the specified handler and return after
     //! the last one is sent. These notifications aren't coordinated with async
