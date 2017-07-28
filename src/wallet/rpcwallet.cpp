@@ -344,7 +344,7 @@ static CTransactionRef SendMoney(interfaces::Chain::Lock& locked_chain, CWallet 
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
     CValidationState state;
-    if (!pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, reservekey, g_connman.get(), state, nUseCoinJoin)) {
+    if (!pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, reservekey, state, nUseCoinJoin)) {
         strError = strprintf("Error: The transaction was rejected! Reason given: %s", FormatStateMessage(state));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
@@ -959,7 +959,7 @@ static UniValue sendmany(const JSONRPCRequest& request)
     if (!fCreated)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strFailReason);
     CValidationState state;
-    if (!pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, keyChange, g_connman.get(), state, nUseCoinJoin ? true : false)) {
+    if (!pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, keyChange, state, nUseCoinJoin)) {
         strFailReason = strprintf("Transaction commit failed:: %s", FormatStateMessage(state));
         throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
     }
@@ -2729,7 +2729,7 @@ static UniValue resendwallettransactions(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: Wallet transaction broadcasting is disabled with -walletbroadcast");
     }
 
-    std::vector<uint256> txids = pwallet->ResendWalletTransactionsBefore(*locked_chain, GetTime(), g_connman.get());
+    std::vector<uint256> txids = pwallet->ResendWalletTransactionsBefore(*locked_chain, GetTime());
     UniValue result(UniValue::VARR);
     for (const uint256& txid : txids)
     {
@@ -4206,7 +4206,7 @@ static UniValue prepareproposal(const JSONRPCRequest& request)
     CReserveKey reservekey(pwallet);
     // -- send the tx to the network
     CValidationState state;
-    if (!pwallet->CommitTransaction(tx, {} /* mapValue */, {} /* orderForm */, reservekey, g_connman.get(), state)) {
+    if (!pwallet->CommitTransaction(tx, {} /* mapValue */, {} /* orderForm */, reservekey, state)) {
         throw JSONRPCError(RPC_INTERNAL_ERROR, "CommitTransaction failed! Reason given: " + state.GetRejectReason());
     }
 

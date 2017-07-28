@@ -92,7 +92,7 @@ void CCoinJoinClientManager::ProcessMessage(CNode* pfrom, const std::string& str
         return;
     }
 
-    if (!CheckDiskSpace()) {
+    if (!CheckDiskSpace((GetDataDir()))) {
         ResetPool();
         fEnableCoinJoin = false;
         strAutoCoinJoinResult = _("WARNING: Low disk space, disabling CoinJoin.");
@@ -495,7 +495,7 @@ bool CCoinJoinClientSession::SendDenominate()
         return false;
     }
 
-    if (!CheckDiskSpace()) {
+    if (!CheckDiskSpace(GetDataDir())) {
         SetNull();
         LogPrintf("%s CCoinJoinClientSession::SendDenominate -- Not enough disk space, disabling CoinJoin.\n", m_wallet_session->GetDisplayName());
         return false;
@@ -1567,7 +1567,7 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
 
 
         CValidationState state;
-        if (!m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */, reservekeyChange, g_connman.get(), state)) {
+        if (!m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */, reservekeyChange, state)) {
             LogPrintf("%s CCoinJoinClientManager::CreateDenominated -- CommitTransaction failed! Reason given: %s\n", m_wallet->GetDisplayName(), state.GetRejectReason());
             keyHolderStorageDenom.ReturnAll();
             return false;
