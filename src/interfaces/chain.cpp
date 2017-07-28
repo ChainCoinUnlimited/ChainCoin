@@ -197,6 +197,18 @@ public:
         auto it_mp = ::mempool.mapTx.find(txid);
         return it_mp != ::mempool.mapTx.end() && it_mp->GetCountWithDescendants() > 1;
     }
+    void getTransactionAncestry(const uint256& txid, size_t& ancestors, size_t& descendants) override
+    {
+        ::mempool.GetTransactionAncestry(txid, ancestors, descendants);
+    }
+
+
+
+
+
+
+
+
     void requestMempoolTransactions(std::function<void(const CTransactionRef&)> fn) override
     {
         LOCK2(::cs_main, ::mempool.cs);
