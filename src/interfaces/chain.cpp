@@ -9,6 +9,7 @@
 #include <modules/coinjoin/coinjoin_analyzer.h>
 #include <primitives/block.h>
 #include <sync.h>
+#include <threadsafety.h>
 #include <txmempool.h>
 #include <uint256.h>
 #include <util/system.h>
@@ -133,6 +134,11 @@ class LockImpl : public Chain::Lock
             return fork->nHeight;
         }
         return nullopt;
+    }
+    bool checkFinalTx(const CTransaction& tx) override
+    {
+        LockAnnotation lock(::cs_main);
+        return CheckFinalTx(tx);
     }
 };
 
