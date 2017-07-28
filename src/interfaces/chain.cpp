@@ -7,6 +7,7 @@
 #include <chain.h>
 #include <chainparams.h>
 #include <modules/coinjoin/coinjoin_analyzer.h>
+#include <policy/rbf.h>
 #include <primitives/block.h>
 #include <sync.h>
 #include <threadsafety.h>
@@ -184,6 +185,11 @@ public:
     {
         LOCK(cs_main);
         return GuessVerificationProgress(Params().TxData(), LookupBlockIndex(block_hash));
+    }
+    RBFTransactionState isRBFOptIn(const CTransaction& tx) override
+    {
+        LOCK(::mempool.cs);
+        return IsRBFOptIn(tx, ::mempool);
     }
     void requestMempoolTransactions(std::function<void(const CTransactionRef&)> fn) override
     {

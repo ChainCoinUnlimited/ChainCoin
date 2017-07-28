@@ -7,6 +7,8 @@
 
 #include <script/standard.h>           // For CTxDestination
 #include <optional.h>
+#include <optional.h>               // For Optional and nullopt
+#include <policy/rbf.h>             // For RBFTransactionState
 
 #include <memory>
 #include <stdint.h>
@@ -138,6 +140,9 @@ public:
     //! Estimate fraction of total transactions verified if blocks up to
     //! the specified block hash are verified.
     virtual double guessVerificationProgress(const uint256& block_hash) = 0;
+
+    //! Check if transaction is RBF opt in.
+    virtual RBFTransactionState isRBFOptIn(const CTransaction& tx) = 0;
 
     //! Synchronously send TransactionAddedToMempool notifications about all
     //! current mempool transactions to the specified handler and return after
