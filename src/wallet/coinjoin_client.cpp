@@ -988,7 +988,7 @@ bool CCoinJoinClientSession::AddFeesAndLocktime(std::vector<CAmount>& vecAmounts
             LogPrintf("CCoinJoinClientSession::AddFeesAndLocktime --- ERROR: Dummysigning transaction failed!\n");
             return false;
         }
-        nFeeNeeded = GetMinimumFee(*m_wallet_session, nBytes, coin_control, ::mempool, ::feeEstimator, &feeCalc);
+        nFeeNeeded = GetMinimumFee(*m_wallet_session, nBytes, coin_control, &feeCalc);
         if (feeCalc.reason == FeeReason::FALLBACK && !m_wallet_session->m_allow_fallback_fee) {
             // eventually allow a fallback fee
             LogPrintf("%s CCoinJoinClientSession::AddFeesAndLocktime --- ERROR: Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.\n", m_wallet_session->GetDisplayName());

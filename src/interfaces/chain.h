@@ -23,8 +23,8 @@ class CScheduler;
 class CTransaction;
 class uint256;
 struct CBlockLocator;
+struct FeeCalculation;
 struct masternode_info_t;
-class CTransaction;
 
 using CTransactionRef = std::shared_ptr<const CTransaction>;
 
@@ -153,6 +153,15 @@ public:
 
     //! Check chain limits.
     virtual bool checkChainLimits(CTransactionRef tx) = 0;
+
+    //! Estimate smart fee.
+    virtual CFeeRate estimateSmartFee(int num_blocks, bool conservative, FeeCalculation* calc = nullptr) = 0;
+
+    //! Fee estimator max target.
+    virtual unsigned int estimateMaxBlocks() = 0;
+
+    //! Pool min fee.
+    virtual CFeeRate mempoolMinFee() = 0;
 
     //! Synchronously send TransactionAddedToMempool notifications about all
     //! current mempool transactions to the specified handler and return after
