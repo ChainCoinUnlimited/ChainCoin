@@ -163,6 +163,9 @@ public:
     //! Pool min fee.
     virtual CFeeRate mempoolMinFee() = 0;
 
+    //! Check if pruning is enabled.
+    virtual bool getPruneMode() = 0;
+
     //! Synchronously send TransactionAddedToMempool notifications about all
     //! current mempool transactions to the specified handler and return after
     //! the last one is sent. These notifications aren't coordinated with async

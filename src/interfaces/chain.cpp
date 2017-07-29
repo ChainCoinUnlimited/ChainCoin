@@ -229,6 +229,7 @@ public:
     {
         return ::mempool.GetMinFee(gArgs.GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000);
     }
+    bool getPruneMode() override { return ::fPruneMode; }
     void requestMempoolTransactions(std::function<void(const CTransactionRef&)> fn) override
     {
         LOCK2(::cs_main, ::mempool.cs);
