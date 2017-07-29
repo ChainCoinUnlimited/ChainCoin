@@ -166,6 +166,9 @@ public:
     //! Check if pruning is enabled.
     virtual bool getPruneMode() = 0;
 
+    //! Check if p2p enabled.
+    virtual bool p2pEnabled() = 0;
+
     //! Synchronously send TransactionAddedToMempool notifications about all
     //! current mempool transactions to the specified handler and return after
     //! the last one is sent. These notifications aren't coordinated with async
