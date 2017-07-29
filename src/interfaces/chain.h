@@ -175,6 +175,15 @@ public:
     //! Get adjusted time.
     virtual int64_t getAdjustedTime() = 0;
 
+    //! Send init message.
+    virtual void initMessage(const std::string& message) = 0;
+
+    //! Send init warning.
+    virtual void initWarning(const std::string& message) = 0;
+
+    //! Send init error.
+    virtual void initError(const std::string& message) = 0;
+
     //! Synchronously send TransactionAddedToMempool notifications about all
     //! current mempool transactions to the specified handler and return after
     //! the last one is sent. These notifications aren't coordinated with async
@@ -187,7 +196,6 @@ public:
 
     //! Recursively calculate the depth of obscuring a single outpoint.
     virtual int analyzeCoin(const COutPoint& outpoint) = 0;
-
 };
 
 //! Interface to let node manage chain clients (wallets, or maybe tools for
