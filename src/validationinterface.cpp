@@ -43,7 +43,7 @@ struct MainSignalsInstance {
     boost::signals2::signal<void (int64_t nBestBlockTime, CConnman* connman)> Broadcast;
     boost::signals2::signal<void (const CBlock&, const CValidationState&)> BlockChecked;
     boost::signals2::signal<void (const CBlockIndex *, const std::shared_ptr<const CBlock>&)> NewPoWValidBlock;
-    boost::signals2::signal<void (CNode*, const NetMsgDest&, const std::string&, CDataStream&, CConnman*)> ProcessModuleMessage;
+    boost::signals2::signal<void (CNode*, const NetMsgDest&, const std::string&, CDataStream&)> ProcessModuleMessage;
     boost::signals2::signal<void (const CGovernanceObject&)> NotifyGovernanceObject;
     boost::signals2::signal<void (const CGovernanceVote&)> NotifyGovernanceVote;
 
@@ -110,7 +110,7 @@ void RegisterValidationInterface(CValidationInterface* pwalletIn) {
     conns.Broadcast = g_signals.m_internals->Broadcast.connect(std::bind(&CValidationInterface::ResendWalletTransactions, pwalletIn, std::placeholders::_1, std::placeholders::_2));
     conns.BlockChecked = g_signals.m_internals->BlockChecked.connect(std::bind(&CValidationInterface::BlockChecked, pwalletIn, std::placeholders::_1, std::placeholders::_2));
     conns.NewPoWValidBlock = g_signals.m_internals->NewPoWValidBlock.connect(std::bind(&CValidationInterface::NewPoWValidBlock, pwalletIn, std::placeholders::_1, std::placeholders::_2));
-    conns.ProcessModuleMessage = g_signals.m_internals->ProcessModuleMessage.connect(std::bind(&CValidationInterface::ProcessModuleMessage, pwalletIn, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+    conns.ProcessModuleMessage = g_signals.m_internals->ProcessModuleMessage.connect(std::bind(&CValidationInterface::ProcessModuleMessage, pwalletIn, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
     conns.NotifyGovernanceObject = g_signals.m_internals->NotifyGovernanceObject.connect(std::bind(&CValidationInterface::NotifyGovernanceObject, pwalletIn, std::placeholders::_1));
     conns.NotifyGovernanceVote = g_signals.m_internals->NotifyGovernanceVote.connect(std::bind(&CValidationInterface::NotifyGovernanceVote, pwalletIn, std::placeholders::_1));
 }
@@ -196,8 +196,8 @@ void CMainSignals::NewPoWValidBlock(const CBlockIndex *pindex, const std::shared
     m_internals->NewPoWValidBlock(pindex, block);
 }
 
-void CMainSignals::ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv, CConnman* connman) {
-    m_internals->ProcessModuleMessage(pfrom, dest, strCommand, vRecv, connman);
+void CMainSignals::ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv) {
+    m_internals->ProcessModuleMessage(pfrom, dest, strCommand, vRecv);
 }
 
 void CMainSignals::NotifyGovernanceObject(const CGovernanceObject &gobject) {

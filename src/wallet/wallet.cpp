@@ -102,7 +102,7 @@ static void ReleaseWallet(CWallet* wallet)
     wallet->WalletLogPrintf("Releasing wallet\n");
     wallet->BlockUntilSyncedToCurrentChain();
     wallet->Flush();
-    UnregisterValidationInterface(wallet);
+    wallet->m_chain_notifications_handler.reset();
     delete wallet;
     // Wallet is now released, notify UnloadWallet, if any.
     {
@@ -1255,39 +1255,35 @@ void CWallet::TransactionRemovedFromMempool(const CTransactionRef &ptx) {
     }
 }
 
-void CWallet::BlockConnected(const std::shared_ptr<const CBlock>& pblock, const CBlockIndex *pindex, const std::vector<CTransactionRef>& vtxConflicted) {
-    int nHeight {0};
-    {
-        auto locked_chain = chain().lock();
-        LOCK(cs_wallet);
-        // TODO: Temporarily ensure that mempool removals are notified before
-        // connected transactions.  This shouldn't matter, but the abandoned
-        // state of transactions in our wallet is currently cleared when we
-        // receive another notification and there is a race condition where
-        // notification of a connected conflict might cause an outside process
-        // to abandon a transaction and then have it inadvertently cleared by
-        // the notification that the conflicted transaction was evicted.
-
-        for (const CTransactionRef& ptx : vtxConflicted) {
-            SyncTransaction(ptx, {} /* block hash */, 0 /* position in block */);
-            TransactionRemovedFromMempool(ptx);
-        }
-        for (size_t i = 0; i < pblock->vtx.size(); i++) {
-            SyncTransaction(pblock->vtx[i], pindex->GetBlockHash(), i);
-            TransactionRemovedFromMempool(pblock->vtx[i]);
-        }
-
-        m_last_block_processed = pindex->GetBlockHash();
-        nHeight = pindex->nHeight;
+void CWallet::BlockConnected(const CBlock& block, const std::vector<CTransactionRef>& vtxConflicted) {
+    const uint256& block_hash = block.GetHash();
+    auto locked_chain = chain().lock();
+    LOCK(cs_wallet);
+    // TODO: Temporarily ensure that mempool removals are notified before
+    // connected transactions.  This shouldn't matter, but the abandoned
+    // state of transactions in our wallet is currently cleared when we
+    // receive another notification and there is a race condition where
+    // notification of a connected conflict might cause an outside process
+    // to abandon a transaction and then have it inadvertently cleared by
+    // the notification that the conflicted transaction was evicted.
+    for (const CTransactionRef& ptx : vtxConflicted) {
+        SyncTransaction(ptx, {} /* block hash */, 0 /* position in block */);
+        TransactionRemovedFromMempool(ptx);
     }
-    coinjoinClient->UpdatedBlockTip(nHeight);
+    for (size_t i = 0; i < block.vtx.size(); i++) {
+        SyncTransaction(block.vtx[i], block_hash, i);
+        TransactionRemovedFromMempool(block.vtx[i]);
+    }
+
+    coinjoinClient->UpdatedBlockTip(*locked_chain->getBlockHeight(block_hash));
+    m_last_block_processed = block_hash;
 }
 
-void CWallet::BlockDisconnected(const std::shared_ptr<const CBlock>& pblock) {
+void CWallet::BlockDisconnected(const CBlock& block) {
     auto locked_chain = chain().lock();
     LOCK(cs_wallet);
 
-    for (const CTransactionRef& ptx : pblock->vtx) {
+    for (const CTransactionRef& ptx : block.vtx) {
         SyncTransaction(ptx, {} /* block hash */, 0 /* position in block */);
     }
 }
@@ -1314,7 +1310,7 @@ void CWallet::BlockUntilSyncedToCurrentChain() {
     // ...otherwise put a callback in the validation interface queue and wait
     // for the queue to drain enough to execute it (indicating we are caught up
     // at least with the time we entered this function).
-    SyncWithValidationInterfaceQueue();
+    chain().waitForNotifications();
 }
 
 
@@ -1877,11 +1873,13 @@ CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_bloc
     return result;
 }
 
-void CWallet::ReacceptWalletTransactions(interfaces::Chain::Lock& locked_chain)
+void CWallet::ReacceptWalletTransactions()
 {
     // If transactions aren't being broadcasted, don't let them into local mempool either
     if (!fBroadcastTransactions)
         return;
+    auto locked_chain = chain().lock();
+    LOCK(cs_wallet);
     std::map<int64_t, CWalletTx*> mapSorted;
 
     // Sort pending wallet transactions based on their initial wallet insertion order
@@ -1891,7 +1889,7 @@ void CWallet::ReacceptWalletTransactions(interfaces::Chain::Lock& locked_chain)
         CWalletTx& wtx = item.second;
         assert(wtx.GetHash() == wtxid);
 
-        int nDepth = wtx.GetDepthInMainChain(locked_chain);
+        int nDepth = wtx.GetDepthInMainChain(*locked_chain);
 
         if (!wtx.IsCoinBase() && (nDepth == 0 && !wtx.isAbandoned())) {
             mapSorted.insert(std::make_pair(wtx.nOrderPos, &wtx));
@@ -1902,7 +1900,7 @@ void CWallet::ReacceptWalletTransactions(interfaces::Chain::Lock& locked_chain)
     for (const std::pair<const int64_t, CWalletTx*>& item : mapSorted) {
         CWalletTx& wtx = *(item.second);
         CValidationState state;
-        wtx.AcceptToMemoryPool(locked_chain, state);
+        wtx.AcceptToMemoryPool(*locked_chain, state);
     }
 }
 
@@ -2201,7 +2199,7 @@ std::vector<uint256> CWallet::ResendWalletTransactionsBefore(interfaces::Chain::
     return result;
 }
 
-void CWallet::ResendWalletTransactions(int64_t nBestBlockTime, CConnman* connman)
+void CWallet::ResendWalletTransactions(interfaces::Chain::Lock& locked_chain, int64_t nBestBlockTime)
 {
     // Do this infrequently and randomly to avoid giving away
     // that these are our transactions.
@@ -2219,17 +2217,16 @@ void CWallet::ResendWalletTransactions(int64_t nBestBlockTime, CConnman* connman
 
     // Rebroadcast unconfirmed txes older than 5 minutes before the last
     // block was found:
-    auto locked_chain = chain().assumeLocked();  // Temporary. Removed in upcoming lock cleanup
-    std::vector<uint256> relayed = ResendWalletTransactionsBefore(*locked_chain, nBestBlockTime-5*60);
+    std::vector<uint256> relayed = ResendWalletTransactionsBefore(locked_chain, nBestBlockTime-5*60);
     if (!relayed.empty())
         WalletLogPrintf("%s: rebroadcast %u unconfirmed transactions\n", __func__, relayed.size());
 }
 
-void CWallet::ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
+void CWallet::ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv)
 {
     if (dest == NetMsgDest::MSG_PSEND || dest == NetMsgDest::MSG_ALL) {
         CDataStream ss(vRecv);
-        coinjoinClient->ProcessMessage(pfrom, strCommand, ss, connman);
+        coinjoinClient->ProcessMessage(pfrom, strCommand, ss);
     }
 }
 
@@ -4745,8 +4742,8 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     chain.loadWallet(interfaces::MakeWallet(walletInstance));
 
-    // Register with the validation interface. It's ok to do this after rescan since we're still holding cs_main.
-    RegisterValidationInterface(walletInstance.get());
+    // Register with the validation interface. It's ok to do this after rescan since we're still holding locked_chain.
+    walletInstance->m_chain_notifications_handler = chain.handleNotifications(*walletInstance);
 
     walletInstance->SetBroadcastTransactions(gArgs.GetBoolArg("-walletbroadcast", DEFAULT_WALLETBROADCAST));
 
@@ -4766,7 +4763,7 @@ void CWallet::postInitProcess()
 
     // Add wallet transactions that aren't already in a block to mempool
     // Do this here as mempool requires genesis block to be loaded
-    ReacceptWalletTransactions(*locked_chain);
+    ReacceptWalletTransactions();
 
     // Update wallet transactions with current mempool transactions.
     chain().requestMempoolTransactions([this](const CTransactionRef& tx) { TransactionAddedToMempool(tx); });

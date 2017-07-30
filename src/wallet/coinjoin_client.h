@@ -12,7 +12,6 @@
 class CCoinJoinClientManager;
 class CReserveKey;
 class CWallet;
-class CConnman;
 
 static const int MIN_COINJOIN_AMOUNT             = 2;
 static const int MIN_COINJOIN_LIQUIDITY          = 0;
@@ -145,7 +144,7 @@ public:
     {
     }
 
-    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman);
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
 
     std::string GetStatus(bool fWaitForBlock);
 
@@ -232,7 +231,7 @@ public:
     {
     }
 
-    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman);
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
 
     void SetMinBlocksToWait(int nMinBlocksToWaitIn) { nMinBlocksToWait = nMinBlocksToWaitIn; }
 

@@ -80,15 +80,13 @@ void CKeyHolderStorage::ReturnAll()
     }
 }
 
-void CCoinJoinClientManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
+void CCoinJoinClientManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv)
 {
     if (fLiteMode) return; // ignore all CoinJoin related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;
 
     if (pfrom->GetSendVersion() < MIN_COINJOIN_PEER_PROTO_VERSION) {
-        LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::ProcessMessage -- peer=%d using obsolete version %i\n", m_wallet->GetDisplayName(), pfrom->GetId(), pfrom->GetSendVersion());
-        connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
-                           strprintf("Version must be %d or greater", MIN_COINJOIN_PEER_PROTO_VERSION)));
+        LogPrintf("%s CCoinJoinClientManager::ProcessMessage -- peer=%d using obsolete version %i\n", m_wallet->GetDisplayName(), pfrom->GetId(), pfrom->GetSendVersion());
         return;
     }
 
@@ -114,7 +112,7 @@ void CCoinJoinClientManager::ProcessMessage(CNode* pfrom, const std::string& str
         masternode_info_t infoMn;
         if (!mnodeman.GetMasternodeInfo(queue.masternodeOutpoint, infoMn) || !queue.CheckSignature(infoMn.pubKeyMasternode)) {
             // we probably have outdated info
-            mnodeman.AskForMN(pfrom, queue.masternodeOutpoint, connman);
+            m_wallet->chain().askForMN(pfrom, queue.masternodeOutpoint);
             LogPrintf("%s CJQUEUE -- Masternode for CoinJoin queue (%s) not found, requesting.\n", m_wallet->GetDisplayName(), queue.ToString());
             return;
         }
@@ -147,7 +145,7 @@ void CCoinJoinClientManager::ProcessMessage(CNode* pfrom, const std::string& str
         {
             LOCK(cs_vecqueue);
             vecCoinJoinQueue.emplace_back(queue);
-            queue.Relay(connman);
+            queue.Relay(g_connman.get());
             LogPrint(BCLog::CJOIN, "%s CJQUEUE -- %s CoinJoin queue (%s) from masternode %s, vecCoinJoinQueue size: %d from %s\n",
                      m_wallet->GetDisplayName(), queue.status == STATUS_CLOSED ? strprintf("closed") : strprintf("new"), queue.ToString(),
                      infoMn.addr.ToString(), GetQueueSize(), pfrom->addr.ToStringIPPort());
@@ -181,12 +179,12 @@ void CCoinJoinClientManager::ProcessMessage(CNode* pfrom, const std::string& str
         strCommand == NetMsgType::CJCOMPLETE) {
         LOCK(cs_deqsessions);
         for (auto& session : deqSessions) {
-            session.ProcessMessage(pfrom, strCommand, vRecv, connman);
+            session.ProcessMessage(pfrom, strCommand, vRecv);
         }
     }
 }
 
-void CCoinJoinClientSession::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
+void CCoinJoinClientSession::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv)
 {
     if (fLiteMode) return; // ignore all CoinJoin related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;
@@ -236,7 +234,7 @@ void CCoinJoinClientSession::ProcessMessage(CNode* pfrom, const std::string& str
 
         if (!psbtxFinal.CheckSignature(infoMixingMasternode.pubKeyMasternode)) {
             // we probably have outdated info
-            mnodeman.AskForMN(pfrom, psbtxFinal.masternodeOutpoint, connman);
+            m_wallet_session->chain().askForMN(pfrom, psbtxFinal.masternodeOutpoint);
             return;
         }
 

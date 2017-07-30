@@ -152,7 +152,7 @@ protected:
      * has been received and connected to the headers tree, though not validated yet
      */
     virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {}
-    virtual void ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv, CConnman* connman) {}
+    virtual void ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv) {}
 
     virtual void NotifyGovernanceVote(const CGovernanceVote &vote) {}
     virtual void NotifyGovernanceObject(const CGovernanceObject &object) {}
@@ -198,7 +198,7 @@ public:
     void Broadcast(int64_t nBestBlockTime, CConnman* connman);
     void BlockChecked(const CBlock&, const CValidationState&);
     void NewPoWValidBlock(const CBlockIndex *, const std::shared_ptr<const CBlock>&);
-    void ProcessModuleMessage(CNode*, const NetMsgDest&, const std::string&, CDataStream&, CConnman*);
+    void ProcessModuleMessage(CNode*, const NetMsgDest&, const std::string&, CDataStream&);
     void NotifyGovernanceVote(const CGovernanceVote&);
     void NotifyGovernanceObject(const CGovernanceObject&);
 };

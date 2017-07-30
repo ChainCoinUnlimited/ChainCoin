@@ -16,8 +16,7 @@
 /** Testing setup and teardown for wallet.
  */
 struct WalletTestingSetup: public TestingSetup {
-    WalletTestingSetup(const std::string& chainName = CBaseChainParams::MAIN);
-    ~WalletTestingSetup();
+    explicit WalletTestingSetup(const std::string& chainName = CBaseChainParams::MAIN);
 
     std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
     CWallet m_wallet;
