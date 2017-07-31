@@ -9,6 +9,7 @@
 #include <optional.h>
 #include <optional.h>               // For Optional and nullopt
 #include <policy/rbf.h>             // For RBFTransactionState
+#include <primitives/transaction.h> // For CTransactionRef
 
 #include <memory>
 #include <stddef.h>
@@ -20,7 +21,7 @@ class CKey;
 class CNode;
 class CBlock;
 class CScheduler;
-class CTransaction;
+class CValidationState;
 class uint256;
 struct CBlockLocator;
 struct FeeCalculation;
@@ -116,6 +117,10 @@ public:
 
         //! Check if transaction will be final given chain height current time.
         virtual bool checkFinalTx(const CTransaction& tx) = 0;
+
+        //! Add transaction to memory pool if the transaction fee is below the
+        //! amount specified by absurd_fee (as a safeguard). */
+        virtual bool submitToMemoryPool(CTransactionRef tx, CAmount absurd_fee, CValidationState& state) = 0;
     };
 
     //! Return Lock interface. Chain is locked when this is called, and
@@ -165,6 +170,12 @@ public:
 
     //! Pool min fee.
     virtual CFeeRate mempoolMinFee() = 0;
+
+    //! Get node max tx fee setting (-maxtxfee).
+    //! This could be replaced by a per-wallet max fee, as proposed at
+    //! https://github.com/bitcoin/bitcoin/issues/15355
+    //! But for the time being, wallets call this to access the node setting.
+    virtual CAmount maxTxFee() = 0;
 
     //! Check if pruning is enabled.
     virtual bool getPruneMode() = 0;
