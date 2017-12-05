@@ -145,8 +145,6 @@ public:
     bool bumpFee(uint256 hash, uint256& new_hash);
 
     static bool isWalletEnabled();
-    bool privateKeysDisabled() const;
-    bool canGetAddresses() const;
 
     void disableAutoBackup() { m_wallet->disableAutoBackup(); }
     void setNumBlocks(const int& nCache) { m_wallet->setNumBlocks(nCache); }
