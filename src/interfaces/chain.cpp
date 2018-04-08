@@ -7,6 +7,7 @@
 #include <chain.h>
 #include <chainparams.h>
 #include <modules/coinjoin/coinjoin_analyzer.h>
+#include <interfaces/wallet.h>
 #include <net.h>
 #include <policy/fees.h>
 #include <policy/policy.h>
@@ -252,6 +253,7 @@ public:
     void initMessage(const std::string& message) override { ::uiInterface.InitMessage(message); }
     void initWarning(const std::string& message) override { InitWarning(message); }
     void initError(const std::string& message) override { InitError(message); }
+    void loadWallet(std::unique_ptr<Wallet> wallet) override { ::uiInterface.LoadWallet(wallet); }
     void requestMempoolTransactions(std::function<void(const CTransactionRef&)> fn) override
     {
         LOCK2(::cs_main, ::mempool.cs);
