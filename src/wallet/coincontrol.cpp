@@ -13,6 +13,7 @@ void CCoinControl::SetNull()
     fAllowOtherInputs = false;
     fAllowWatchOnly = false;
     m_avoid_partial_spends = gArgs.GetBoolArg("-avoidpartialspends", DEFAULT_AVOIDPARTIALSPENDS);
+    m_avoid_address_reuse = false;
     setSelected.clear();
     fUseCoinJoin = true;
     m_feerate.reset();
