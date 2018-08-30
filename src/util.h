@@ -130,7 +130,6 @@ namespace BCLog {
         MNODE       = (1 << 21),
         MNODESYNC   = (1 << 22),
         MNODEPAY    = (1 << 23),
-        KEEPASS     = (1 << 24),
         GOV         = (1 << 25),
         PRIVSEND    = (1 << 26),
         ALL         = ~(uint32_t)0,
