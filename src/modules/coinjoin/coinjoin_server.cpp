@@ -30,8 +30,6 @@ void CCoinJoinServer::ProcessModuleMessage(CNode* pfrom, const std::string& strC
 
     if (pfrom->GetSendVersion() < MIN_COINJOIN_PEER_PROTO_VERSION) {
         LogPrint(BCLog::CJOIN, "CCoinJoinServer::ProcessModuleMessage -- peer=%d using obsolete version %i\n", pfrom->GetId(), pfrom->GetSendVersion());
-        connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
-                           strprintf("Version must be %d or greater", MIN_COINJOIN_PEER_PROTO_VERSION)));
         return;
     }
 

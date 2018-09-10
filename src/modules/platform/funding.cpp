@@ -96,8 +96,6 @@ void CGovernanceManager::ProcessModuleMessage(CNode* pfrom, const std::string& s
     {
         if(pfrom->GetSendVersion() < MIN_GOVERNANCE_PEER_PROTO_VERSION) {
             LogPrint(BCLog::GOV, "MNGOVERNANCESYNC -- peer=%d using obsolete version %i\n", pfrom->GetId(), pfrom->GetSendVersion());
-            connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
-                               strprintf("Version must be %d or greater", MIN_GOVERNANCE_PEER_PROTO_VERSION)));
             return;
         }
 
@@ -133,8 +131,6 @@ void CGovernanceManager::ProcessModuleMessage(CNode* pfrom, const std::string& s
 
         if(pfrom->GetSendVersion() < MIN_GOVERNANCE_PEER_PROTO_VERSION) {
             LogPrint(BCLog::GOV, "MNGOVERNANCEOBJECT -- peer=%d using obsolete version %i\n", pfrom->GetId(), pfrom->GetSendVersion());
-            connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
-                               strprintf("Version must be %d or greater", MIN_GOVERNANCE_PEER_PROTO_VERSION)));
             return;
         }
 
@@ -211,8 +207,6 @@ void CGovernanceManager::ProcessModuleMessage(CNode* pfrom, const std::string& s
 
         if(pfrom->GetSendVersion() < MIN_GOVERNANCE_PEER_PROTO_VERSION) {
             LogPrint(BCLog::GOV, "MNGOVERNANCEOBJECTVOTE -- peer=%d using obsolete version %i\n", pfrom->GetId(), pfrom->GetSendVersion());
-            connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
-                               strprintf("Version must be %d or greater", MIN_GOVERNANCE_PEER_PROTO_VERSION)));
         }
 
         // Ignore such messages until masternode list is synced
