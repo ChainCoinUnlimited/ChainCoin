@@ -247,8 +247,9 @@ void SendCoinsDialog::on_sendButton_clicked()
                 recipients.append(entry->getValue());
                 recipients[i].fCoinJoin = (ui->spinCoinJoinLevel->value() > 0);
             }
-            else
+            else if (valid)
             {
+                ui->scrollArea->ensureWidgetVisible(entry);
                 valid = false;
             }
         }
