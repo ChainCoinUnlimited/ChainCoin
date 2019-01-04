@@ -102,10 +102,14 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                 if(CCoinJoin::IsDenominatedAmount(txout.nValue)) fCoinJoin = true;
             }
 
-            CAmount nChange = wtx.change;
+            std::string address;
+            for (auto it = wtx.txout_address.begin(); it != wtx.txout_address.end(); ++it) {
+                if (it != wtx.txout_address.begin()) address += ", ";
+                address += EncodeDestination(*it);
+            }
 
-            parts.append(TransactionRecord(hash, nTime, fCoinJoin ? TransactionRecord::CoinJoinCreateDenominations : TransactionRecord::SendToSelf, "",
-                            -(nDebit - nChange), nCredit - nChange));
+            CAmount nChange = wtx.change;
+            parts.append(TransactionRecord(hash, nTime, fCoinJoin ? TransactionRecord::CoinJoinCreateDenominations : TransactionRecord::SendToSelf, address, -(nDebit - nChange), nCredit - nChange));
             parts.last().involvesWatchAddress = involvesWatchAddress;   // maybe pass to TransactionRecord as constructor argument
         }
 
