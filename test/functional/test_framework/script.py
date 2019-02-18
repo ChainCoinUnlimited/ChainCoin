@@ -9,7 +9,6 @@ This file is modified from python-bitcoinlib.
 
 from .messages import CTransaction, CTxOut, sha256, hash256, uint256_from_str, ser_uint256, ser_string
 
-from binascii import hexlify
 import hashlib
 import struct
 
@@ -436,7 +435,7 @@ class CScript(bytes):
 
     # Python 3.4 compatibility
     def hex(self):
-        return hexlify(self).decode('ascii')
+        return self.hex()
 
     def __new__(cls, value=b''):
         if isinstance(value, bytes) or isinstance(value, bytearray):
@@ -529,7 +528,7 @@ class CScript(bytes):
     def __repr__(self):
         def _repr(o):
             if isinstance(o, bytes):
-                return "x('%s')" % hexlify(o).decode('ascii')
+                return "x('%s')" % o.hex()
             else:
                 return repr(o)
 
