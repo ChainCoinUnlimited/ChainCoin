@@ -117,7 +117,7 @@ class AcceptBlockTest(BitcoinTestFramework):
             if x['hash'] == block_h1f.hash:
                 assert_equal(x['status'], "headers-only")
                 tip_entry_found = True
-        assert(tip_entry_found)
+        assert tip_entry_found
         assert_raises_rpc_error(-1, "Block not found on disk", self.nodes[0].getblock, block_h1f.hash)
 
         # 4. Send another two block that build on the fork.
@@ -134,7 +134,7 @@ class AcceptBlockTest(BitcoinTestFramework):
             if x['hash'] == block_h2f.hash:
                 assert_equal(x['status'], "headers-only")
                 tip_entry_found = True
-        assert(tip_entry_found)
+        assert tip_entry_found
 
         # But this block should be accepted by node since it has equal work.
         self.nodes[0].getblock(block_h2f.hash)
@@ -153,7 +153,7 @@ class AcceptBlockTest(BitcoinTestFramework):
             if x['hash'] == block_h3.hash:
                 assert_equal(x['status'], "headers-only")
                 tip_entry_found = True
-        assert(tip_entry_found)
+        assert tip_entry_found
         self.nodes[0].getblock(block_h3.hash)
 
         # But this block should be accepted by node since it has more work.
@@ -266,7 +266,7 @@ class AcceptBlockTest(BitcoinTestFramework):
             if x['hash'] == block_292.hash:
                 assert_equal(x['status'], "headers-only")
                 tip_entry_found = True
-        assert(tip_entry_found)
+        assert tip_entry_found
         assert_raises_rpc_error(-1, "Block not found on disk", self.nodes[0].getblock, block_292.hash)
 
         test_node.send_message(msg_block(block_289f))
