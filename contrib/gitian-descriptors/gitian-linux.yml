@@ -1,5 +1,5 @@
 ---
-name: "chaincoin-linux-0.18"
+name: "chaincoin-linux-0.19"
 enable_cache: true
 suites:
 - "bionic"
