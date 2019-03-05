@@ -245,6 +245,7 @@ BITCOIN_CORE_H = \
   util/memory.h \
   util/moneystr.h \
   util/rbf.h \
+  util/settings.h \
   util/string.h \
   util/threadnames.h \
   util/time.h \
@@ -590,6 +591,7 @@ libchaincoin_util_a_SOURCES = \
   util/system.cpp \
   util/moneystr.cpp \
   util/rbf.cpp \
+  util/settings.cpp \
   util/threadnames.cpp \
   util/spanparsing.cpp \
   util/strencodings.cpp \
