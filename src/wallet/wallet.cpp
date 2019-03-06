@@ -3088,7 +3088,7 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
         LOCK(cs_wallet);
         {
             std::vector<COutput> vAvailableCoins;
-            AvailableCoins(*locked_chain, vAvailableCoins, true, &coin_control, nCoinType);
+            AvailableCoins(*locked_chain, vAvailableCoins, true, &coin_control, nCoinType, 1, MAX_MONEY, MAX_MONEY, 0, coin_control.m_min_depth);
             CoinSelectionParams coin_selection_params; // Parameters for coin selection, init with dummy
             if (nCoinJoin > 0)
                 coin_selection_params.use_private = true;
