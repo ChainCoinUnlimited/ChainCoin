@@ -511,8 +511,8 @@ libchaincoin_common_a_SOURCES = \
   netaddress.cpp \
   netbase.cpp \
   policy/feerate.cpp \
-  psbt.cpp \
   protocol.cpp \
+  psbt.cpp \
   scheduler.cpp \
   script/descriptor.cpp \
   script/ismine.cpp \
