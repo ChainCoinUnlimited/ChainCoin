@@ -132,7 +132,12 @@ pushd "$TARGET" || exit 1
         echo "Using cached $tag"
       else
         mkdir "$tag"
-        URL="https://chaincoin.org/bin/chaincoin-${tag:1}/chaincoin-${tag:1}-$PLATFORM.tar.gz"
+        if [[ "$tag" =~ v(.*)(rc[0-9]+)$ ]]; then
+            BIN_PATH="bin/chaincoin-${BASH_REMATCH[1]}/test.${BASH_REMATCH[2]}"
+        else
+            BIN_PATH="bin/chaincoin-${tag:1}"
+        fi
+        URL="https://chaincoin.org/$BIN_PATH/chaincoin-${tag:1}-$PLATFORM.tar.gz"
         echo "Fetching: $URL"
         curl -O $URL
         tar -zxf "chaincoin-${tag:1}-$PLATFORM.tar.gz" -C "$tag" --strip-components=1 "chaincoin-${tag:1}"
