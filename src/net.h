@@ -784,7 +784,7 @@ public:
         int64_t nextSendTimeFeeFilter{0};
     };
 
-    TxRelay m_tx_relay;
+    std::unique_ptr<TxRelay> m_tx_relay;
     // Used for headers announcements - unfiltered blocks to relay
     std::vector<uint256> vBlockHashesToAnnounce GUARDED_BY(cs_inventory);
 
@@ -900,26 +900,26 @@ public:
     void AddInventoryKnown(const CInv& inv)
     {
         {
-            LOCK(m_tx_relay.cs_tx_inventory);
-            m_tx_relay.filterInventoryKnown.insert(inv.hash);
+            LOCK(m_tx_relay->cs_tx_inventory);
+            m_tx_relay->filterInventoryKnown.insert(inv.hash);
         }
     }
 
     void PushInventory(const CInv& inv)
     {
         if (inv.type == MSG_TX) {
-            LOCK(m_tx_relay.cs_tx_inventory);
-            if (!m_tx_relay.filterInventoryKnown.contains(inv.hash)) {
+            LOCK(m_tx_relay->cs_tx_inventory);
+            if (!m_tx_relay->filterInventoryKnown.contains(inv.hash)) {
                 LogPrint(BCLog::NET, "PushInventory --  tx: %s peer=%d\n", inv.ToString(), id);
-                m_tx_relay.setInventoryTxToSend.insert(inv.hash);
+                m_tx_relay->setInventoryTxToSend.insert(inv.hash);
             }
         } else if (inv.type == MSG_BLOCK) {
             LOCK(cs_inventory);
             LogPrint(BCLog::NET, "PushInventory --  block: %s peer=%d\n", inv.ToString(), id);
             vInventoryBlockToSend.push_back(inv.hash);
         } else {
-            LOCK(m_tx_relay.cs_tx_inventory);
-            if (!m_tx_relay.filterInventoryKnown.contains(inv.hash)) {
+            LOCK(m_tx_relay->cs_tx_inventory);
+            if (!m_tx_relay->filterInventoryKnown.contains(inv.hash)) {
                 LOCK(cs_inventory);
                 LogPrint(BCLog::NET, "PushInventory --  inv: %s peer=%d\n", inv.ToString(), id);
                 vInventoryOtherToSend.push_back(inv);
