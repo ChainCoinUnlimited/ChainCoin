@@ -899,7 +899,7 @@ public:
 
     void AddInventoryKnown(const CInv& inv)
     {
-        {
+        if (m_tx_relay != nullptr) {
             LOCK(m_tx_relay->cs_tx_inventory);
             m_tx_relay->filterInventoryKnown.insert(inv.hash);
         }
@@ -907,7 +907,7 @@ public:
 
     void PushInventory(const CInv& inv)
     {
-        if (inv.type == MSG_TX) {
+        if (inv.type == MSG_TX && m_tx_relay != nullptr) {
             LOCK(m_tx_relay->cs_tx_inventory);
             if (!m_tx_relay->filterInventoryKnown.contains(inv.hash)) {
                 LogPrint(BCLog::NET, "PushInventory --  tx: %s peer=%d\n", inv.ToString(), id);
