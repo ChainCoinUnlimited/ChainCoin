@@ -400,6 +400,8 @@ crypto_libchaincoin_crypto_base_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 crypto_libchaincoin_crypto_base_a_SOURCES = \
   crypto/aes.cpp \
   crypto/aes.h \
+  crypto/chacha_poly_aead.h \
+  crypto/chacha_poly_aead.cpp \
   crypto/chacha20.h \
   crypto/chacha20.cpp \
   crypto/common.h \
@@ -691,7 +693,7 @@ chaincoin_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHRE
 # chaincoinconsensus library #
 if BUILD_BITCOIN_LIBS
 include_HEADERS = script/chaincoinconsensus.h
-libchaincoinconsensus_la_SOURCES = $(crypto_libchaincoin_crypto_base_a_SOURCES) $(crypto_libchaincoin_crypto_c11_a_SOURCES) $(libchaincoin_consensus_a_SOURCES)
+libchaincoinconsensus_la_SOURCES = support/cleanse.cpp $(crypto_libchaincoin_crypto_base_a_SOURCES) $(crypto_libchaincoin_crypto_c11_a_SOURCES) $(libchaincoin_consensus_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
   libchaincoinconsensus_la_SOURCES += compat/glibc_compat.cpp
