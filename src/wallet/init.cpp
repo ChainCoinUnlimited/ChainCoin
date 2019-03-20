@@ -229,9 +229,10 @@ void StartWallets(CScheduler& scheduler)
         pwallet->postInitProcess();
     }
 
-    // Run a thread to flush wallet periodically
+    // Schedule periodic wallet flushes and tx rebroadcasts
     scheduler.scheduleEvery(MaybeCompactWalletDB, 500);
     scheduler.scheduleEvery(coinJoinClientTask, 1000);
+    scheduler.scheduleEvery(MaybeResendWalletTxs, 1000);
 }
 
 void FlushWallets()
