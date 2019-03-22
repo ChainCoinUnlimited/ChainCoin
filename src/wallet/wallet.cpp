@@ -1298,7 +1298,6 @@ void CWallet::UpdatedBlockTip()
 
 
 void CWallet::BlockUntilSyncedToCurrentChain() {
-    AssertLockNotHeld(cs_main);
     AssertLockNotHeld(cs_wallet);
 
     {
