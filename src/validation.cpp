@@ -328,7 +328,7 @@ static void LimitMempoolSize(CTxMemPool& pool, size_t limit, unsigned long age) 
 static bool IsCurrentForFeeEstimation() EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
     AssertLockHeld(cs_main);
-    if (IsInitialBlockDownload())
+    if (::ChainstateActive().IsInitialBlockDownload())
         return false;
     if (::ChainActive().Tip()->GetBlockTime() < (GetTime() - MAX_FEE_ESTIMATION_TIP_AGE))
         return false;
@@ -1053,27 +1053,30 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
     return ret;
 }
 
-bool IsInitialBlockDownload()
+// Note that though this is marked const, we may end up modifying `m_cached_finished_ibd`, which
+// is a performance-related implementation detail. This function must be marked
+// `const` so that `CValidationInterface` clients (which are given a `const CChainState*`)
+// can call it.
+//
+bool CChainState::IsInitialBlockDownload() const
 {
-    // Once this function has returned false, it must remain false.
-    static std::atomic<bool> latchToFalse{false};
     // Optimization: pre-test latch before taking the lock.
-    if (latchToFalse.load(std::memory_order_relaxed))
+    if (m_cached_finished_ibd.load(std::memory_order_relaxed))
         return false;
 
     LOCK(cs_main);
-    if (latchToFalse.load(std::memory_order_relaxed))
+    if (m_cached_finished_ibd.load(std::memory_order_relaxed))
         return false;
     if (fImporting || fReindex)
         return true;
-    if (::ChainActive().Tip() == nullptr)
+    if (m_chain.Tip() == nullptr)
         return true;
-    if (::ChainActive().Tip()->nChainWork < nMinimumChainWork)
+    if (m_chain.Tip()->nChainWork < nMinimumChainWork)
         return true;
-    if (::ChainActive().Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
+    if (m_chain.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
         return true;
     LogPrintf("Leaving InitialBlockDownload (latching to false)\n");
-    latchToFalse.store(true, std::memory_order_relaxed);
+    m_cached_finished_ibd.store(true, std::memory_order_relaxed);
     return false;
 }
 
@@ -1102,7 +1105,7 @@ static void CheckForkWarningConditions() EXCLUSIVE_LOCKS_REQUIRED(cs_main)
     AssertLockHeld(cs_main);
     // Before we get past initial download, we cannot reliably alert about forks
     // (we assume we don't get stuck on a fork before finishing our initial sync)
-    if (IsInitialBlockDownload())
+    if (::ChainstateActive().IsInitialBlockDownload())
         return;
 
     // If our best fork is no longer within 120 blocks (+/- 3 hours if no one mines it)
@@ -2056,7 +2059,7 @@ void static UpdateTip(const CBlockIndex *pindexNew, const CChainParams& chainPar
     }
 
     std::string warningMessages;
-    if (!IsInitialBlockDownload())
+    if (!::ChainstateActive().IsInitialBlockDownload())
     {
         int nUpgraded = 0;
         const CBlockIndex* pindex = pindexNew;
@@ -2447,7 +2450,7 @@ static void NotifyHeaderTip() LOCKS_EXCLUDED(cs_main) {
 
         if (pindexHeader != pindexHeaderOld) {
             fNotify = true;
-            fInitialBlockDownload = IsInitialBlockDownload();
+            fInitialBlockDownload = ::ChainstateActive().IsInitialBlockDownload();
             pindexHeaderOld = pindexHeader;
         }
     }
@@ -3582,7 +3585,7 @@ static void FindFilesToPrune(std::set<int>& setFilesToPrune, uint64_t nPruneAfte
         // To avoid excessive prune events negating the benefit of high dbcache
         // values, we should not prune too rapidly.
         // So when pruning in IBD, increase the buffer a bit to avoid a re-prune too soon.
-        if (IsInitialBlockDownload()) {
+        if (::ChainstateActive().IsInitialBlockDownload()) {
             // Since this is only relevant during IBD, we use a fixed 10%
             nBuffer += nPruneTarget / 10;
         }
