@@ -4762,7 +4762,7 @@ void CWallet::postInitProcess()
     ReacceptWalletTransactions(*locked_chain);
 
     // Update wallet transactions with current mempool transactions.
-    chain().requestMempoolTransactions([this](const CTransactionRef& tx) { TransactionAddedToMempool(tx); });
+    chain().requestMempoolTransactions(*this);
 
     if((gArgs.GetBoolArg("-mnconflock", true)) && (masternodeConfig.getCount() > 0)) {
         WalletLogPrintf("Locking Masternodes:\n");
