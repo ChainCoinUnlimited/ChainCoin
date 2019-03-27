@@ -159,7 +159,7 @@ void CMasternode::Check(bool fForce)
             return;
         }
 
-        nHeight = chainActive.Height();
+        nHeight = ::ChainActive().Height();
     }
 
     if (IsPoSeBanned()) {
@@ -569,7 +569,7 @@ bool CMasternodeBroadcast::CheckOutpoint(int& nDos)
         return false;
     }
 
-    if (chainActive.Height() - nHeight + 1 < Params().GetConsensus().nMasternodeMinimumConfirmations) {
+    if (::ChainActive().Height() - nHeight + 1 < Params().GetConsensus().nMasternodeMinimumConfirmations) {
         LogPrintf("CMasternodeBroadcast::CheckOutpoint -- Masternode UTXO must have at least %d confirmations, masternode=%s\n",
                 Params().GetConsensus().nMasternodeMinimumConfirmations, outpoint.ToStringShort());
         // UTXO is legit but has not enough confirmations.
@@ -583,7 +583,7 @@ bool CMasternodeBroadcast::CheckOutpoint(int& nDos)
     // Verify that sig time is legit, should be at least not earlier than the timestamp of the block
     // at which collateral became nMasternodeMinimumConfirmations blocks deep.
     // NOTE: this is not accurate because block timestamp is NOT guaranteed to be 100% correct one.
-    CBlockIndex* pRequiredConfIndex = chainActive[nHeight + Params().GetConsensus().nMasternodeMinimumConfirmations - 1]; // block where tx got nMasternodeMinimumConfirmations
+    CBlockIndex* pRequiredConfIndex = ::ChainActive()[nHeight + Params().GetConsensus().nMasternodeMinimumConfirmations - 1]; // block where tx got nMasternodeMinimumConfirmations
     if (pRequiredConfIndex->GetBlockTime() > sigTime) {
         LogPrintf("CMasternodeBroadcast::CheckOutpoint -- Bad sigTime %d (%d conf block is at %d) for Masternode %s %s\n",
                   sigTime, Params().GetConsensus().nMasternodeMinimumConfirmations, pRequiredConfIndex->GetBlockTime(), outpoint.ToStringShort(), addr.ToString());
@@ -679,10 +679,10 @@ uint256 CMasternodePing::GetSignatureHash() const
 CMasternodePing::CMasternodePing(const COutPoint& outpoint)
 {
     LOCK(cs_main);
-    if (!chainActive.Tip() || chainActive.Height() < 12) return;
+    if (!::ChainActive().Tip() || ::ChainActive().Height() < 12) return;
 
     masternodeOutpoint = outpoint;
-    blockHash = chainActive[chainActive.Height() - 12]->GetBlockHash();
+    blockHash = ::ChainActive()[::ChainActive().Height() - 12]->GetBlockHash();
     sigTime = GetAdjustedTime();
     nDaemonVersion = CLIENT_VERSION;
 }
@@ -783,7 +783,7 @@ bool CMasternodePing::CheckAndUpdate(CMasternode* pmn, bool fFromNewBroadcast, i
     }
 
     {
-        if (LookupBlockIndex(blockHash) != nullptr && LookupBlockIndex(blockHash)->nHeight < chainActive.Height() - MASTERNODE_MAX_MNP_BLOCKS) {
+        if (LookupBlockIndex(blockHash) != nullptr && LookupBlockIndex(blockHash)->nHeight < ::ChainActive().Height() - MASTERNODE_MAX_MNP_BLOCKS) {
             LogPrintf("CMasternodePing::CheckAndUpdate -- Masternode ping is invalid, block hash is too old: masternode=%s  blockHash=%s\n", masternodeOutpoint.ToStringShort(), blockHash.ToString());
             // nDos = 1;
             return false;

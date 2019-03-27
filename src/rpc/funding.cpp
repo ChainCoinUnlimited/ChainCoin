@@ -845,7 +845,7 @@ static UniValue getfundinginfo(const JSONRPCRequest& request)
     LOCK(cs_main);
 
     int nLastSuperblock = 0, nNextSuperblock = 0;
-    int nBlockHeight = chainActive.Height();
+    int nBlockHeight = ::ChainActive().Height();
 
     CSuperblock::GetNearestSuperblocksHeights(nBlockHeight, nLastSuperblock, nNextSuperblock);
 

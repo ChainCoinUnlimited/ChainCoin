@@ -14,7 +14,7 @@
 void ModuleInterface::InitializeCurrentBlockTip()
 {
     LOCK(cs_main);
-    UpdatedBlockTip(chainActive.Tip(), nullptr, IsInitialBlockDownload());
+    UpdatedBlockTip(::ChainActive().Tip(), nullptr, IsInitialBlockDownload());
 }
 
 void ModuleInterface::ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv)

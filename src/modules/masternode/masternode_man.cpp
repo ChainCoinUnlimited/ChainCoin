@@ -474,10 +474,10 @@ bool CMasternodeMan::Has(const COutPoint& outpoint)
 
 bool CMasternodeMan::HasBlockHash(uint256& hashRet, int nBlockHeight)
 {
-    if (chainActive.Tip() == nullptr) return false;
-    if (nBlockHeight < -1 || nBlockHeight > chainActive.Height()) return false;
-    if (nBlockHeight == -1) nBlockHeight = chainActive.Height();
-    CBlockIndex* pblockindex = chainActive[nBlockHeight];
+    if (::ChainActive().Tip() == nullptr) return false;
+    if (nBlockHeight < -1 || nBlockHeight > ::ChainActive().Height()) return false;
+    if (nBlockHeight == -1) nBlockHeight = ::ChainActive().Height();
+    CBlockIndex* pblockindex = ::ChainActive()[nBlockHeight];
     hashRet = pblockindex->GetBlockHash();
     return true;
 }
@@ -528,7 +528,7 @@ bool CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight, bool f
         if (!pcoinsTip->GetCoin(mnpair.first, coin)) continue;
 
         //make sure it has at least as many confirmations as there are masternodes
-        if ((chainActive.Height() - coin.nHeight + 1) < nMnCount) continue;
+        if ((::ChainActive().Height() - coin.nHeight + 1) < nMnCount) continue;
 
         vecMasternodeLastPaid.push_back(std::make_pair(mnpair.second.GetLastPaidBlock(), &mnpair.second));
     }
