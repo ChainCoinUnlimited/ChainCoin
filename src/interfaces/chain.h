@@ -265,8 +265,9 @@ public:
         virtual void TransactionRemovedFromMempool(const CTransactionRef& ptx) {}
         virtual void BlockConnected(const CBlock& block, const std::vector<CTransactionRef>& tx_conflicted) {}
         virtual void BlockDisconnected(const CBlock& block) {}
+        virtual void UpdatedBlockTip() {}
         virtual void ChainStateFlushed(const CBlockLocator& locator) {}
-        virtual void ResendWalletTransactions(Lock& locked_chain, int64_t best_block_time) {}
+        virtual void ResendWalletTransactions(Lock& locked_chain) {}
         virtual void ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv) {}
     };
 
