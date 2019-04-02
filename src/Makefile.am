@@ -271,7 +271,6 @@ libchaincoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libchaincoin_server_a_SOURCES = \
   addrman.cpp \
   banman.cpp \
-  bloom.cpp \
   blockencodings.cpp \
   blockfilter.cpp \
   chain.cpp \
@@ -284,12 +283,10 @@ libchaincoin_server_a_SOURCES = \
   index/base.cpp \
   index/txindex.cpp \
   interfaces/chain.cpp \
-  interfaces/handler.cpp \
   interfaces/modules.cpp \
   interfaces/node.cpp \
   init.cpp \
   dbwrapper.cpp \
-  merkleblock.cpp \
   messagesigner.cpp \
   miner.cpp \
   modules/coinjoin/coinjoin.cpp \
@@ -313,7 +310,6 @@ libchaincoin_server_a_SOURCES = \
   node/coin.cpp \
   node/transaction.cpp \
   noui.cpp \
-  outputtype.cpp \
   policy/fees.cpp \
   policy/rbf.cpp \
   policy/settings.cpp \
@@ -502,6 +498,7 @@ libchaincoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libchaincoin_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
+  bloom.cpp \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \
@@ -510,8 +507,10 @@ libchaincoin_common_a_SOURCES = \
   key.cpp \
   key_io.cpp \
   keystore.cpp \
+  merkleblock.cpp \
   netaddress.cpp \
   netbase.cpp \
+  outputtype.cpp \
   policy/feerate.cpp \
   policy/policy.cpp \
   protocol.cpp \
@@ -540,6 +539,7 @@ libchaincoin_util_a_SOURCES = \
   compat/glibcxx_sanity.cpp \
   compat/strnlen.cpp \
   fs.cpp \
+  interfaces/handler.cpp \
   logging.cpp \
   random.cpp \
   rpc/protocol.cpp \
