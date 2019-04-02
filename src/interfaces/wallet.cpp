@@ -30,6 +30,7 @@
 #include <wallet/fees.h>
 #include <wallet/coinjoin_client.h>
 #include <wallet/rpcwallet.h>
+#include <wallet/load.h>
 #include <wallet/wallet.h>
 #include <wallet/walletutil.h>
 
