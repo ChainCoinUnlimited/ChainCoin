@@ -190,6 +190,7 @@ BITCOIN_CORE_H = \
   policy/fees.h \
   policy/policy.h \
   policy/rbf.h \
+  policy/settings.h \
   pow.h \
   protocol.h \
   psbt.h \
@@ -314,8 +315,8 @@ libchaincoin_server_a_SOURCES = \
   noui.cpp \
   outputtype.cpp \
   policy/fees.cpp \
-  policy/policy.cpp \
   policy/rbf.cpp \
+  policy/settings.cpp \
   pow.cpp \
   rest.cpp \
   rpc/blockchain.cpp \
@@ -513,6 +514,7 @@ libchaincoin_common_a_SOURCES = \
   netaddress.cpp \
   netbase.cpp \
   policy/feerate.cpp \
+  policy/policy.cpp \
   protocol.cpp \
   psbt.cpp \
   scheduler.cpp \
