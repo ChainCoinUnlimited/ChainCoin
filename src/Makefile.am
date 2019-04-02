@@ -272,6 +272,9 @@ obj/build.h: FORCE
 libchaincoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
 # server: shared between chaincoind and chaincoin-qt
+# Contains code accessing mempool and chain state that is meant to be separated
+# from wallet and gui code (see node/README.md). Shared code should go in
+# libchaincoin_common or libchaincoin_util libraries, instead.
 libchaincoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libchaincoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libchaincoin_server_a_SOURCES = \
