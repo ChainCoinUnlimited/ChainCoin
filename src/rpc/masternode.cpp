@@ -15,6 +15,7 @@
 #include <modules/masternode/masternode_man.h>
 #include <modules/coinjoin/coinjoin_server.h>
 #include <rpc/server.h>
+#include <rpc/util.h>
 #include <util/system.h>
 #include <util/moneystr.h>
 

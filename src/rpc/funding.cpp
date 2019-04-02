@@ -17,6 +17,7 @@
 #include <modules/masternode/masternode_man.h>
 #include <messagesigner.h>
 #include <rpc/server.h>
+#include <rpc/util.h>
 #include <util/system.h>
 #include <util/strencodings.h>
 #include <util/moneystr.h>

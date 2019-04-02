@@ -9,7 +9,6 @@
 #include <chain.h>
 #include <consensus/validation.h>
 #include <core_io.h>
-#include <httpserver.h>
 #include <init.h>
 #include <interfaces/chain.h>
 #include <validation.h>
@@ -31,9 +30,12 @@
 #include <shutdown.h>
 #include <timedata.h>
 #include <util/bip32.h>
+#include <util/fees.h>
 #include <util/system.h>
 #include <util/moneystr.h>
+#include <util/validation.h>
 #include <validation.h>
+#include <util/url.h>
 #include <wallet/coincontrol.h>
 #include <wallet/feebumper.h>
 #include <wallet/psbtwallet.h>

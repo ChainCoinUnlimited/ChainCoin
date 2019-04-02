@@ -28,6 +28,7 @@
 #include <util/system.h>
 #include <util/moneystr.h>
 #include <util/strencodings.h>
+#include <util/validation.h>
 
 #include <modules/platform/funding.h>
 #include <modules/masternode/masternode_payments.h>
