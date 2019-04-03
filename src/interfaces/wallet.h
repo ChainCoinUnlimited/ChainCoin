@@ -144,10 +144,9 @@ public:
         int nCoinJoin) = 0;
 
     //! Commit transaction.
-    virtual bool commitTransaction(CTransactionRef tx,
+    virtual void commitTransaction(CTransactionRef tx,
         WalletValueMap value_map,
         WalletOrderForm order_form,
-        std::string& reject_reason,
         int nCoinJoin) = 0;
 
     //! Return whether transaction can be abandoned.
