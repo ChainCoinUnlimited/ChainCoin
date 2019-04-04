@@ -19,7 +19,6 @@ struct CBlockLocator;
 
 class CConnman;
 class CDataStream;
-class CReserveScript;
 class CValidationInterface;
 class CValidationState;
 class CGovernanceVote;
