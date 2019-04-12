@@ -124,3 +124,6 @@ chaincoin-wallet
 Chaincoin.cflags
 Chaincoin.creator.user.4.8-pre1
 Chaincoin.cxxflags
+
+# clang-check
+*.plist
