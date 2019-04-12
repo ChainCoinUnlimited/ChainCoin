@@ -65,6 +65,7 @@ src/qt/chaincoin-qt.includes
 *.a
 *.pb.cc
 *.pb.h
+*.dat
 
 *.log
 *.trs
