@@ -68,16 +68,18 @@ static constexpr int STALE_RELAY_AGE_LIMIT = 30 * 24 * 60 * 60;
 /// Age after which a block is considered historical for purposes of rate
 /// limiting block relay. Set to one week, denominated in seconds.
 static constexpr int HISTORICAL_BLOCK_AGE = 7 * 24 * 60 * 60;
-/** Maximum number of in-flight inventory items from a peer */
+/** Maximum number of in-flight transactions from a peer */
 static constexpr int32_t MAX_PEER_INV_IN_FLIGHT = 100;
-/** Maximum number of announced inventory items from a peer */
+/** Maximum number of announced transactions from a peer */
 static constexpr int32_t MAX_PEER_INV_ANNOUNCEMENTS = 2 * MAX_INV_SZ;
-/** How many microseconds to delay requesting inventory items from inbound peers */
-static constexpr int64_t INBOUND_PEER_INV_DELAY = 2 * 1000000;
-/** How long to wait (in microseconds) before downloading a inventory item from an additional peer */
-static constexpr int64_t GETDATA_INV_INTERVAL = 60 * 1000000;
-/** Maximum delay (in microseconds) for inventory item requests to avoid biasing some peers over others. */
-static constexpr int64_t MAX_GETDATA_RANDOM_DELAY = 2 * 1000000;
+/** How many microseconds to delay requesting transactions from inbound peers */
+static constexpr int64_t INBOUND_PEER_INV_DELAY = 2 * 1000000; // 2 seconds
+/** How long to wait (in microseconds) before downloading a transaction from an additional peer */
+static constexpr int64_t GETDATA_INV_INTERVAL = 60 * 1000000; // 1 minute
+/** Maximum delay (in microseconds) for transaction requests to avoid biasing some peers over others. */
+static constexpr int64_t MAX_GETDATA_RANDOM_DELAY = 2 * 1000000; // 2 seconds
+/** How long to wait (in microseconds) before expiring an in-flight getdata request to a peer */
+static constexpr int64_t INV_EXPIRY_INTERVAL = 10 * GETDATA_INV_INTERVAL;
 static_assert(INBOUND_PEER_INV_DELAY >= MAX_GETDATA_RANDOM_DELAY,
 "To preserve security, MAX_GETDATA_RANDOM_DELAY should not exceed INBOUND_PEER_DELAY");
 /** Limit to avoid sending big packets. Not used in processing incoming GETDATA for compatibility */
@@ -346,8 +348,11 @@ struct CNodeState {
         //! Store all the inventory items a peer has recently announced
         std::set<uint256> m_inv_announced;
 
-        //! Store transactions which were requested by us
-        std::set<uint256> m_inv_in_flight;
+        //! Store transactions which were requested by us, with timestamp
+        std::map<uint256, int64_t> m_inv_in_flight;
+
+        //! Periodically check for stuck getdata requests
+        int64_t m_check_expiry_timer{0};
     };
 
     InvDownloadState m_inv_download;
@@ -3415,19 +3420,19 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         CNodeState *state = State(pfrom->GetId());
         std::vector<CInv> vInv;
         vRecv >> vInv;
-        if (vInv.size() <= MAX_PEER_TX_IN_FLIGHT + MAX_BLOCKS_IN_TRANSIT_PER_PEER) {
+        if (vInv.size() <= MAX_PEER_INV_IN_FLIGHT + MAX_BLOCKS_IN_TRANSIT_PER_PEER) {
             for (CInv &inv : vInv) {
                 if (inv.type == MSG_TX || inv.type == MSG_WITNESS_TX) {
                     // If we receive a NOTFOUND message for a txid we requested, erase
                     // it from our data structures for this peer.
-                    auto in_flight_it = state->m_tx_download.m_tx_in_flight.find(inv.hash);
-                    if (in_flight_it == state->m_tx_download.m_tx_in_flight.end()) {
+                    auto in_flight_it = state->m_inv_download.m_inv_in_flight.find(inv.hash);
+                    if (in_flight_it == state->m_inv_download.m_inv_in_flight.end()) {
                         // Skip any further work if this is a spurious NOTFOUND
                         // message.
                         continue;
                     }
-                    state->m_tx_download.m_tx_in_flight.erase(in_flight_it);
-                    state->m_tx_download.m_tx_announced.erase(inv.hash);
+                    state->m_inv_download.m_inv_in_flight.erase(in_flight_it);
+                    state->m_inv_download.m_inv_announced.erase(inv.hash);
                 }
             }
         }
@@ -4251,9 +4256,31 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
         //
         // Message: getdata (non-blocks)
         //
+
+        // For robustness, expire old requests after a long timeout, so that
+        // we can resume downloading inventory from a peer even if they
+        // were unresponsive in the past.
+        // Eventually we should consider disconnecting peers, but this is
+        // conservative.
+        if (state.m_inv_download.m_check_expiry_timer <= nNow) {
+            for (auto it=state.m_inv_download.m_inv_in_flight.begin(); it != state.m_inv_download.m_inv_in_flight.end();) {
+                if (it->second <= nNow - INV_EXPIRY_INTERVAL) {
+                    LogPrint(BCLog::NET, "timeout of inflight tx %s from peer=%d\n", it->first.ToString(), pto->GetId());
+                    state.m_inv_download.m_inv_announced.erase(it->first);
+                    state.m_inv_download.m_inv_in_flight.erase(it++);
+                } else {
+                    ++it;
+                }
+            }
+            // On average, we do this check every TX_EXPIRY_INTERVAL. Randomize
+            // so that we're not doing this for all peers at the same time.
+            state.m_inv_download.m_check_expiry_timer = nNow + INV_EXPIRY_INTERVAL/2 + GetRand(INV_EXPIRY_INTERVAL);
+        }
+
         auto& inv_process_time = state.m_inv_download.m_inv_process_time;
         while (!inv_process_time.empty() && inv_process_time.begin()->first <= nNow && state.m_inv_download.m_inv_in_flight.size() < MAX_PEER_INV_IN_FLIGHT) {
-            const CInv& inv = inv_process_time.begin()->second;
+            const CInv& _inv = inv_process_time.begin()->second;
+            const CInv& inv = _inv.type == MSG_TX ? CInv(MSG_TX | GetFetchFlags(pto), _inv.hash) : _inv;
             if (!AlreadyHave(inv)) {
                 // If this inventory was last requested more than 1 minute ago,
                 // then request.
@@ -4266,7 +4293,7 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
                         vGetData.clear();
                     }
                     UpdateInvRequestTime(inv.hash, nNow);
-                    state.m_inv_download.m_inv_in_flight.insert(inv.hash);
+                    state.m_inv_download.m_inv_in_flight.emplace(inv.hash, nNow);
                 } else {
                     // This inventory is in flight from someone else; queue
                     // up processing to happen after the download times out
