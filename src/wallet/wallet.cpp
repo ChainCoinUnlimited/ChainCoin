@@ -1,14 +1,12 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2018 The Bitcoin Core developers
-// Copyright (c) 2014-2017 The Dash Core developers
-// Copyright (c) 2018 PM-Tech
+// Copyright (c) 2009-2019 The Bitcoin Core developers
+// Copyright (c) 2018-2019 PM-Tech
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <wallet/wallet.h>
 
 #include <chain.h>
-#include <checkpoints.h>
 #include <consensus/consensus.h>
 #include <consensus/validation.h>
 #include <fs.h>
