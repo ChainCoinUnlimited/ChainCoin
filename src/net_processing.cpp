@@ -710,6 +710,24 @@ void UpdateInvRequestTime(const uint256& hash, int64_t request_time) EXCLUSIVE_L
     }
 }
 
+int64_t CalculateInvGetDataTime(const uint256& hash, int64_t current_time, bool use_inbound_delay) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+{
+    int64_t process_time;
+    int64_t last_request_time = GetInvRequestTime(hash);
+    // First time requesting this tx
+    if (last_request_time == 0) {
+        process_time = current_time;
+    } else {
+        // Randomize the delay to avoid biasing some peers over others (such as due to
+        // fixed ordering of peer processing in ThreadMessageHandler)
+        process_time = last_request_time + GETDATA_INV_INTERVAL + GetRand(MAX_GETDATA_RANDOM_DELAY);
+    }
+
+    // We delay processing announcements from inbound peers
+    if (use_inbound_delay) process_time += INBOUND_PEER_INV_DELAY;
+
+    return process_time;
+}
 
 void RequestInv(CNodeState* state, const CInv& inv, int64_t nNow) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
@@ -723,19 +741,9 @@ void RequestInv(CNodeState* state, const CInv& inv, int64_t nNow) EXCLUSIVE_LOCK
     }
     peer_download_state.m_inv_announced.insert(inv.hash);
 
-    int64_t process_time;
-    int64_t last_request_time = GetInvRequestTime(inv.hash);
-    // First time requesting this tx
-    if (last_request_time == 0) {
-        process_time = nNow;
-    } else {
-        // Randomize the delay to avoid biasing some peers over others (such as due to
-        // fixed ordering of peer processing in ThreadMessageHandler)
-        process_time = last_request_time + GETDATA_INV_INTERVAL + GetRand(MAX_GETDATA_RANDOM_DELAY);
-    }
-
-    // We delay processing announcements from non-preferred (eg inbound) peers
-    if (!state->fPreferredDownload) process_time += INBOUND_PEER_INV_DELAY;
+    // Calculate the time to try requesting this transaction. Use
+    // fPreferredDownload as a proxy for outbound peers.
+    int64_t process_time = CalculateInvGetDataTime(inv.hash, nNow, !state->fPreferredDownload);
 
     peer_download_state.m_inv_process_time.emplace(process_time, inv);
 }
@@ -4279,6 +4287,9 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
 
         auto& inv_process_time = state.m_inv_download.m_inv_process_time;
         while (!inv_process_time.empty() && inv_process_time.begin()->first <= nNow && state.m_inv_download.m_inv_in_flight.size() < MAX_PEER_INV_IN_FLIGHT) {
+            // Erase this entry from tx_process_time (it may be added back for
+            // processing at a later time, see below)
+            inv_process_time.erase(inv_process_time.begin());
             const CInv& _inv = inv_process_time.begin()->second;
             const CInv& inv = _inv.type == MSG_TX ? CInv(MSG_TX | GetFetchFlags(pto), _inv.hash) : _inv;
             if (!AlreadyHave(inv)) {
@@ -4299,14 +4310,14 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
                     // up processing to happen after the download times out
                     // (with a slight delay for inbound peers, to prefer
                     // requests to outbound peers).
-                    RequestInv(&state, inv, nNow);
+                    int64_t next_process_time = CalculateInvGetDataTime(inv.hash, nNow, !state.fPreferredDownload);
+                    inv_process_time.emplace(next_process_time, inv);
                 }
             } else {
                 // We have already seen this inventory, no need to download.
                 state.m_inv_download.m_inv_announced.erase(inv.hash);
                 state.m_inv_download.m_inv_in_flight.erase(inv.hash);
             }
-            inv_process_time.erase(inv_process_time.begin());
         }
 
 
