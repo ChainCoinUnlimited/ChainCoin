@@ -709,7 +709,9 @@ void UpdateInvRequestTime(const uint256& hash, int64_t request_time) EXCLUSIVE_L
 void RequestInv(CNodeState* state, const CInv& inv, int64_t nNow) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
     CNodeState::InvDownloadState& peer_download_state = state->m_inv_download;
-    if (peer_download_state.m_inv_announced.size() >= MAX_PEER_INV_ANNOUNCEMENTS || peer_download_state.m_inv_announced.count(inv.hash)) {
+    if (peer_download_state.m_inv_announced.size() >= MAX_PEER_INV_ANNOUNCEMENTS ||
+            peer_download_state.m_inv_process_time.size() >= MAX_PEER_INV_ANNOUNCEMENTS ||
+            peer_download_state.m_inv_announced.count(inv.hash)) {
         // Too many queued announcements from this peer, or we already have
         // this announcement
         return;
