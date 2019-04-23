@@ -71,10 +71,10 @@ public:
     uint64_t AssumedBlockchainSize() const { return m_assumed_blockchain_size; }
     /** Minimum free space (in GB) needed for data directory when pruned; Does not include prune target*/
     uint64_t AssumedChainStateSize() const { return m_assumed_chain_state_size; }
-    /** Make miner stop after a block is found. In RPC, don't return until nGenProcLimit blocks are generated */
-    bool MineBlocksOnDemand() const { return fMineBlocksOnDemand; }
     /** Allow nodes with the same address and multiple ports */
     bool AllowMultiplePorts() const { return fAllowMultiplePorts; }
+    /** Whether it is possible to mine blocks on demand (no retargeting) */
+    bool MineBlocksOnDemand() const { return consensus.fPowNoRetargeting; }
     /** Return the BIP70 network string (main, test or regtest) */
     std::string NetworkIDString() const { return strNetworkID; }
     /** Return true if the fallback fee is by default enabled for this network */
@@ -106,7 +106,6 @@ protected:
     std::vector<SeedSpec6> vFixedSeeds;
     bool fDefaultConsistencyChecks;
     bool fRequireStandard;
-    bool fMineBlocksOnDemand;
     bool fAllowMultiplePorts;
     CCheckpointData checkpointData;
     ChainTxData chainTxData;

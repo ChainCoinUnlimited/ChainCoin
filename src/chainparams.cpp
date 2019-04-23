@@ -155,7 +155,6 @@ public:
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
-        fMineBlocksOnDemand = false;
         fAllowMultiplePorts = false;
 
         nPoolMinInputs = 3;
@@ -277,7 +276,6 @@ public:
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
-        fMineBlocksOnDemand = false;
         fAllowMultiplePorts = true;
 
         nPoolMinInputs = 3;
@@ -374,7 +372,6 @@ public:
 
         fDefaultConsistencyChecks = true;
         fRequireStandard = false;
-        fMineBlocksOnDemand = true;
         fAllowMultiplePorts = true;
 
         nPoolMinInputs = 3;
