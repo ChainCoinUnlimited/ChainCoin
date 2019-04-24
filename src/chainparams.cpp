@@ -156,6 +156,7 @@ public:
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         fAllowMultiplePorts = false;
+        m_is_test_chain = false;
 
         nPoolMinInputs = 3;
         nPoolMaxInputs = 8;
@@ -277,6 +278,7 @@ public:
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
         fAllowMultiplePorts = true;
+        m_is_test_chain = true;
 
         nPoolMinInputs = 3;
         nPoolMaxInputs = 8;
@@ -373,6 +375,7 @@ public:
         fDefaultConsistencyChecks = true;
         fRequireStandard = false;
         fAllowMultiplePorts = true;
+        m_is_test_chain = true;
 
         nPoolMinInputs = 3;
         nPoolMaxInputs = 8;

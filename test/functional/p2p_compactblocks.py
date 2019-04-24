@@ -96,6 +96,9 @@ class CompactBlocksTest(BitcoinTestFramework):
         super().__init__()
         self.setup_clean_chain = True
         self.num_nodes = 1
+        self.extra_args = [[
+            "-acceptnonstdtxn=1",
+        ]]
         self.utxos = []
 
     def skip_test_if_missing_module(self):
