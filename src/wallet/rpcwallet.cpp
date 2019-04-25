@@ -444,6 +444,8 @@ static UniValue sendtoaddress(const JSONRPCRequest& request)
     }
 
     coin_control.m_avoid_address_reuse = GetAvoidReuseFlag(pwallet, request.params[8]);
+    // We also enable partial spend avoidance if reuse avoidance is set.
+    coin_control.m_avoid_partial_spends |= coin_control.m_avoid_address_reuse;
 
     int nUseCoinJoin = 0;
     nUseCoinJoin = request.params[9].get_int();
