@@ -1463,10 +1463,6 @@ UniValue converttopsbt(const JSONRPCRequest& request)
         throw std::runtime_error(help.ToString());
     }
 
-    if (request.fHelp || !help.IsValidNumArgs(request.params.size())) {
-        throw std::runtime_error(help.ToString());
-    }
-
     RPCTypeCheck(request.params, {UniValue::VSTR, UniValue::VBOOL, UniValue::VBOOL}, true);
 
     // parse hex string from parameter
