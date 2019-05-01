@@ -250,8 +250,6 @@ chaincoin-${VERSION}-x86_64-linux-gnu.tar.gz
 chaincoin-${VERSION}-osx64.tar.gz
 chaincoin-${VERSION}-osx.dmg
 chaincoin-${VERSION}.tar.gz
-chaincoin-${VERSION}-win32-setup.exe
-chaincoin-${VERSION}-win32.zip
 chaincoin-${VERSION}-win64-setup.exe
 chaincoin-${VERSION}-win64.zip
 ```
