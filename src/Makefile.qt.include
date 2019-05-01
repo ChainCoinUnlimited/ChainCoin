@@ -176,6 +176,7 @@ QT_MOC_CPP = \
   qt/moc_proposaltablemodel.cpp \
   qt/moc_proposalview.cpp \
   qt/moc_qrdialog.cpp \
+  qt/moc_qrimagewidget.cpp \
   qt/moc_qvalidatedlineedit.cpp \
   qt/moc_qvaluecombobox.cpp \
   qt/moc_receivecoinsdialog.cpp \
@@ -263,6 +264,7 @@ BITCOIN_QT_H = \
   qt/peertablemodel.h \
   qt/platformstyle.h \
   qt/qrdialog.h \
+  qt/qrimagewidget.h \
   qt/qvalidatedlineedit.h \
   qt/qvaluecombobox.h \
   qt/receivecoinsdialog.h \
@@ -599,6 +601,7 @@ BITCOIN_QT_WALLET_CPP = \
   qt/proposaltablemodel.cpp \
   qt/proposalview.cpp \
   qt/qrdialog.cpp \
+  qt/qrimagewidget.cpp \
   qt/receivecoinsdialog.cpp \
   qt/receiverequestdialog.cpp \
   qt/recentrequeststablemodel.cpp \
