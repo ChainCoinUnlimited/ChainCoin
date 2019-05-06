@@ -1447,7 +1447,7 @@ static void ThreadMapPort()
             }
         }
 
-        std::string strDesc = "Chaincoin Core " + FormatFullVersion();
+        std::string strDesc = PACKAGE_NAME " " + FormatFullVersion();
 
         do {
             r = UPNP_AddPortMapping(urls.controlURL, data.first.servicetype,
