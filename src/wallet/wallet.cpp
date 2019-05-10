@@ -2613,7 +2613,7 @@ CAmount CWallet::GetAvailableBalance(const CCoinControl* coinControl) const
     return balance;
 }
 
-void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<COutput> &vCoins, bool fOnlySafe, const CCoinControl *coinControl, AvailableCoinsType nCoinType, const CAmount &nMinimumAmount, const CAmount &nMaximumAmount, const CAmount &nMinimumSumAmount, const uint64_t nMaximumCount, const int nMinDepth, const int nMaxDepth) const
+void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<COutput>& vCoins, bool fOnlySafe, const CCoinControl* coinControl, AvailableCoinsType nCoinType, const CAmount& nMinimumAmount, const CAmount& nMaximumAmount, const CAmount& nMinimumSumAmount, const uint64_t nMaximumCount) const
 {
     AssertLockHeld(cs_wallet);
 
@@ -2622,6 +2622,8 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
     // Either the WALLET_FLAG_AVOID_REUSE flag is not set (in which case we always allow), or we default to avoiding, and only in the case where
     // a coin control object is provided, and has the avoid address reuse flag set to false, do we allow already used addresses
     bool allow_used_addresses = !IsWalletFlagSet(WALLET_FLAG_AVOID_REUSE) || (coinControl && !coinControl->m_avoid_address_reuse);
+    const int min_depth = {coinControl ? coinControl->m_min_depth : DEFAULT_MIN_DEPTH};
+    const int max_depth = {coinControl ? coinControl->m_max_depth : DEFAULT_MAX_DEPTH};
 
     for (const auto& entry : mapWallet)
     {
@@ -2681,8 +2683,9 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
             continue;
         }
 
-        if (nDepth < nMinDepth || nDepth > nMaxDepth)
+        if (nDepth < min_depth || nDepth > max_depth) {
             continue;
+        }
 
         for (unsigned int i = 0; i < wtx.tx->vout.size(); i++) {
             bool found = false;
@@ -3068,8 +3071,10 @@ bool CWallet::SelectJoinCoins(CAmount nValueMin, CAmount nValueMax, std::vector<
     std::vector<COutput> vCoins;
 
     auto locked_chain = chain().lock();
+    CCoinControl cctl;
+    cctl.m_min_depth = nMinDepth;
     LOCK(cs_wallet);
-    AvailableCoins(*locked_chain, vCoins, true, nullptr, ONLY_DENOMINATED, 1, MAX_MONEY, MAX_MONEY, 0, nMinDepth);
+    AvailableCoins(*locked_chain, vCoins, true, &cctl, ONLY_DENOMINATED, 1, MAX_MONEY, MAX_MONEY);
 
     //order the array so denominations are sorted by nValue.
     std::sort(vCoins.begin(), vCoins.end(), ascending);
@@ -3271,6 +3276,7 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
                          int& nChangePosInOut, std::string& strFailReason, const CCoinControl& coin_control, bool sign, AvailableCoinsType _nCoinType, int nCoinJoin)
 {
     AvailableCoinsType nCoinType = nCoinJoin > 0 ? ONLY_DENOMINATED : _nCoinType;
+    if (nCoinJoin > 0) coin_control.m_min_depth = coinjoinClient->nCoinJoinDepth;
     CAmount nValue = 0;
     ReserveDestination reservedest(this);
     int nChangePosRequest = nChangePosInOut;
@@ -3306,7 +3312,7 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
         LOCK(cs_wallet);
         {
             std::vector<COutput> vAvailableCoins;
-            AvailableCoins(*locked_chain, vAvailableCoins, true, &coin_control, nCoinType, 1, MAX_MONEY, MAX_MONEY, 0, coin_control.m_min_depth);
+            AvailableCoins(*locked_chain, vAvailableCoins, true, &coin_control, nCoinType, 1, MAX_MONEY, MAX_MONEY, 0);
             CoinSelectionParams coin_selection_params; // Parameters for coin selection, init with dummy
             if (nCoinJoin > 0)
                 coin_selection_params.use_private = true;
