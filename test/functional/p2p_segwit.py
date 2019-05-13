@@ -36,6 +36,7 @@ from test_framework.messages import (
     ser_vector,
     sha256,
     uint256_from_str,
+    FromHex,
 )
 from test_framework.mininode import (
     P2PInterface,
@@ -77,6 +78,7 @@ from test_framework.util import (
     disconnect_nodes,
     get_bip9_status,
     hex_str_to_bytes,
+    assert_raises_rpc_error,
 )
 
 # The versionbit bit used to signal activation of SegWit
@@ -269,6 +271,7 @@ class SegWitTest(BitcoinTestFramework):
         self.test_non_standard_witness()
         self.test_upgrade_after_activation()
         self.test_witness_sigops()
+        self.test_superfluous_witness()
 
     # Individual tests
 
@@ -2033,6 +2036,52 @@ class SegWitTest(BitcoinTestFramework):
         test_witness_block(self.nodes[0], self.test_node, block_5, accepted=True)
 
         # TODO: test p2sh sigop counting
+
+    def test_superfluous_witness(self):
+        # Serialization of tx that puts witness flag to 3 always
+        def serialize_with_bogus_witness(tx):
+            flags = 3
+            r = b""
+            r += struct.pack("<i", tx.nVersion)
+            if flags:
+                dummy = []
+                r += ser_vector(dummy)
+                r += struct.pack("<B", flags)
+            r += ser_vector(tx.vin)
+            r += ser_vector(tx.vout)
+            if flags & 1:
+                if (len(tx.wit.vtxinwit) != len(tx.vin)):
+                    # vtxinwit must have the same length as vin
+                    tx.wit.vtxinwit = tx.wit.vtxinwit[:len(tx.vin)]
+                    for i in range(len(tx.wit.vtxinwit), len(tx.vin)):
+                        tx.wit.vtxinwit.append(CTxInWitness())
+                r += tx.wit.serialize()
+            r += struct.pack("<I", tx.nLockTime)
+            return r
+
+        class msg_bogus_tx(msg_tx):
+            def serialize(self):
+                return serialize_with_bogus_witness(self.tx)
+
+        self.nodes[0].sendtoaddress(self.nodes[0].getnewaddress(address_type='bech32'), 5)
+        self.nodes[0].generate(1)
+        unspent = next(u for u in self.nodes[0].listunspent() if u['spendable'] and u['address'].startswith('bcrt'))
+
+        raw = self.nodes[0].createrawtransaction([{"txid": unspent['txid'], "vout": unspent['vout']}], {self.nodes[0].getnewaddress(): 1})
+        tx = FromHex(CTransaction(), raw)
+        assert_raises_rpc_error(-22, "TX decode failed", self.nodes[0].decoderawtransaction, serialize_with_bogus_witness(tx).hex())
+        with self.nodes[0].assert_debug_log(['Superfluous witness record']):
+            self.nodes[0].p2p.send_message(msg_bogus_tx(tx))
+            self.nodes[0].p2p.sync_with_ping()
+        raw = self.nodes[0].signrawtransactionwithwallet(raw)
+        assert raw['complete']
+        raw = raw['hex']
+        tx = FromHex(CTransaction(), raw)
+        assert_raises_rpc_error(-22, "TX decode failed", self.nodes[0].decoderawtransaction, serialize_with_bogus_witness(tx).hex())
+        with self.nodes[0].assert_debug_log(['Unknown transaction optional data']):
+            self.nodes[0].p2p.send_message(msg_bogus_tx(tx))
+            self.nodes[0].p2p.sync_with_ping()
+
 
 if __name__ == '__main__':
     SegWitTest().main()
