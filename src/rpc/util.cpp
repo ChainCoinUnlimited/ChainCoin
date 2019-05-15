@@ -4,7 +4,6 @@
 
 #include <key_io.h>
 #include <keystore.h>
-#include <policy/fees.h>
 #include <outputtype.h>
 #include <rpc/util.h>
 #include <tinyformat.h>
