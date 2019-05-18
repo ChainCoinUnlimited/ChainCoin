@@ -368,7 +368,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
     QString questionString = tr("Are you sure you want to send?");
     questionString.append("<br /><span style='font-size:10pt;'>");
     questionString.append(tr("Please, review your transaction."));
-    questionString.append("</span>");
+    questionString.append("</span>%1");
 
     if(txFee > 0)
     {
@@ -409,7 +409,17 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
     questionString.append(QString("<br /><span style='font-size:10pt; font-weight:normal;'>(=%1)</span>")
         .arg(alternativeUnits.join(" " + tr("or") + " ")));
 
-    SendConfirmationDialog confirmationDialog(tr("Confirm send coins"), questionString, "To review recipient list click \"Show Details...\"", formatted.join("\n\n"), SEND_CONFIRM_DELAY, this);
+    QString informative_text;
+    QString detailed_text;
+    if (formatted.size() > 1) {
+        questionString = questionString.arg("");
+        informative_text = tr("To review recipient list click \"Show Details...\"");
+        detailed_text = formatted.join("\n\n");
+    } else {
+        questionString = questionString.arg("<br /><br />" + formatted.at(0));
+    }
+
+    SendConfirmationDialog confirmationDialog(tr("Confirm send coins"), questionString, informative_text, detailed_text, SEND_CONFIRM_DELAY, this);
     confirmationDialog.exec();
     QMessageBox::StandardButton retval = static_cast<QMessageBox::StandardButton>(confirmationDialog.result());
 
