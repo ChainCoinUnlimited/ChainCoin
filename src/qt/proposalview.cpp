@@ -70,11 +70,11 @@ ProposalList::ProposalList(const PlatformStyle *platformStyle, QWidget *parent) 
 {
     ui->setupUi(this);
 
-    ui->hlayout->setSpacing(5);
+    ui->horizontal_layout->setSpacing(5);
     if (platformStyle->getUseExtraSpacing()) {
-        ui->hlayout->addSpacing(26);
+        ui->horizontal_layout->addSpacing(26);
     } else {
-        ui->hlayout->addSpacing(23);
+        ui->horizontal_layout->addSpacing(23);
     }
 
     if (platformStyle->getUseExtraSpacing()) {
