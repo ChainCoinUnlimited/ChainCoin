@@ -141,9 +141,16 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="hlayout">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Choose your vote in the popup after selecting a type. Votes are sent trough all eligible Masternodes.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontal_layout">
        <property name="spacing">
-        <number>25</number>
+        <number>6</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -187,13 +194,6 @@
          </property>
          <property name="text">
           <string>Vote Endorse</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Choose your vote in the popup after selecting a type. Votes are sent trough all eligible Masternodes.</string>
          </property>
         </widget>
        </item>
