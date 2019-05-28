@@ -6,6 +6,7 @@
 
 #include <chainparams.h>
 #include <qt/chaincoin.h>
+#include <key.h>
 #include <qt/bitcoingui.h>
 #include <qt/networkstyle.h>
 #include <qt/rpcconsole.h>
@@ -62,6 +63,7 @@ void AppTests::appTests()
     }
 #endif
 
+    ECC_Stop(); // Already started by the common test setup, so stop it to avoid interference
     m_app.parameterSetup();
     m_app.createOptionsModel(true /* reset settings */);
     QScopedPointer<const NetworkStyle> style(
