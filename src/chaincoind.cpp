@@ -13,17 +13,13 @@
 #include <compat.h>
 #include <fs.h>
 #include <interfaces/chain.h>
-#include <rpc/server.h>
 #include <init.h>
 #include <noui.h>
 #include <shutdown.h>
 #include <modules/masternode/masternode_config.h>
 #include <util/system.h>
-#include <httpserver.h>
-#include <httprpc.h>
 #include <util/threadnames.h>
 #include <util/strencodings.h>
-#include <walletinitinterface.h>
 
 #include <stdio.h>
 

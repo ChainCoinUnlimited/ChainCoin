@@ -13,9 +13,7 @@
 #include <consensus/merkle.h>
 #include <consensus/tx_verify.h>
 #include <consensus/validation.h>
-#include <hash.h>
 #include <modules/masternode/masternode_payments.h>
-#include <net.h>
 #include <policy/feerate.h>
 #include <policy/policy.h>
 #include <pow.h>
@@ -25,7 +23,6 @@
 #include <util/moneystr.h>
 #include <util/system.h>
 #include <util/validation.h>
-#include <validationinterface.h>
 
 #include <algorithm>
 #include <queue>

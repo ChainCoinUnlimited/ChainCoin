@@ -4,13 +4,10 @@
 
 #include <attributes.h>
 #include <coins.h>
-#include <consensus/validation.h>
 #include <script/standard.h>
 #include <uint256.h>
 #include <undo.h>
 #include <util/strencodings.h>
-#include <test/setup_common.h>
-#include <validation.h>
 
 #include <map>
 #include <vector>

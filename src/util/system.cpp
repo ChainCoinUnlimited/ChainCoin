@@ -7,8 +7,6 @@
 #include <util/system.h>
 
 #include <chainparamsbase.h>
-#include <random.h>
-#include <serialize.h>
 #include <util/strencodings.h>
 
 #include <stdarg.h>
