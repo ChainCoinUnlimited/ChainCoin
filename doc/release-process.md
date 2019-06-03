@@ -263,6 +263,7 @@ The list of files should be:
 chaincoin-${VERSION}-aarch64-linux-gnu.tar.gz
 chaincoin-${VERSION}-arm-linux-gnueabihf.tar.gz
 chaincoin-${VERSION}-i686-pc-linux-gnu.tar.gz
+chaincoin-${VERSION}-riscv64-linux-gnu.tar.gz
 chaincoin-${VERSION}-x86_64-linux-gnu.tar.gz
 chaincoin-${VERSION}-osx64.tar.gz
 chaincoin-${VERSION}-osx.dmg
