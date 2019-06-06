@@ -15,7 +15,6 @@
 #include <interfaces/wallet.h>
 #include <key.h>
 #include <key_io.h>
-#include <keystore.h>
 #include <modules/masternode/masternode_config.h>
 #include <policy/fees.h>
 #include <policy/policy.h>
@@ -24,6 +23,7 @@
 #include <reverse_iterator.h>
 #include <script/descriptor.h>
 #include <script/script.h>
+#include <script/signingprovider.h>
 #include <util/bip32.h>
 #include <util/error.h>
 #include <util/fees.h>
