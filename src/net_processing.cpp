@@ -73,13 +73,13 @@ static constexpr int32_t MAX_PEER_INV_IN_FLIGHT = 100;
 /** Maximum number of announced transactions from a peer */
 static constexpr int32_t MAX_PEER_INV_ANNOUNCEMENTS = 2 * MAX_INV_SZ;
 /** How many microseconds to delay requesting transactions from inbound peers */
-static constexpr int64_t INBOUND_PEER_INV_DELAY = 2 * 1000000; // 2 seconds
+static constexpr std::chrono::microseconds INBOUND_PEER_INV_DELAY{std::chrono::seconds{2}};
 /** How long to wait (in microseconds) before downloading a transaction from an additional peer */
-static constexpr int64_t GETDATA_INV_INTERVAL = 60 * 1000000; // 1 minute
+static constexpr std::chrono::microseconds GETDATA_INV_INTERVAL{std::chrono::seconds{60}};
 /** Maximum delay (in microseconds) for transaction requests to avoid biasing some peers over others. */
-static constexpr int64_t MAX_GETDATA_RANDOM_DELAY = 2 * 1000000; // 2 seconds
+static constexpr std::chrono::microseconds MAX_GETDATA_RANDOM_DELAY{std::chrono::seconds{2}};
 /** How long to wait (in microseconds) before expiring an in-flight getdata request to a peer */
-static constexpr int64_t INV_EXPIRY_INTERVAL = 10 * GETDATA_INV_INTERVAL;
+static constexpr std::chrono::microseconds INV_EXPIRY_INTERVAL{GETDATA_INV_INTERVAL * 10};
 static_assert(INBOUND_PEER_INV_DELAY >= MAX_GETDATA_RANDOM_DELAY,
 "To preserve security, MAX_GETDATA_RANDOM_DELAY should not exceed INBOUND_PEER_DELAY");
 /** Limit to avoid sending big packets. Not used in processing incoming GETDATA for compatibility */
@@ -343,16 +343,16 @@ struct CNodeState {
         /* Track when to attempt download of announced transactions (process
          * time in micros -> hash)
          */
-        std::multimap<int64_t, CInv> m_inv_process_time;
+        std::multimap<std::chrono::microseconds, CInv> m_inv_process_time;
 
         //! Store all the inventory items a peer has recently announced
         std::set<uint256> m_inv_announced;
 
         //! Store transactions which were requested by us, with timestamp
-        std::map<uint256, int64_t> m_inv_in_flight;
+        std::map<uint256, std::chrono::microseconds> m_inv_in_flight;
 
         //! Periodically check for stuck getdata requests
-        int64_t m_check_expiry_timer{0};
+        std::chrono::microseconds m_check_expiry_timer{0};
     };
 
     InvDownloadState m_inv_download;
@@ -394,7 +394,7 @@ struct CNodeState {
 };
 
 // Keeps track of the time (in microseconds) when transactions were requested last time
-limitedmap<uint256, int64_t> g_already_asked_for GUARDED_BY(cs_main)(MAX_INV_SZ);
+limitedmap<uint256, std::chrono::microseconds> g_already_asked_for GUARDED_BY(cs_main)(MAX_INV_SZ);
 
 /** Map maintaining per-node state. */
 static std::map<NodeId, CNodeState> mapNodeState GUARDED_BY(cs_main);
@@ -691,16 +691,16 @@ void EraseInvRequest(const uint256& hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
     g_already_asked_for.erase(hash);
 }
 
-int64_t GetInvRequestTime(const uint256& hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+std::chrono::microseconds GetInvRequestTime(const uint256& hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
     auto it = g_already_asked_for.find(hash);
     if (it != g_already_asked_for.end()) {
         return it->second;
     }
-    return 0;
+    return {};
 }
 
-void UpdateInvRequestTime(const uint256& hash, int64_t request_time) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+void UpdateInvRequestTime(const uint256& hash, std::chrono::microseconds request_time) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
     auto it = g_already_asked_for.find(hash);
     if (it == g_already_asked_for.end()) {
@@ -710,17 +710,17 @@ void UpdateInvRequestTime(const uint256& hash, int64_t request_time) EXCLUSIVE_L
     }
 }
 
-int64_t CalculateInvGetDataTime(const uint256& hash, int64_t current_time, bool use_inbound_delay) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+std::chrono::microseconds CalculateInvGetDataTime(const uint256& hash, std::chrono::microseconds current_time, bool use_inbound_delay) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
-    int64_t process_time;
-    int64_t last_request_time = GetInvRequestTime(hash);
+    std::chrono::microseconds process_time;
+    const auto last_request_time = GetInvRequestTime(hash);
     // First time requesting this tx
-    if (last_request_time == 0) {
+    if (last_request_time.count() == 0) {
         process_time = current_time;
     } else {
         // Randomize the delay to avoid biasing some peers over others (such as due to
         // fixed ordering of peer processing in ThreadMessageHandler)
-        process_time = last_request_time + GETDATA_INV_INTERVAL + GetRand(MAX_GETDATA_RANDOM_DELAY);
+        process_time = last_request_time + GETDATA_INV_INTERVAL + GetRandMicros(MAX_GETDATA_RANDOM_DELAY);
     }
 
     // We delay processing announcements from inbound peers
@@ -729,7 +729,7 @@ int64_t CalculateInvGetDataTime(const uint256& hash, int64_t current_time, bool 
     return process_time;
 }
 
-void RequestInv(CNodeState* state, const CInv& inv, int64_t nNow) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+void RequestInv(CNodeState* state, const CInv& inv, std::chrono::microseconds current_time) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
     CNodeState::InvDownloadState& peer_download_state = state->m_inv_download;
     if (peer_download_state.m_inv_announced.size() >= MAX_PEER_INV_ANNOUNCEMENTS ||
@@ -743,7 +743,7 @@ void RequestInv(CNodeState* state, const CInv& inv, int64_t nNow) EXCLUSIVE_LOCK
 
     // Calculate the time to try requesting this transaction. Use
     // fPreferredDownload as a proxy for outbound peers.
-    int64_t process_time = CalculateInvGetDataTime(inv.hash, nNow, !state->fPreferredDownload);
+    const auto process_time = CalculateInvGetDataTime(inv.hash, current_time, !state->fPreferredDownload);
 
     peer_download_state.m_inv_process_time.emplace(process_time, inv);
 }
@@ -2334,7 +2334,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         LOCK(cs_main);
 
         uint32_t nFetchFlags = GetFetchFlags(pfrom);
-        int64_t nNow = GetTimeMicros();
+        const auto current_time = GetTime<std::chrono::microseconds>();
 
         for (CInv &inv : vInv)
         {
@@ -2366,7 +2366,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 if (fBlocksOnly) {
                     LogPrint(BCLog::NET, "transaction (%s) inv sent in violation of protocol peer=%d\n", inv.hash.ToString(), pfrom->GetId());
                 } else if (!fAlreadyHave && !fImporting && !fReindex && !::ChainstateActive().IsInitialBlockDownload()) {
-                    RequestInv(State(pfrom->GetId()), inv, nNow);
+                    RequestInv(State(pfrom->GetId()), inv, current_time);
                 }
             }
         }
@@ -2641,12 +2641,12 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             }
             if (!fRejectedParents) {
                 uint32_t nFetchFlags = GetFetchFlags(pfrom);
-                int64_t nNow = GetTimeMicros();
+                const auto current_time = GetTime<std::chrono::microseconds>();
 
                 for (const CTxIn& txin : tx.vin) {
                     CInv _inv(MSG_TX | nFetchFlags, txin.prevout.hash);
                     pfrom->AddInventoryKnown(_inv);
-                    if (!AlreadyHave(_inv)) RequestInv(State(pfrom->GetId()), _inv, nNow);
+                    if (!AlreadyHave(_inv)) RequestInv(State(pfrom->GetId()), _inv, current_time);
                 }
                 AddOrphanTx(ptx, pfrom->GetId());
 
@@ -4184,6 +4184,9 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
             connman->PushMessage(pto, msgMaker.Make(NetMsgType::INV, vInv));
 
         // Detect whether we're stalling
+        const auto current_time = GetTime<std::chrono::microseconds>();
+        // nNow is the current system time (GetTimeMicros is not mockable) and
+        // should be replaced by the mockable current_time eventually
         nNow = GetTimeMicros();
         if (state.nStallingSince && state.nStallingSince < nNow - 1000000 * BLOCK_STALLING_TIMEOUT) {
             // Stalling only triggers when the block download window cannot move. During normal steady state,
@@ -4276,9 +4279,9 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
         // were unresponsive in the past.
         // Eventually we should consider disconnecting peers, but this is
         // conservative.
-        if (state.m_inv_download.m_check_expiry_timer <= nNow) {
+        if (state.m_inv_download.m_check_expiry_timer <= current_time) {
             for (auto it=state.m_inv_download.m_inv_in_flight.begin(); it != state.m_inv_download.m_inv_in_flight.end();) {
-                if (it->second <= nNow - INV_EXPIRY_INTERVAL) {
+                if (it->second <= current_time - INV_EXPIRY_INTERVAL) {
                     LogPrint(BCLog::NET, "timeout of inflight tx %s from peer=%d\n", it->first.ToString(), pto->GetId());
                     state.m_inv_download.m_inv_announced.erase(it->first);
                     state.m_inv_download.m_inv_in_flight.erase(it++);
@@ -4288,11 +4291,11 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
             }
             // On average, we do this check every TX_EXPIRY_INTERVAL. Randomize
             // so that we're not doing this for all peers at the same time.
-            state.m_inv_download.m_check_expiry_timer = nNow + INV_EXPIRY_INTERVAL/2 + GetRand(INV_EXPIRY_INTERVAL);
+            state.m_inv_download.m_check_expiry_timer = current_time + INV_EXPIRY_INTERVAL / 2 + GetRandMicros(INV_EXPIRY_INTERVAL);
         }
 
         auto& inv_process_time = state.m_inv_download.m_inv_process_time;
-        while (!inv_process_time.empty() && inv_process_time.begin()->first <= nNow && state.m_inv_download.m_inv_in_flight.size() < MAX_PEER_INV_IN_FLIGHT) {
+        while (!inv_process_time.empty() && inv_process_time.begin()->first <= current_time && state.m_inv_download.m_inv_in_flight.size() < MAX_PEER_INV_IN_FLIGHT) {
             // Erase this entry from tx_process_time (it may be added back for
             // processing at a later time, see below)
             inv_process_time.erase(inv_process_time.begin());
@@ -4301,22 +4304,22 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
             if (!AlreadyHave(inv)) {
                 // If this inventory was last requested more than 1 minute ago,
                 // then request.
-                int64_t last_request_time = GetInvRequestTime(inv.hash);
-                if (last_request_time <= nNow - GETDATA_INV_INTERVAL) {
+                const auto last_request_time = GetInvRequestTime(inv.hash);
+                if (last_request_time <= current_time - GETDATA_INV_INTERVAL) {
                     LogPrint(BCLog::NET, "Requesting %s peer=%d\n", inv.ToString(), pto->GetId());
                     vGetData.push_back(inv);
                     if (vGetData.size() >= MAX_GETDATA_SZ) {
                         connman->PushMessage(pto, msgMaker.Make(NetMsgType::GETDATA, vGetData));
                         vGetData.clear();
                     }
-                    UpdateInvRequestTime(inv.hash, nNow);
-                    state.m_inv_download.m_inv_in_flight.emplace(inv.hash, nNow);
+                    UpdateInvRequestTime(inv.hash, current_time);
+                    state.m_inv_download.m_inv_in_flight.emplace(inv.hash, current_time);
                 } else {
                     // This inventory is in flight from someone else; queue
                     // up processing to happen after the download times out
                     // (with a slight delay for inbound peers, to prefer
                     // requests to outbound peers).
-                    int64_t next_process_time = CalculateInvGetDataTime(inv.hash, nNow, !state.fPreferredDownload);
+                    const auto next_process_time = CalculateInvGetDataTime(inv.hash, current_time, !state.fPreferredDownload);
                     inv_process_time.emplace(next_process_time, inv);
                 }
             } else {
