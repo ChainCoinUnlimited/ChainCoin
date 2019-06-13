@@ -198,7 +198,7 @@ test_chaincoin_filtered.info: test_chaincoin.info
 	$(LCOV) -a $@ $(LCOV_OPTS) -o $@
 
 functional_test.info: test_chaincoin_filtered.info
-	-@TIMEOUT=15 test/functional/test_runner.py $(EXTENDED_FUNCTIONAL_TESTS)
+	@TIMEOUT=15 test/functional/test_runner.py $(EXTENDED_FUNCTIONAL_TESTS)
 	$(LCOV) -c $(LCOV_OPTS) -d $(abs_builddir)/src --t functional-tests -o $@
 	$(LCOV) -z $(LCOV_OPTS) -d $(abs_builddir)/src
 
