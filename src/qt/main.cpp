@@ -4,6 +4,8 @@
 
 #include <qt/chaincoin.h>
 
+#include <util/translation.h>
+
 #include <QCoreApplication>
 
 #include <functional>
