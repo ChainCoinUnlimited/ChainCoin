@@ -37,7 +37,7 @@ namespace {
 class PendingWalletTxImpl : public PendingWalletTx
 {
 public:
-    explicit PendingWalletTxImpl(CWallet& wallet) : m_wallet(wallet), m_key(&wallet) {}
+    explicit PendingWalletTxImpl(CWallet& wallet) : m_wallet(wallet), m_dest(&wallet) {}
 
     const CTransaction& get() override { return *m_tx; }
 
@@ -49,7 +49,7 @@ public:
         auto locked_chain = m_wallet.chain().lock();
         LOCK(m_wallet.cs_wallet);
         CValidationState state;
-        if (!m_wallet.CommitTransaction(m_tx, std::move(value_map), std::move(order_form), m_key, state, nCoinJoin)) {
+        if (!m_wallet.CommitTransaction(m_tx, std::move(value_map), std::move(order_form), m_dest, state, nCoinJoin)) {
             reject_reason = state.GetRejectReason();
             return false;
         }
@@ -58,7 +58,7 @@ public:
 
     CTransactionRef m_tx;
     CWallet& m_wallet;
-    CReserveKey m_key;
+    ReserveDestination m_dest;
 };
 
 //! Construct wallet tx struct.
@@ -241,7 +241,7 @@ public:
         auto locked_chain = m_wallet->chain().lock();
         LOCK(m_wallet->cs_wallet);
         auto pending = MakeUnique<PendingWalletTxImpl>(*m_wallet);
-        if (!m_wallet->CreateTransaction(*locked_chain, recipients, pending->m_tx, pending->m_key, fee, change_pos,
+        if (!m_wallet->CreateTransaction(*locked_chain, recipients, pending->m_tx, pending->m_dest, fee, change_pos,
                 fail_reason, coin_control, sign, nCoinJoin ? ONLY_DENOMINATED : ALL_COINS, nCoinJoin)) {
             return {};
         }

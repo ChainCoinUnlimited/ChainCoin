@@ -246,16 +246,12 @@ static UniValue getrawchangeaddress(const JSONRPCRequest& request)
         }
     }
 
-    CReserveKey reservekey(pwallet);
-    CPubKey vchPubKey;
-    if (!reservekey.GetReservedKey(vchPubKey, true))
+    ReserveDestination reservedest(pwallet);
+    CTxDestination dest;
+    if (!reservedest.GetReservedDestination(output_type, dest, true))
         throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
 
-    reservekey.KeepKey();
-
-    pwallet->LearnRelatedScripts(vchPubKey, output_type);
-    CTxDestination dest = GetDestinationForKey(vchPubKey, output_type);
-
+    reservedest.KeepDestination();
     return EncodeDestination(dest);
 }
 
@@ -320,7 +316,7 @@ static CTransactionRef SendMoney(interfaces::Chain::Lock& locked_chain, CWallet 
     CScript scriptPubKey = GetScriptForDestination(address);
 
     // Create and send the transaction
-    CReserveKey reservekey(pwallet);
+    ReserveDestination reservedest(pwallet);
     CAmount nFeeRequired;
     std::string strError;
     std::vector<CRecipient> vecSend;
@@ -328,13 +324,13 @@ static CTransactionRef SendMoney(interfaces::Chain::Lock& locked_chain, CWallet 
     CRecipient recipient = {scriptPubKey, nValue, fSubtractFeeFromAmount};
     vecSend.push_back(recipient);
     CTransactionRef tx;
-    if (!pwallet->CreateTransaction(locked_chain, vecSend, tx, reservekey, nFeeRequired, nChangePosRet, strError, coin_control, true, nUseCoinJoin ? ONLY_DENOMINATED : ALL_COINS)) {
+    if (!pwallet->CreateTransaction(locked_chain, vecSend, tx, reservedest, nFeeRequired, nChangePosRet, strError, coin_control, true, nUseCoinJoin ? ONLY_DENOMINATED : ALL_COINS)) {
         if (!fSubtractFeeFromAmount && nValue + nFeeRequired > curBalance)
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
     CValidationState state;
-    if (!pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, reservekey, state, nUseCoinJoin)) {
+    if (!pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, reservedest, state, nUseCoinJoin)) {
         strError = strprintf("Error: The transaction was rejected! Reason given: %s", FormatStateMessage(state));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
@@ -922,7 +918,7 @@ static UniValue sendmany(const JSONRPCRequest& request)
     std::shuffle(vecSend.begin(), vecSend.end(), FastRandomContext());
 
     // Send
-    CReserveKey keyChange(pwallet);
+    ReserveDestination changedest(pwallet);
     CAmount nFeeRequired = 0;
     int nChangePosRet = -1;
     std::string strFailReason;
@@ -931,12 +927,12 @@ static UniValue sendmany(const JSONRPCRequest& request)
         nUseCoinJoin = request.params[8].get_int();
 
     CTransactionRef tx;
-    bool fCreated = pwallet->CreateTransaction(*locked_chain, vecSend, tx, keyChange, nFeeRequired, nChangePosRet, strFailReason,
+    bool fCreated = pwallet->CreateTransaction(*locked_chain, vecSend, tx, changedest, nFeeRequired, nChangePosRet, strFailReason,
                                                coin_control, true, nUseCoinJoin ? ONLY_DENOMINATED : ALL_COINS);
     if (!fCreated)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strFailReason);
     CValidationState state;
-    if (!pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, keyChange, state, nUseCoinJoin)) {
+    if (!pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, changedest, state, nUseCoinJoin)) {
         strFailReason = strprintf("Transaction commit failed:: %s", FormatStateMessage(state));
         throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
     }
@@ -4266,10 +4262,10 @@ static UniValue prepareproposal(const JSONRPCRequest& request)
     }
 
     // -- make our change address
-    CReserveKey reservekey(pwallet);
+    ReserveDestination changedest(pwallet);
     // -- send the tx to the network
     CValidationState state;
-    if (!pwallet->CommitTransaction(tx, {} /* mapValue */, {} /* orderForm */, reservekey, state)) {
+    if (!pwallet->CommitTransaction(tx, {} /* mapValue */, {} /* orderForm */, changedest, state)) {
         throw JSONRPCError(RPC_INTERNAL_ERROR, "CommitTransaction failed! Reason given: " + state.GetRejectReason());
     }
 

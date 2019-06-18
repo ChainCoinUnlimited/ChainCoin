@@ -27,28 +27,27 @@ void CKeyHolderStorage::AddKey(CScript &script, CWallet* pwalletIn)
         LogPrintf("%s CKeyHolderStorage::%s -- Error: Only SegWit addresses are supported for mixing\n", pwalletIn->GetDisplayName(), __func__);
         return;
     }
-    std::shared_ptr<CReserveKey> reservekey = std::make_shared<CReserveKey>(pwalletIn);;
-    CPubKey vchPubKey;
-    if (!reservekey->GetReservedKey(vchPubKey)) {
+    std::shared_ptr<ReserveDestination> reservedest = std::make_shared<ReserveDestination>(pwalletIn);;
+    CTxDestination dest;
+    if (!reservedest->GetReservedDestination(output_type, dest, true)) {
         LogPrintf("%s CKeyHolderStorage::%s -- Warning: Keypool ran out, trying to top up\n", pwalletIn->GetDisplayName(), __func__);
         pwalletIn->TopUpKeyPool();
-        if (!reservekey->GetReservedKey(vchPubKey)) {
+        if (!reservedest->GetReservedDestination(output_type, dest, true)) {
             LogPrintf("%s CKeyHolderStorage::%s -- Error: Failed to obtain key from keypool\n", pwalletIn->GetDisplayName(), __func__);
             return;
         }
     }
-    pwalletIn->LearnRelatedScripts(vchPubKey, output_type);
 
-    script = GetScriptForDestination(GetDestinationForKey(vchPubKey, output_type));
+    script = GetScriptForDestination(dest);
 
     LOCK(cs_storage);
-    storage.emplace_back(std::move(reservekey));
+    storage.emplace_back(std::move(reservedest));
     LogPrintf("%s CKeyHolderStorage::AddKey -- storage size %lld\n", pwalletIn->GetDisplayName(), storage.size());
 }
 
 void CKeyHolderStorage::KeepAll()
 {
-    std::vector<std::shared_ptr<CReserveKey> > tmp;
+    std::vector<std::shared_ptr<ReserveDestination> > tmp;
     {
         // don't hold cs_storage while calling KeepKey(), which might lock cs_wallet
         LOCK(cs_storage);
@@ -56,8 +55,8 @@ void CKeyHolderStorage::KeepAll()
     }
 
     if (tmp.size() > 0) {
-        for (auto &key : tmp) {
-            key->KeepKey();
+        for (auto &dest : tmp) {
+            dest->KeepDestination();
         }
         LogPrint(BCLog::CJOIN, "CKeyHolderStorage::KeepAll -- %lld keys kept\n", tmp.size());
     }
@@ -65,7 +64,7 @@ void CKeyHolderStorage::KeepAll()
 
 void CKeyHolderStorage::ReturnAll()
 {
-    std::vector<std::shared_ptr<CReserveKey> > tmp;
+    std::vector<std::shared_ptr<ReserveDestination> > tmp;
     {
         // don't hold cs_storage while calling ReturnKey(), which might lock cs_wallet
         LOCK(cs_storage);
@@ -73,8 +72,8 @@ void CKeyHolderStorage::ReturnAll()
     }
 
     if (tmp.size() > 0) {
-        for (auto &key : tmp) {
-            key->ReturnKey();
+        for (auto &dest : tmp) {
+            dest->ReturnDestination();
         }
         LogPrint(BCLog::CJOIN, "CKeyHolderStorage::ReturnAll -- %lld keys returned\n", tmp.size());
     }
@@ -1561,11 +1560,10 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
         CWalletTx wtx(m_wallet, tx);
 
         // make our change address
-        CReserveKey reservekeyChange(m_wallet);
-
+        ReserveDestination changedest(m_wallet);
 
         CValidationState state;
-        if (!m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */, reservekeyChange, state)) {
+        if (!m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */, changedest, state)) {
             LogPrintf("%s CCoinJoinClientManager::CreateDenominated -- CommitTransaction failed! Reason given: %s\n", m_wallet->GetDisplayName(), state.GetRejectReason());
             keyHolderStorageDenom.ReturnAll();
             return false;

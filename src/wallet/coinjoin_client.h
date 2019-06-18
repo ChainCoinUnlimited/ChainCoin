@@ -10,7 +10,7 @@
 #include <modules/coinjoin/coinjoin.h>
 
 class CCoinJoinClientManager;
-class CReserveKey;
+class ReserveDestination;
 class CWallet;
 
 static const int MIN_COINJOIN_AMOUNT             = 2;
@@ -30,7 +30,7 @@ static const int COINJOIN_KEYS_THRESHOLD_STOP    = 50;
 class CKeyHolderStorage
 {
 private:
-    std::vector<std::shared_ptr<CReserveKey> > storage;
+    std::vector<std::shared_ptr<ReserveDestination> > storage;
     mutable CCriticalSection cs_storage;
 
 public:
