@@ -201,9 +201,10 @@ BITCOIN_CORE_H = \
   rpc/blockchain.h \
   rpc/client.h \
   rpc/protocol.h \
-  rpc/server.h \
   rpc/rawtransaction_util.h \
   rpc/register.h \
+  rpc/request.h \
+  rpc/server.h \
   rpc/util.h \
   scheduler.h \
   script/descriptor.h \
@@ -558,7 +559,7 @@ libchaincoin_util_a_SOURCES = \
   interfaces/handler.cpp \
   logging.cpp \
   random.cpp \
-  rpc/protocol.cpp \
+  rpc/request.cpp \
   support/cleanse.cpp \
   sync.cpp \
   threadinterrupt.cpp \
