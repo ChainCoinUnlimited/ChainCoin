@@ -175,6 +175,7 @@ BITCOIN_CORE_H = \
   modules/platform/funding_vote.h \
   modules/platform/funding_votedb.h \
   net.h \
+  net_permissions.h \
   net_processing.h \
   netaddress.h \
   netbase.h \
@@ -531,6 +532,7 @@ libchaincoin_common_a_SOURCES = \
   merkleblock.cpp \
   netaddress.cpp \
   netbase.cpp \
+  net_permissions.cpp \
   outputtype.cpp \
   policy/feerate.cpp \
   policy/policy.cpp \
