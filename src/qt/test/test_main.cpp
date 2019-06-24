@@ -6,7 +6,6 @@
 #include <config/chaincoin-config.h>
 #endif
 
-#include <chainparams.h>
 #include <interfaces/node.h>
 #include <qt/chaincoin.h>
 #include <qt/test/apptests.h>
