@@ -4869,18 +4869,7 @@ bool AutoBackupWallet (std::shared_ptr<CWallet> pwallet, const WalletLocation& l
 
     fs::path backupsDir = GetBackupsDir();
 
-    if (!fs::exists(backupsDir))
-    {
-        // Always create backup folder to not confuse the operating system's file browser
-        LogPrintf("Creating backup folder %s\n", backupsDir.string());
-        if(!fs::create_directories(backupsDir)) {
-            // smth is wrong, we shouldn't continue until it's resolved
-            strBackupError = strprintf(_("Wasn't able to create wallet backup folder %s!"), backupsDir.string());
-            LogPrintf("%s\n", strBackupError);
-            nWalletBackups = -1;
-            return false;
-        }
-    } else if (!fs::is_directory(backupsDir)) {
+    if (!fs::is_directory(backupsDir)) {
         // smth is wrong, we shouldn't continue until it's resolved
         strBackupError = strprintf(_("%s is not a valid backup folder!"), backupsDir.string());
         LogPrintf("%s\n", strBackupError);
