@@ -8,6 +8,7 @@ src/chaincoin-tx
 src/test/test_chaincoin
 src/test/test_chaincoin_fuzzy
 src/qt/test/test_chaincoin-qt
+*.pdb
 
 # autoreconf
 Makefile.in
