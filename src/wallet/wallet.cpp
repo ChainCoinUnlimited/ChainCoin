@@ -3785,8 +3785,7 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
     {
         LOCK(cs_wallet);
 
-        if (IsLocked())
-            return false;
+        if (IsLocked()) return false;
 
         // Top up key pool
         unsigned int nTargetSize;
@@ -3847,8 +3846,7 @@ bool CWallet::ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool, bool fRe
     {
         LOCK(cs_wallet);
 
-        if (!IsLocked(true))
-            TopUpKeyPool();
+        TopUpKeyPool();
 
         bool fReturningInternal = fRequestedInternal;
         fReturningInternal &= (IsHDEnabled() && CanSupportFeature(FEATURE_HD_SPLIT)) || IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS);
@@ -3940,9 +3938,8 @@ bool CWallet::GetNewDestination(const OutputType type, const std::string label, 
 {
     LOCK(cs_wallet);
     error.clear();
-    if (!IsLocked()) {
-        TopUpKeyPool();
-    }
+
+    TopUpKeyPool();
 
     // Generate a new key that is added to wallet
     CPubKey new_key;
@@ -3960,9 +3957,8 @@ bool CWallet::GetNewDestination(const OutputType type, const std::string label, 
 bool CWallet::GetNewChangeDestination(const OutputType type, CTxDestination& dest, std::string& error)
 {
     error.clear();
-    if (!IsLocked()) {
-        TopUpKeyPool();
-    }
+
+    TopUpKeyPool();
 
     ReserveDestination reservedest(this);
     if (!reservedest.GetReservedDestination(type, dest, true)) {
