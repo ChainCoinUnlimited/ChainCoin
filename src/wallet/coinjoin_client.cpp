@@ -1559,11 +1559,8 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
         CTransactionRef tx(MakeTransactionRef(std::move(mtx)));
         CWalletTx wtx(m_wallet, tx);
 
-        // make our change address
-        ReserveDestination changedest(m_wallet);
-
         CValidationState state;
-        if (!m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */, changedest, state)) {
+        if (!m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */, state)) {
             LogPrintf("%s CCoinJoinClientManager::CreateDenominated -- CommitTransaction failed! Reason given: %s\n", m_wallet->GetDisplayName(), state.GetRejectReason());
             keyHolderStorageDenom.ReturnAll();
             return false;

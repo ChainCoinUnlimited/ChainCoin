@@ -3000,9 +3000,8 @@ bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount& nFeeRet, int& nC
     auto locked_chain = chain().lock();
     LOCK(cs_wallet);
 
-    ReserveDestination reservedest(this);
     CTransactionRef tx_new;
-    if (!CreateTransaction(*locked_chain, vecSend, tx_new, reservedest, nFeeRet, nChangePosInOut, strFailReason, coinControl, false)) {
+    if (!CreateTransaction(*locked_chain, vecSend, tx_new, nFeeRet, nChangePosInOut, strFailReason, coinControl, false)) {
         return false;
     }
 
@@ -3136,9 +3135,6 @@ bool CWallet::GetOutpointAndKeysFromOutput(const COutput& out, COutPoint& outpoi
 
 bool CWallet::GetBudgetSystemCollateralTX(interfaces::Chain::Lock& locked_chain, CTransactionRef& tx, uint256 hash, CAmount amount)
 {
-    // make our change address
-    ReserveDestination reservedest(this);
-
     CScript scriptChange;
     scriptChange << OP_RETURN << ToByteVector(hash);
 
@@ -3149,7 +3145,7 @@ bool CWallet::GetBudgetSystemCollateralTX(interfaces::Chain::Lock& locked_chain,
     vecSend.push_back((CRecipient){scriptChange, amount, false});
 
     CCoinControl coin_control;
-    bool success = CreateTransaction(locked_chain, vecSend, tx, reservedest, nFeeRet, nChangePosRet, strFail, coin_control, true, ALL_COINS);
+    bool success = CreateTransaction(locked_chain, vecSend, tx, nFeeRet, nChangePosRet, strFail, coin_control, true, ALL_COINS);
     if(!success){
         WalletLogPrintf("CWallet::GetBudgetSystemCollateralTX -- Error: %s\n", strFail);
         return false;
@@ -3246,11 +3242,12 @@ OutputType CWallet::TransactionChangeType(OutputType change_type, const std::vec
     return m_default_address_type;
 }
 
-bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std::vector<CRecipient>& vecSend, CTransactionRef& tx, ReserveDestination& reservedest, CAmount& nFeeRet,
+bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std::vector<CRecipient>& vecSend, CTransactionRef& tx, CAmount& nFeeRet,
                          int& nChangePosInOut, std::string& strFailReason, const CCoinControl& coin_control, bool sign, AvailableCoinsType _nCoinType, int nCoinJoin)
 {
     AvailableCoinsType nCoinType = nCoinJoin > 0 ? ONLY_DENOMINATED : _nCoinType;
     CAmount nValue = 0;
+    ReserveDestination reservedest(this);
     int nChangePosRequest = nChangePosInOut;
     unsigned int nSubtractFeeFromAmount = 0;
     for (const auto& recipient : vecSend)
@@ -3624,7 +3621,7 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
 /**
  * Call after CreateTransaction unless you want to abort
  */
-bool CWallet::CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::vector<std::pair<std::string, std::string>> orderForm, ReserveDestination& reservedest, CValidationState& state, int nCoinJoin)
+bool CWallet::CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::vector<std::pair<std::string, std::string>> orderForm, CValidationState& state, int nCoinJoin)
 {
     {
         auto locked_chain = chain().lock();
@@ -3640,8 +3637,6 @@ bool CWallet::CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::ve
 
         WalletLogPrintf("CommitTransaction:\n%s", wtxNew.tx->ToString()); /* Continued */
         {
-            // Take key pair from key pool so it won't be used again
-            reservedest.KeepDestination();
 
             // Add tx to wallet, because if it has change it's also ours,
             // otherwise just for transaction history.
