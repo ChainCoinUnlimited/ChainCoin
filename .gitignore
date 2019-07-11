@@ -136,3 +136,7 @@ Chaincoin.cxxflags
 
 # clang-check
 *.plist
+
+osx_volname
+dist/
+*.background.tiff
