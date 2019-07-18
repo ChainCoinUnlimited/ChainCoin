@@ -188,11 +188,11 @@ void ProposalDialog::on_submitButton_clicked()
 
     if (sendStatus.status == WalletModel::OK) {
         CoinControlDialog::coinControl()->UnSelectAll();
-        Q_EMIT coinsSent(currentTransaction.getWtx()->get().GetHash());
+        Q_EMIT coinsSent(currentTransaction.getWtx()->GetHash());
     }
 
     // and finalize our proposal
-    hash = clientModel->node().validateProposal(data, currentTransaction.getWtx()->get().GetHash(), amount, errRet);
+    hash = clientModel->node().validateProposal(data, currentTransaction.getWtx()->GetHash(), amount, errRet);
 
     if(hash == uint256()) {
         ui->statusLabel->setStyleSheet("QLabel { color: red; }");

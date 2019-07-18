@@ -439,7 +439,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
         accept();
         CoinControlDialog::coinControl()->UnSelectAll();
         coinControlUpdateLabels();
-        Q_EMIT coinsSent(currentTransaction.getWtx()->get().GetHash());
+        Q_EMIT coinsSent(currentTransaction.getWtx()->GetHash());
     }
     fNewRecipientAllowed = true;
 }
