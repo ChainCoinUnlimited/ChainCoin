@@ -79,6 +79,8 @@ fs::path GetDefaultDataDir();
 const fs::path &GetBlocksDir();
 const fs::path &GetDataDir(bool fNetSpecific = true);
 const fs::path &GetBackupsDir();
+// Return true if -datadir option points to a valid directory or is not specified.
+bool CheckDataDirOption();
 /** Tests only */
 void ClearDatadirCache();
 fs::path GetConfigFile(const std::string& confPath);
