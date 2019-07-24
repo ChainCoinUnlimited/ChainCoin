@@ -526,7 +526,7 @@ bool CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight, bool f
 
         //check the output
         Coin coin;
-        if (!pcoinsTip->GetCoin(mnpair.first, coin)) continue;
+        if (!::ChainstateActive().CoinsTip().GetCoin(mnpair.first, coin)) continue;
 
         //make sure it has at least as many confirmations as there are masternodes
         if ((::ChainActive().Height() - coin.nHeight + 1) < nMnCount) continue;

@@ -114,7 +114,7 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
     AssertLockHeld(cs_main);
 
     Coin coin;
-    if (!pcoinsTip->GetCoin(outpoint, coin)) {
+    if (!::ChainstateActive().CoinsTip().GetCoin(outpoint, coin)) {
         return COLLATERAL_UTXO_NOT_FOUND;
     }
 
@@ -156,7 +156,7 @@ void CMasternode::Check(bool fForce)
     int nHeight = 0;
     if (!fUnitTest) {
         Coin coin;
-        if (!pcoinsTip->GetCoin(outpoint, coin)) {
+        if (!::ChainstateActive().CoinsTip().GetCoin(outpoint, coin)) {
             nActiveState = MASTERNODE_OUTPOINT_SPENT;
             uiInterface.NotifyMasternodeChanged(outpoint, CT_UPDATED);
             LogPrint(BCLog::MNODE, "CMasternode::Check -- Failed to find Masternode UTXO, masternode=%s\n", outpoint.ToStringShort());
