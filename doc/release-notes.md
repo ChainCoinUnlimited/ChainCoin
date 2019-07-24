@@ -17,8 +17,8 @@ https://github.com/chaincoin/wiki/
 
   <https://github.com/chaincoin/chaincoin/releases/tag/>
 
-This is a new major version release, including new features, various bugfixes
-and performance improvements, as well as updated translations.
+This release includes new features, various bug fixes and performance
+improvements, as well as updated translations.
 
 Please report bugs using the issue tracker at GitHub:
 
@@ -36,26 +36,19 @@ Upgrading directly from a version of Chaincoin Core that has reached its EOL is
 possible, but might take some time if the datadir needs to be migrated.  Old
 wallet versions of Chaincoin Core are generally supported.
 
-Downgrading warning
--------------------
-
-Wallets created in 0.16 and later are not compatible with versions prior to 0.16
-and will not work if you try to use newly created wallets in older versions. Existing
-wallets that were created with older versions are not affected by this.
-
 Compatibility
 ==============
 
 Chaincoin Core is supported and extensively tested on operating systems using
-the Linux kernel, macOS 10.11+, and Windows 7 and newer.  It is not recommended
+the Linux kernel, macOS 10.10+, and Windows 7 and newer. It is not recommended
 to use Chaincoin Core on unsupported systems.
 
 Chaincoin Core should also work on most other Unix-like systems but is not
-frequently tested on them.
+as frequently tested on them.
 
-From 0.17.0 onwards, macOS <10.11 is no longer supported.  0.17.0 is
+From 0.17.0 onwards, macOS <10.10 is no longer supported. 0.17.0 is
 built using Qt 5.9.x, which doesn't support versions of macOS older than
-10.11.  Additionally, Bitcoin Core does not yet change appearance when
+10.10. Additionally, Chaincoin Core does not yet change appearance when
 macOS "dark mode" is activated.
 
 In addition to previously-supported CPU platforms, this release's
