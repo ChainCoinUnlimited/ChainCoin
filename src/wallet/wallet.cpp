@@ -3276,7 +3276,6 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
                          int& nChangePosInOut, std::string& strFailReason, const CCoinControl& coin_control, bool sign, AvailableCoinsType _nCoinType, int nCoinJoin)
 {
     AvailableCoinsType nCoinType = nCoinJoin > 0 ? ONLY_DENOMINATED : _nCoinType;
-    if (nCoinJoin > 0) coin_control.m_min_depth = coinjoinClient->nCoinJoinDepth;
     CAmount nValue = 0;
     ReserveDestination reservedest(this);
     int nChangePosRequest = nChangePosInOut;

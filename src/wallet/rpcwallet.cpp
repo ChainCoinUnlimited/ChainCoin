@@ -2911,13 +2911,7 @@ static UniValue listunspent(const JSONRPCRequest& request)
         cctl.m_max_depth = nMaxDepth;
         auto locked_chain = pwallet->chain().lock();
         LOCK(pwallet->cs_wallet);
-<<<<<<< HEAD
-        pwallet->AvailableCoins(*locked_chain, vecOutputs, !include_unsafe, &cctl, ALL_COINS, nMinimumAmount, nMaximumAmount, nMinimumSumAmount, nMaximumCount, nMinDepth, nMaxDepth);
-||||||| parent of 80ba4241a... extract min & max depth onto coin control
-        pwallet->AvailableCoins(*locked_chain, vecOutputs, !include_unsafe, &cctl, nMinimumAmount, nMaximumAmount, nMinimumSumAmount, nMaximumCount, nMinDepth, nMaxDepth);
-=======
-        pwallet->AvailableCoins(*locked_chain, vecOutputs, !include_unsafe, &cctl, nMinimumAmount, nMaximumAmount, nMinimumSumAmount, nMaximumCount);
->>>>>>> 80ba4241a... extract min & max depth onto coin control
+        pwallet->AvailableCoins(*locked_chain, vecOutputs, !include_unsafe, &cctl, ALL_COINS, nMinimumAmount, nMaximumAmount, nMinimumSumAmount, nMaximumCount);
     }
 
     LOCK(pwallet->cs_wallet);
