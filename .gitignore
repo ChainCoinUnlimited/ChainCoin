@@ -85,6 +85,7 @@ src/qt/chaincoin-qt.includes
 # Compilation and Qt preprocessor part
 *.qm
 Makefile
+!depends/Makefile
 chaincoin-qt
 Chaincoin-Qt.app
 background.tiff*
