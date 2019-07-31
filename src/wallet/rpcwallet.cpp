@@ -11,7 +11,6 @@
 #include <key_io.h>
 #include <modules/platform/funding_object.h>
 #include <modules/platform/funding_validators.h>
-#include <node/transaction.h>
 #include <outputtype.h>
 #include <policy/feerate.h>
 #include <policy/fees.h>
@@ -39,7 +38,6 @@
 
 #include <univalue.h>
 
-#include <functional>
 
 static const std::string WALLET_ENDPOINT_BASE = "/wallet/";
 

@@ -30,7 +30,6 @@
 #include <reverse_iterator.h>
 #include <script/script.h>
 #include <script/sigcache.h>
-#include <script/standard.h>
 #include <shutdown.h>
 #include <timedata.h>
 #include <tinyformat.h>
@@ -51,9 +50,6 @@
 #include <modules/masternode/masternode_man.h>
 #include <modules/masternode/masternode_payments.h>
 
-#include <future>
-#include <numeric>
-#include <sstream>
 #include <string>
 
 #include <boost/algorithm/string/replace.hpp>

@@ -8,7 +8,6 @@
 
 #include <functional>
 #include <memory>
-#include <stdint.h>
 #include <string>
 #include <uint256.h>
 
