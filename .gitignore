@@ -90,6 +90,9 @@ chaincoin-qt
 Chaincoin-Qt.app
 background.tiff*
 
+# Qt Creator
+Makefile.am.user
+
 # Unit-tests
 Makefile.test
 chaincoin-qt_test
