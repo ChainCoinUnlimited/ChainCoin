@@ -19,6 +19,10 @@ ExecStart=/usr/bin/chaincoind -daemon \
                             -conf=/etc/chaincoin/chaincoin.conf \
                             -datadir=/var/lib/chaincoind
 
+# Make sure the config directory is readable by the service user
+PermissionsStartOnly=true
+ExecStartPre=/bin/chgrp bitcoin /etc/bitcoin
+
 # Process management
 ####################
 
