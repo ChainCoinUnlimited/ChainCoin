@@ -54,11 +54,12 @@ namespace BCLog {
         COINDB      = (1 << 18),
         QT          = (1 << 19),
         LEVELDB     = (1 << 20),
-        MNODE       = (1 << 21),
-        MNODESYNC   = (1 << 22),
-        MNODEPAY    = (1 << 23),
-        GOV         = (1 << 24),
-        CJOIN    = (1 << 25),
+        VALIDATION  = (1 << 21),
+        MNODE       = (1 << 22),
+        MNODESYNC   = (1 << 23),
+        MNODEPAY    = (1 << 24),
+        GOV         = (1 << 25),
+        CJOIN       = (1 << 26),
         ALL         = ~(uint32_t)0,
     };
 
