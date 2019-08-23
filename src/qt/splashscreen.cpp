@@ -5,13 +5,12 @@
 
 #include <qt/splashscreen.h>
 
-#include <qt/guiutil.h>
-#include <qt/networkstyle.h>
-
 #include <clientversion.h>
 #include <interfaces/handler.h>
 #include <interfaces/node.h>
 #include <interfaces/wallet.h>
+#include <qt/guiutil.h>
+#include <qt/networkstyle.h>
 #include <ui_interface.h>
 #include <util/system.h>
 #include <util/translation.h>
@@ -26,7 +25,6 @@
 SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const NetworkStyle *networkStyle) :
     QWidget(nullptr, f), curAlignment(0), m_node(node)
 {
-
     // transparent background
     setAttribute(Qt::WA_TranslucentBackground);
     setStyleSheet("background:transparent;");
@@ -35,20 +33,21 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
     setWindowFlags(Qt::FramelessWindowHint);
 
     // set reference point, paddings
-    int paddingLeft             = 14;
+    int paddingRight            = 14;
     int paddingTop              = 470;
     int titleVersionVSpace      = 17;
-    int titleCopyrightVSpace    = 32;
+    int titleCopyrightVSpace    = 40;
 
     float fontFactor            = 1.0;
+    float devicePixelRatio      = 1.0;
+    devicePixelRatio = static_cast<QGuiApplication*>(QCoreApplication::instance())->devicePixelRatio() / 2;
 
     // define text to place
     QString titleText       = PACKAGE_NAME;
     QString versionText     = QString(tr("Version %1")).arg(QString::fromStdString(FormatFullVersion()));
-    QString copyrightTextBtc   = QChar(0xA9)+QString(" 2009-%1 ").arg(COPYRIGHT_YEAR) + QString(tr("The Bitcoin Core developers"));
-    QString copyrightTextDash   = QChar(0xA9)+QString(" 2014-%1 ").arg(COPYRIGHT_YEAR) + QString(tr("The Dash Core developers"));
-    QString copyrightTextCHC   = QChar(0xA9)+QString(" 2014-%1 ").arg(COPYRIGHT_YEAR) + QString(tr("The Chaincoin Core developers"));
+    QString copyrightText   = QString::fromUtf8(CopyrightHolders(strprintf("\xc2\xA9 %u-%u ", 2009, COPYRIGHT_YEAR)).c_str());
     QString titleAddText    = networkStyle->getTitleAddText();
+
     // networkstyle.cpp can't (yet) read themes, so we do it here to get the correct Splash-screen
     QString splashScreenPath = ":/images/" + GUIUtil::getThemeName() + "/splash";
     if(gArgs.GetBoolArg("-regtest", false))
@@ -58,34 +57,48 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
 
     QString font = QApplication::font().toString();
 
-    // load the bitmap for writing some text over it
+    // create a bitmap according to device pixelratio
+    QSize splashSize(430*devicePixelRatio,720*devicePixelRatio);
     pixmap = QPixmap(splashScreenPath);
 
+    // change to HiDPI if it makes sense
+    pixmap.setDevicePixelRatio(devicePixelRatio);
     QPainter pixPaint(&pixmap);
+
     pixPaint.setPen(QColor(100,100,100));
 
     // check font size and drawing with
     pixPaint.setFont(QFont(font, 28*fontFactor));
     QFontMetrics fm = pixPaint.fontMetrics();
-    int titleTextWidth  = fm.width(titleText);
-    if(titleTextWidth > 160) {
-        // strange font rendering, Arial probably not found
-        fontFactor = 0.75;
+    int titleTextWidth = GUIUtil::TextWidth(fm, titleText);
+    if (titleTextWidth > 176) {
+        fontFactor = fontFactor * 176 / titleTextWidth;
     }
 
     pixPaint.setFont(QFont(font, 28*fontFactor));
     fm = pixPaint.fontMetrics();
-    titleTextWidth  = fm.width(titleText);
-    pixPaint.drawText(paddingLeft,paddingTop,titleText);
+    titleTextWidth  = GUIUtil::TextWidth(fm, titleText);
+    pixPaint.drawText(pixmap.width()/devicePixelRatio-titleTextWidth-paddingRight,paddingTop,titleText);
 
     pixPaint.setFont(QFont(font, 15*fontFactor));
-    pixPaint.drawText(paddingLeft,paddingTop+titleVersionVSpace,versionText);
+
+    // if the version string is too long, reduce size
+    fm = pixPaint.fontMetrics();
+    int versionTextWidth  = GUIUtil::TextWidth(fm, versionText);
+    if(versionTextWidth > titleTextWidth+paddingRight-10) {
+        pixPaint.setFont(QFont(font, 10*fontFactor));
+        titleVersionVSpace -= 5;
+    }
+    pixPaint.drawText(pixmap.width()/devicePixelRatio-titleTextWidth-paddingRight+2,paddingTop+titleVersionVSpace,versionText);
 
     // draw copyright stuff
-    pixPaint.setFont(QFont(font, 10*fontFactor));
-    pixPaint.drawText(paddingLeft,paddingTop+titleCopyrightVSpace,copyrightTextBtc);
-    pixPaint.drawText(paddingLeft,paddingTop+titleCopyrightVSpace+12,copyrightTextDash);
-    pixPaint.drawText(paddingLeft,paddingTop+titleCopyrightVSpace+24,copyrightTextCHC);
+    {
+        pixPaint.setFont(QFont(font, 10*fontFactor));
+        const int x = pixmap.width()/devicePixelRatio-titleTextWidth-paddingRight;
+        const int y = paddingTop+titleCopyrightVSpace;
+        QRect copyrightRect(x, y, pixmap.width() - x - paddingRight, pixmap.height() - y);
+        pixPaint.drawText(copyrightRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, copyrightText);
+    }
 
     // draw additional text if special network
     if(!titleAddText.isEmpty()) {
@@ -93,14 +106,17 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
         boldFont.setWeight(QFont::Bold);
         pixPaint.setFont(boldFont);
         fm = pixPaint.fontMetrics();
-        int titleAddTextWidth  = fm.width(titleAddText);
-        pixPaint.drawText(pixmap.width()-titleAddTextWidth-10,pixmap.height()-25,titleAddText);
+        int titleAddTextWidth  = GUIUtil::TextWidth(fm, titleAddText);
+        pixPaint.drawText(pixmap.width()/devicePixelRatio-titleAddTextWidth-10,15,titleAddText);
     }
 
     pixPaint.end();
 
+    // Set window title
+    setWindowTitle(titleText + " " + titleAddText);
+
     // Resize window and move to center of desktop, disallow resizing
-    QRect r(QPoint(), pixmap.size());
+    QRect r(QPoint(), QSize(pixmap.size().width()/devicePixelRatio,pixmap.size().height()/devicePixelRatio));
     resize(r.size());
     setFixedSize(r.size());
     move(QApplication::desktop()->screenGeometry().center() - r.center());

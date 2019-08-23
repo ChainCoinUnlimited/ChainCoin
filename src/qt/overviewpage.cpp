@@ -134,6 +134,12 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
 
     m_balances.balance = -1;
 
+    // use a SingleColorIcon for the "out of sync warning" icon
+    QIcon icon = platformStyle->SingleColorIcon(":/icons/warning");
+    icon.addPixmap(icon.pixmap(QSize(64,64), QIcon::Normal), QIcon::Disabled); // also set the disabled icon because we are using a disabled QPushButton to work around missing HiDPI support of QLabel (https://bugreports.qt.io/browse/QTBUG-42503)
+    ui->labelTransactionsStatus->setIcon(icon);
+    ui->labelWalletStatus->setIcon(icon);
+
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
     ui->listTransactions->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
@@ -142,7 +148,6 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
 
     connect(ui->listTransactions, &QListView::clicked, this, &OverviewPage::handleTransactionClicked);
 
-    // init "out of sync" warning labels
     // start with displaying the "out of sync" warnings
     showOutOfSyncWarning(true);
     connect(ui->labelWalletStatus, &QPushButton::clicked, this, &OverviewPage::handleOutOfSyncWarningClicks);
@@ -152,9 +157,6 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     // hide PS frame (helps to preserve saved size)
     // we'll setup and make it visible in updateAdvancedPSUI() later if we are not in litemode
     ui->frameCoinJoin->setVisible(false);
-
-    // start with displaying the "out of sync" warnings
-    showOutOfSyncWarning(true);
 
     // that's it for litemode
     if(fLiteMode) return;
