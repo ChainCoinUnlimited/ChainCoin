@@ -34,7 +34,7 @@ private:
     mutable CCriticalSection cs_storage;
 
 public:
-    void AddKey(std::shared_ptr<CReserveScript> &script, CWallet* pwalletIn);
+    void AddKey(CScript &script, CWallet* pwalletIn);
     void KeepAll();
     void ReturnAll();
 

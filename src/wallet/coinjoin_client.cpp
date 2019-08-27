@@ -20,7 +20,7 @@
 #include <numeric>
 #include <memory>
 
-void CKeyHolderStorage::AddKey(std::shared_ptr<CReserveScript> &script, CWallet* pwalletIn)
+void CKeyHolderStorage::AddKey(CScript &script, CWallet* pwalletIn)
 {
     OutputType output_type = pwalletIn->m_default_change_type != OutputType::CHANGE_AUTO ? pwalletIn->m_default_change_type : pwalletIn->m_default_address_type;
     if (output_type == OutputType::LEGACY) {
@@ -39,7 +39,7 @@ void CKeyHolderStorage::AddKey(std::shared_ptr<CReserveScript> &script, CWallet*
     }
     pwalletIn->LearnRelatedScripts(vchPubKey, output_type);
 
-    script->reserveScript = GetScriptForDestination(GetDestinationForKey(vchPubKey, output_type));
+    script = GetScriptForDestination(GetDestinationForKey(vchPubKey, output_type));
 
     LOCK(cs_storage);
     storage.emplace_back(std::move(reservekey));
@@ -843,9 +843,9 @@ bool CCoinJoinClientSession::CreateSessionTransaction(std::vector<std::pair<CTxI
                  FormatMoney(it->second.nValue));
         if (fMixingOnly) {
             nValueRem -= it->second.nValue;
-            std::shared_ptr<CReserveScript> scriptDenom = std::make_shared<CReserveScript>();
+            CScript scriptDenom;
             keyHolderStorage.AddKey(scriptDenom, m_wallet_session);
-            mtxSession.vout.emplace_back(CTxOut(it->second.nValue, scriptDenom->reserveScript));
+            mtxSession.vout.emplace_back(CTxOut(it->second.nValue, scriptDenom));
             vecAmounts.emplace_back(it->second.nValue);
             nSessionDenom |= it->second.nValue;
             LogPrint(BCLog::CJOIN, "%s CCoinJoinClientSession::CreateSessionTransaction --- step 1a: added output: %s, remaining: %s\n",
@@ -874,9 +874,9 @@ bool CCoinJoinClientSession::CreateSessionTransaction(std::vector<std::pair<CTxI
             while (count < static_cast<int>(target) && nValueRem >= denom) {
                 count++;
                 nValueRem -= denom;
-                std::shared_ptr<CReserveScript> scriptDenom = std::make_shared<CReserveScript>();
+                CScript scriptDenom;
                 keyHolderStorage.AddKey(scriptDenom, m_wallet_session);
-                mtxSession.vout.emplace_back(CTxOut(denom, scriptDenom->reserveScript));
+                mtxSession.vout.emplace_back(CTxOut(denom, scriptDenom));
                 vecAmounts.emplace_back(denom);
                 nSessionDenom |= denom;
                 LogPrint(BCLog::CJOIN, "%s CCoinJoinClientSession::CreateSessionTransaction --- step 2: added output: %s, remaining: %s\n",
@@ -890,9 +890,9 @@ bool CCoinJoinClientSession::CreateSessionTransaction(std::vector<std::pair<CTxI
         for (auto denom = COINJOIN_HIGH_DENOM; denom >= COINJOIN_LOW_DENOM; denom >>=1) {
             while (nValueRem >= denom) {
                 nValueRem -= denom;
-                std::shared_ptr<CReserveScript> scriptDenom = std::make_shared<CReserveScript>();
+                CScript scriptDenom;
                 keyHolderStorage.AddKey(scriptDenom, m_wallet_session);
-                mtxSession.vout.emplace_back(CTxOut(denom, scriptDenom->reserveScript));
+                mtxSession.vout.emplace_back(CTxOut(denom, scriptDenom));
                 vecAmounts.emplace_back(denom);
                 nSessionDenom |= denom;
                 LogPrint(BCLog::CJOIN, "%s CCoinJoinClientSession::CreateSessionTransaction --- step 3: added output: %s, remaining: %s\n",
@@ -1479,16 +1479,16 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
             // missing denoms
             while (nValueLeft >= denom && count < target && mtx.vout.size() < tx_size) {
                 count++;
-                std::shared_ptr<CReserveScript> scriptDenom = std::make_shared<CReserveScript>();
+                CScript scriptDenom;
                 keyHolderStorageDenom.AddKey(scriptDenom, m_wallet);
 
-                if (!scriptDenom || scriptDenom->reserveScript.empty()) {
+                if (scriptDenom.empty()) {
                     LogPrintf("%s CCoinJoinClientManager::CreateDenominated -- No script available, Keypool exhausted?\n", m_wallet->GetDisplayName());
                     return false;
                 }
 
                 vecAmounts.push_back(denom);
-                mtx.vout.push_back(CTxOut(denom, scriptDenom->reserveScript));
+                mtx.vout.push_back(CTxOut(denom, scriptDenom));
 
                 //subtract denomination amount
                 nValueLeft -= denom;
@@ -1500,16 +1500,16 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
         for (auto denom = COINJOIN_HIGH_DENOM; denom >= COINJOIN_LOW_DENOM; denom >>= 1) {
             if (nValueLeft == 0) break;
             if (nValueLeft >= denom  && mtx.vout.size() < tx_size) {
-                std::shared_ptr<CReserveScript> scriptDenom = std::make_shared<CReserveScript>();
+                CScript scriptDenom;
                 keyHolderStorageDenom.AddKey(scriptDenom, m_wallet);
 
-                if (!scriptDenom || scriptDenom->reserveScript.empty()) {
+                if (scriptDenom.empty()) {
                     LogPrintf("%s CCoinJoinClientManager::CreateDenominated -- No script available, Keypool exhausted?\n", m_wallet->GetDisplayName());
                     return false;
                 }
 
                 vecAmounts.push_back(denom);
-                mtx.vout.push_back(CTxOut(denom, scriptDenom->reserveScript));
+                mtx.vout.push_back(CTxOut(denom, scriptDenom));
 
                 //subtract denomination amount
                 nValueLeft -= denom;
