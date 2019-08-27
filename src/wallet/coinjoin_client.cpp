@@ -919,14 +919,14 @@ bool CCoinJoinClientSession::CreateSessionTransaction(std::vector<std::pair<CTxI
  * Return a height-based locktime for new transactions (uses the height of the
  * current chain tip unless we are not synced with the current chain
  */
-static uint32_t GetLocktimeForCoinJoin(interfaces::Chain::Lock& locked_chain)
+static uint32_t GetLocktimeForCoinJoin(interfaces::Chain& chain, interfaces::Chain::Lock& locked_chain)
 {
     uint32_t const height = locked_chain.getHeight().get_value_or(-1);
     uint32_t locktime;
     // Discourage fee sniping, see wallet.cpp
     // used in this context to determine the masternode which should
     // receive the fees for CoinJoin! at max 8 blocks in the future
-    if (!IsInitialBlockDownload()) {
+    if (chain.isInitialBlockDownload()) {
         locktime = (int)height + GetRandInt(8);
     } else {
         locktime = 0;
@@ -942,7 +942,7 @@ bool CCoinJoinClientSession::AddFeesAndLocktime(std::vector<CAmount>& vecAmounts
     CScript payee = CScript();
     {
         auto locked_chain = m_wallet_session->chain().lock();
-        locktime = GetLocktimeForCoinJoin(*locked_chain);
+        locktime = GetLocktimeForCoinJoin(m_wallet_session->chain(), *locked_chain);
     }
     if (locktime == 0) {
         LogPrintf("CCoinJoinClientSession::AddFeesAndLocktime --- ERROR: failed to find nLocktime!\n");

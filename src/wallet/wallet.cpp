@@ -1902,7 +1902,7 @@ void CWallet::ReacceptWalletTransactions(interfaces::Chain::Lock& locked_chain)
     for (const std::pair<const int64_t, CWalletTx*>& item : mapSorted) {
         CWalletTx& wtx = *(item.second);
         CValidationState state;
-        wtx.AcceptToMemoryPool(*locked_chain, state);
+        wtx.AcceptToMemoryPool(locked_chain, state);
     }
 }
 
@@ -3005,13 +3005,13 @@ bool CWallet::GetBudgetSystemCollateralTX(interfaces::Chain::Lock& locked_chain,
     return true;
 }
 
-static bool IsCurrentForAntiFeeSniping(interfaces::Chain::Lock& locked_chain)
+static bool IsCurrentForAntiFeeSniping(interfaces::Chain& chain, interfaces::Chain::Lock& locked_chain)
 {
-    if (IsInitialBlockDownload()) {
+    if (chain.isInitialBlockDownload()) {
         return false;
     }
     constexpr int64_t MAX_ANTI_FEE_SNIPING_TIP_AGE = 8 * 60 * 60; // in seconds
-    if (chainActive.Tip()->GetBlockTime() < (GetTime() - MAX_ANTI_FEE_SNIPING_TIP_AGE)) {
+    if (locked_chain.getBlockTime(*locked_chain.getHeight()) < (GetTime() - MAX_ANTI_FEE_SNIPING_TIP_AGE)) {
         return false;
     }
     return true;
@@ -3021,7 +3021,7 @@ static bool IsCurrentForAntiFeeSniping(interfaces::Chain::Lock& locked_chain)
  * Return a height-based locktime for new transactions (uses the height of the
  * current chain tip unless we are not synced with the current chain
  */
-static uint32_t GetLocktimeForNewTransaction(interfaces::Chain::Lock& locked_chain)
+static uint32_t GetLocktimeForNewTransaction(interfaces::Chain& chain, interfaces::Chain::Lock& locked_chain)
 {
     uint32_t const height = locked_chain.getHeight().get_value_or(-1);
     uint32_t locktime;
@@ -3045,7 +3045,7 @@ static uint32_t GetLocktimeForNewTransaction(interfaces::Chain::Lock& locked_cha
     // enough, that fee sniping isn't a problem yet, but by implementing a fix
     // now we ensure code won't be written that makes assumptions about
     // nLockTime that preclude a fix later.
-    if (IsCurrentForAntiFeeSniping(locked_chain)) {
+    if (IsCurrentForAntiFeeSniping(chain, locked_chain)) {
         locktime = height;
 
         // Secondly occasionally randomly pick a nLockTime even further back, so
@@ -3120,7 +3120,7 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
 
     CMutableTransaction txNew;
 
-    txNew.nLockTime = GetLocktimeForNewTransaction(locked_chain);
+    txNew.nLockTime = GetLocktimeForNewTransaction(chain(), locked_chain);
 
     FeeCalculation feeCalc;
     CAmount nFeeNeeded;
