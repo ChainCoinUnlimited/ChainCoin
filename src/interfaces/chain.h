@@ -288,7 +288,7 @@ public:
     //! synchronous notifications from requestMempoolTransactions. Clients need
     //! to be prepared to handle this by ignoring notifications about unknown
     //! removed transactions and already added new transactions.
-    virtual void requestMempoolTransactions(std::function<void(const CTransactionRef&)> fn) = 0;
+    virtual void requestMempoolTransactions(Notifications& notifications) = 0;
 
     //! Find a Masternode by outpoint
     virtual void askForMN(CNode* pnode, const COutPoint& outpoint) = 0;

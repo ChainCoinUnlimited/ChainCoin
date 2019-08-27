@@ -373,11 +373,11 @@ public:
     {
         return MakeUnique<RpcHandlerImpl>(command);
     }
-    void requestMempoolTransactions(std::function<void(const CTransactionRef&)> fn) override
+    void requestMempoolTransactions(Notifications& notifications) override
     {
         LOCK2(::cs_main, ::mempool.cs);
         for (const CTxMemPoolEntry& entry : ::mempool.mapTx) {
-            fn(entry.GetSharedTx());
+            notifications.TransactionAddedToMempool(entry.GetSharedTx());
         }
     }
     void askForMN(CNode* pnode, const COutPoint& outpoint) override

@@ -2487,18 +2487,18 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
         if (nDepth < nMinDepth || nDepth > nMaxDepth)
             continue;
 
-        for (unsigned int i = 0; i < wtx->tx->vout.size(); i++) {
+        for (unsigned int i = 0; i < wtx.tx->vout.size(); i++) {
             bool found = false;
             if(nCoinType == ONLY_DENOMINATED) {
-                found = CCoinJoin::IsDenominatedAmount(wtx->tx->vout[i].nValue);
+                found = CCoinJoin::IsDenominatedAmount(wtx.tx->vout[i].nValue);
             } else if(nCoinType == ONLY_1000) {
-                found = wtx->tx->vout[i].nValue == 1000*COIN;
+                found = wtx.tx->vout[i].nValue == 1000*COIN;
             } else {
                 found = true;
             }
             if(!found) continue;
 
-            if (wtx->tx->vout[i].nValue < nMinimumAmount || wtx->tx->vout[i].nValue > nMaximumAmount)
+            if (wtx.tx->vout[i].nValue < nMinimumAmount || wtx.tx->vout[i].nValue > nMaximumAmount)
                 continue;
 
             if (coinControl && coinControl->HasSelected() && !coinControl->fAllowOtherInputs && !coinControl->IsSelected(COutPoint(entry.first, i)))
