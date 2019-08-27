@@ -33,9 +33,8 @@
 #include <util/fees.h>
 #include <util/system.h>
 #include <util/moneystr.h>
-#include <util/validation.h>
-#include <validation.h>
 #include <util/url.h>
+#include <util/validation.h>
 #include <wallet/coincontrol.h>
 #include <wallet/feebumper.h>
 #include <wallet/psbtwallet.h>
@@ -4027,13 +4026,7 @@ UniValue walletcreatefundedpsbt(const JSONRPCRequest& request)
 
     CAmount fee;
     int change_position;
-    bool rbf = pwallet->m_signal_rbf;
-    const UniValue &replaceable_arg = request.params[3]["replaceable"];
-    if (!replaceable_arg.isNull()) {
-        RPCTypeCheckArgument(replaceable_arg, UniValue::VBOOL);
-        rbf = replaceable_arg.isTrue();
-    }
-    CMutableTransaction rawTx = ConstructTransaction(request.params[0], request.params[1], request.params[2], rbf);
+    CMutableTransaction rawTx = ConstructTransaction(request.params[0], request.params[1], request.params[2], request.params[3]["replaceable"]);
     FundTransaction(pwallet, rawTx, fee, change_position, request.params[3]);
 
     // Make a blank psbt

@@ -429,7 +429,7 @@ static UniValue createrawtransaction(const JSONRPCRequest& request)
     if (!request.params[3].isNull()) {
         rbf = request.params[3].isTrue();
     }
-    CMutableTransaction rawTx = ConstructTransaction(request.params[0], request.params[1], request.params[2], rbf);
+    CMutableTransaction rawTx = ConstructTransaction(request.params[0], request.params[1], request.params[2], request.params[3]);
 
     return EncodeHexTx(CTransaction(rawTx));
 }
@@ -1413,7 +1413,7 @@ UniValue createpsbt(const JSONRPCRequest& request)
     if (!request.params[3].isNull()) {
         rbf = request.params[3].isTrue();
     }
-    CMutableTransaction rawTx = ConstructTransaction(request.params[0], request.params[1], request.params[2], rbf);
+    CMutableTransaction rawTx = ConstructTransaction(request.params[0], request.params[1], request.params[2], request.params[3]);
 
     // Make a blank psbt
     PartiallySignedTransaction psbtx;
