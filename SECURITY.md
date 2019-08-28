@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Versions of Bitcoin Core that are currently supported with security updates:
+Versions of Chaincoin that are currently supported with security updates:
 
 | Version | Supported          |
 | ------- | ------------------ |
