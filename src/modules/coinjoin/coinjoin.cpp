@@ -21,6 +21,11 @@
 #include <numeric>
 #include <string>
 
+//! Discourage users to set fees higher than this amount (in satoshis) per kB
+constexpr CAmount HIGH_TX_FEE_PER_KB{COIN / 500};
+//! -maxtxfee will warn if called with a higher fee than this amount (in satoshis)
+constexpr CAmount HIGH_MAX_TX_FEE{100 * HIGH_TX_FEE_PER_KB};
+
 uint256 CCoinJoinQueue::GetSignatureHash() const
 {
     return SerializeHash(*this);

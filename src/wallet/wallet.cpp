@@ -2038,9 +2038,6 @@ CAmount CWalletTx::GetDenominatedCredit(interfaces::Chain::Lock& locked_chain, i
     if (IsImmatureCoinBase(locked_chain))
         return 0;
 
-    CAmount* cache = nullptr;
-    bool* cache_used = nullptr;
-
     if (nCoinJoinDepth >= pwallet->coinjoinClient->nCoinJoinDepth && fUseCache && allow_cache && m_amounts[ANONYMIZED_CREDIT].m_cached[filter]) {
         return m_amounts[ANONYMIZED_CREDIT].m_value[filter];
     }

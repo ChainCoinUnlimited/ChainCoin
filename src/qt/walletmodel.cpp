@@ -293,7 +293,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareCollateral(WalletModelTransacti
         // reject absurdly high fee. (This can never happen because the
         // wallet caps the fee at maxTxFee. This merely serves as a
         // belt-and-suspenders check)
-        if (nFeeRequired > m_node.getMaxTxFee())
+        if (nFeeRequired > m_wallet->getDefaultMaxTxFee())
             return AbsurdFee;
     }
 
