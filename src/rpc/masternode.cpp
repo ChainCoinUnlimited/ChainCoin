@@ -672,7 +672,7 @@ UniValue masternodebroadcast(const JSONRPCRequest& request)
                 resultObj.pushKV("outpoint", mnb.outpoint.ToStringShort());
                 resultObj.pushKV("addr", mnb.addr.ToString());
                 resultObj.pushKV("pubKeyCollateralAddress", EncodeDestination(mnb.collDest));
-                resultObj.pushKV("pubKeyMasternode", EncodeDestination(mnb.pubKeyMasternode.GetID()));
+                resultObj.pushKV("pubKeyMasternode", EncodeDestination(PKHash(mnb.pubKeyMasternode)));
                 resultObj.pushKV("vchSig", EncodeBase64(&mnb.vchSig[0], mnb.vchSig.size()));
                 resultObj.pushKV("sigTime", mnb.sigTime);
                 resultObj.pushKV("protocolVersion", mnb.nProtocolVersion);

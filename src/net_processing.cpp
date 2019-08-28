@@ -2339,7 +2339,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 if (fBlocksOnly) {
                     LogPrint(BCLog::NET, "transaction (%s) inv sent in violation of protocol peer=%d\n", inv.hash.ToString(), pfrom->GetId());
                 } else if (!fAlreadyHave && !fImporting && !fReindex && !::ChainstateActive().IsInitialBlockDownload()) {
-                    RequestInv(State(pfrom->GetId()), inv.hash, nNow);
+                    RequestInv(State(pfrom->GetId()), inv, nNow);
                 }
             }
         }
@@ -2703,7 +2703,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
     if (strCommand == NetMsgType::MNANNOUNCE)
     {
-        if (fReindex || fImporting || IsInitialBlockDownload()) return true;
+        if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
             LOCK(cs_main);
 
@@ -2727,7 +2727,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
     if (strCommand == NetMsgType::MNPING)
     {
-        if (fReindex || fImporting || IsInitialBlockDownload()) return true;
+        if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
             LOCK(cs_main);
 
@@ -2751,7 +2751,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
     if (strCommand == NetMsgType::MNVERIFY)
     {
-        if (fReindex || fImporting || IsInitialBlockDownload()) return true;
+        if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
             LOCK(cs_main);
 
@@ -2775,7 +2775,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
     if (strCommand == NetMsgType::MASTERNODEPAYMENTVOTE)
     {
-        if (fReindex || fImporting || IsInitialBlockDownload()) return true;
+        if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
             LOCK(cs_main);
 
@@ -2799,7 +2799,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
     if (strCommand == NetMsgType::MNGOVERNANCEOBJECT)
     {
-        if (fReindex || fImporting || IsInitialBlockDownload()) return true;
+        if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
             LOCK(cs_main);
 
@@ -2823,7 +2823,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
     if (strCommand == NetMsgType::MNGOVERNANCEOBJECTVOTE)
     {
-        if (fReindex || fImporting || IsInitialBlockDownload()) return true;
+        if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
             LOCK(cs_main);
 

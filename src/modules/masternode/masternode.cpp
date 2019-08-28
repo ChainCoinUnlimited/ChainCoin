@@ -126,7 +126,11 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
     CTxDestination dest2;
     if (pubkey == CPubKey() ||
             !ExtractDestination(coin.out.scriptPubKey, dest1) ||
-            !ExtractDestination(GetScriptForDestination(pubkey.GetID()), dest2)) {
+            !ExtractDestination(GetScriptForDestination(PKHash(pubkey)), dest2)) {
+        return COLLATERAL_INVALID_PUBKEY;
+    }
+
+    if (dest1 != dest2) {
         return COLLATERAL_INVALID_PUBKEY;
     }
 
@@ -465,7 +469,7 @@ bool CMasternodeBroadcast::SimpleCheck(int& nDos)
     }
 
     CScript pubkeyScript;
-    pubkeyScript = GetScriptForDestination(pubKeyMasternode.GetID());
+    pubkeyScript = GetScriptForDestination(PKHash(pubKeyMasternode));
 
     if (pubkeyScript.size() != 25) {
         LogPrintf("CMasternodeBroadcast::SimpleCheck -- pubKeyMasternode has the wrong size\n");
