@@ -13,6 +13,7 @@
 #include <script/sign.h>
 #include <shutdown.h>
 #include <util/moneystr.h>
+#include <util/translation.h>
 #include <wallet/coincontrol.h>
 #include <wallet/fees.h>
 #include <wallet/psbtwallet.h>

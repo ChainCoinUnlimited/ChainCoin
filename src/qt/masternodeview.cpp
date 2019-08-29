@@ -14,6 +14,7 @@
 #include <qt/walletmodel.h>
 
 #include <interfaces/node.h>
+#include <util/translation.h>
 
 #include <QMenu>
 #include <QMessageBox>

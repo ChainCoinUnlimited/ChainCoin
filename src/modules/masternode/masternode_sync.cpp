@@ -12,6 +12,7 @@
 #include <netfulfilledman.h>
 #include <netmessagemaker.h>
 #include <ui_interface.h>
+#include <util/translation.h>
 #include <validation.h>
 
 

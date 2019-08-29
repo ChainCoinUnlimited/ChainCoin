@@ -20,6 +20,7 @@
 #include <shutdown.h>
 #include <ui_interface.h>
 #include <util/system.h>
+#include <util/translation.h>
 #include <warnings.h>
 
 #include <boost/algorithm/string/replace.hpp>

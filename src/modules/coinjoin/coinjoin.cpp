@@ -15,8 +15,9 @@
 #include <policy/policy.h>
 #include <policy/settings.h>
 #include <reverse_iterator.h>
-#include <util/system.h>
 #include <util/moneystr.h>
+#include <util/system.h>
+#include <util/translation.h>
 
 #include <numeric>
 #include <string>

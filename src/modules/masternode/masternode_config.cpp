@@ -9,6 +9,7 @@
 #include <netbase.h>
 #include <util/system.h>
 #include <util/strencodings.h>
+#include <util/translation.h>
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
