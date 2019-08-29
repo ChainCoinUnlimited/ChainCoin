@@ -1689,11 +1689,11 @@ void CMasternodeMan::WarnMasternodeDaemonUpdates()
 
     std::string strWarning;
     if (nUpdatedMasternodes != size()) {
-        strWarning = strprintf(_("Warning: At least %d of %d masternodes are running on a newer software version. Please check latest releases, you might need to update too."),
+        strWarning = strprintf(_("Warning: At least %d of %d masternodes are running on a newer software version. Please check latest releases, you might need to update too.").translated,
                     nUpdatedMasternodes, size());
     } else {
         // someone was postponing this update for way too long probably
-        strWarning = strprintf(_("Warning: Every masternode (out of %d known ones) is running on a newer software version. Please check latest releases, it's very likely that you missed a major/critical update."),
+        strWarning = strprintf(_("Warning: Every masternode (out of %d known ones) is running on a newer software version. Please check latest releases, it's very likely that you missed a major/critical update.").translated,
                     size());
     }
 

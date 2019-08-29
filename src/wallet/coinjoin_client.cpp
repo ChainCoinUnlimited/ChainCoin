@@ -92,7 +92,7 @@ void CCoinJoinClientManager::ProcessMessage(CNode* pfrom, const std::string& str
     if (!CheckDiskSpace((GetDataDir()))) {
         ResetPool();
         fEnableCoinJoin = false;
-        strAutoCoinJoinResult = _("WARNING: Low disk space, disabling CoinJoin.");
+        strAutoCoinJoinResult = _("WARNING: Low disk space, disabling CoinJoin.").translated;
         LogPrintf("%s CCoinJoinClientManager::ProcessMessage -- Not enough disk space, disabling CoinJoin.\n", m_wallet->GetDisplayName());
         return;
     }
@@ -336,14 +336,14 @@ std::string CCoinJoinClientSession::GetStatus(bool fWaitForBlock)
 
     switch(nState) {
         case POOL_STATE_IDLE:
-            return _("CoinJoin is idle.");
+            return _("CoinJoin is idle.").translated;
         case POOL_STATE_CONNECTING:
             return strAutoCoinJoinResult;
         case POOL_STATE_QUEUE:
             if (     nStatusMessageProgress % 70 <= 30) strSuffix = ".";
             else if (nStatusMessageProgress % 70 <= 50) strSuffix = "..";
             else if (nStatusMessageProgress % 70 <= 70) strSuffix = "...";
-            return strprintf(_("Submitted to masternode, waiting in queue %s"), strSuffix);;
+            return strprintf(_("Submitted to masternode, waiting in queue %s").translated, strSuffix);;
         case POOL_STATE_ACCEPTING_ENTRIES:
             if (nEntriesCount == 0) {
                 nStatusMessageProgress = 0;
@@ -353,26 +353,26 @@ std::string CCoinJoinClientSession::GetStatus(bool fWaitForBlock)
                     fLastEntryAccepted = false;
                     nStatusMessageProgress = 0;
                 }
-                return _("CoinJoin request complete:") + " " + _("Your transaction was accepted into the pool!");
+                return _("CoinJoin request complete:").translated + " " + _("Your transaction was accepted into the pool!").translated;
             } else {
-                if (     nStatusMessageProgress % 70 <= 40) return strprintf(_("Submitted following entries to masternode: %u / %d"), nEntriesCount, CCoinJoin::GetMaxPoolInputs());
+                if (     nStatusMessageProgress % 70 <= 40) return strprintf(_("Submitted following entries to masternode: %u / %d").translated, nEntriesCount, CCoinJoin::GetMaxPoolInputs());
                 else if (nStatusMessageProgress % 70 <= 50) strSuffix = ".";
                 else if (nStatusMessageProgress % 70 <= 60) strSuffix = "..";
                 else if (nStatusMessageProgress % 70 <= 70) strSuffix = "...";
-                return strprintf(_("Submitted to masternode, waiting for more entries ( %u / %d ) %s"), nEntriesCount, CCoinJoin::GetMaxPoolInputs(), strSuffix);
+                return strprintf(_("Submitted to masternode, waiting for more entries ( %u / %d ) %s").translated, nEntriesCount, CCoinJoin::GetMaxPoolInputs(), strSuffix);
             }
         case POOL_STATE_SIGNING:
-            if (     nStatusMessageProgress % 70 <= 40) return _("Found enough users, signing ...");
+            if (     nStatusMessageProgress % 70 <= 40) return _("Found enough users, signing ...").translated;
             else if (nStatusMessageProgress % 70 <= 50) strSuffix = ".";
             else if (nStatusMessageProgress % 70 <= 60) strSuffix = "..";
             else if (nStatusMessageProgress % 70 <= 70) strSuffix = "...";
-            return strprintf(_("Found enough users, signing ( waiting %s )"), strSuffix);
+            return strprintf(_("Found enough users, signing ( waiting %s )").translated, strSuffix);
         case POOL_STATE_ERROR:
-            return _("CoinJoin request incomplete:") + " " + strLastMessage + " " + _("Will retry...");
+            return _("CoinJoin request incomplete:").translated + " " + strLastMessage + " " + _("Will retry...").translated;
         case POOL_STATE_SUCCESS:
-            return _("CoinJoin request complete:") + " " + strLastMessage;
+            return _("CoinJoin request complete:").translated + " " + strLastMessage;
        default:
-            return strprintf(_("Unknown state: id = %u"), nState);
+            return strprintf(_("Unknown state: id = %u").translated, nState);
     }
 }
 
@@ -467,7 +467,7 @@ void CCoinJoinClientManager::CheckResult(int nHeight)
         }
         if (!found) session.SetError();
         if (session.PoolStateManager()) {
-            strAutoCoinJoinResult = _("Session timed out.");
+            strAutoCoinJoinResult = _("Session timed out.").translated;
         }
     }
     // let's see if we can free up some space by popping the first finished session
@@ -543,7 +543,7 @@ bool CCoinJoinClientSession::CheckPoolStateUpdate(PoolState nStateNew, int nEntr
     // do not update state when mixing client state is one of these
     if (nState == POOL_STATE_IDLE || nState == POOL_STATE_ERROR || nState == POOL_STATE_SUCCESS) return false;
 
-    strAutoCoinJoinResult = _("Masternode:") + " " + CCoinJoin::GetMessageByID(nMessageID);
+    strAutoCoinJoinResult = _("Masternode:").translated + " " + CCoinJoin::GetMessageByID(nMessageID);
 
     // if rejected at any state
     if (nStatusUpdate == STATUS_REJECTED) {
@@ -754,7 +754,7 @@ bool CCoinJoinClientManager::CheckAutomaticBackup()
 {
     if (!m_wallet) {
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CheckAutomaticBackup -- Wallet is not initialized, no mixing available.\n", m_wallet->GetDisplayName());
-        strAutoCoinJoinResult = _("Wallet is not initialized") + ", " + _("no mixing available.");
+        strAutoCoinJoinResult = _("Wallet is not initialized").translated + ", " + _("no mixing available.").translated;
         fEnableCoinJoin = false; // no mixing
         return false;
     }
@@ -762,7 +762,7 @@ bool CCoinJoinClientManager::CheckAutomaticBackup()
     switch(nWalletBackups) {
         case 0:
             LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CheckAutomaticBackup -- Automatic backups disabled, no mixing available.\n", m_wallet->GetDisplayName());
-            strAutoCoinJoinResult = _("Automatic backups disabled") + ", " + _("no mixing available.");
+            strAutoCoinJoinResult = _("Automatic backups disabled").translated + ", " + _("no mixing available.").translated;
             fEnableCoinJoin = false; // stop mixing
             m_wallet->nKeysLeftSinceAutoBackup = 0; // no backup, no "keys since last backup"
             return false;
@@ -771,28 +771,28 @@ bool CCoinJoinClientManager::CheckAutomaticBackup()
             // There is no way to bring user attention in daemon mode so we just update status and
             // keep spamming if debug is on.
             LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CheckAutomaticBackup -- ERROR! Failed to create automatic backup.\n", m_wallet->GetDisplayName());
-            strAutoCoinJoinResult = _("ERROR! Failed to create automatic backup") + ", " + _("see debug.log for details.");
+            strAutoCoinJoinResult = _("ERROR! Failed to create automatic backup").translated + ", " + _("see debug.log for details.").translated;
             return false;
         case -2:
             // We were able to create automatic backup but keypool was not replenished because wallet is locked.
             // There is no way to bring user attention in daemon mode so we just update status and
             // keep spamming if debug is on.
             LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CheckAutomaticBackup -- WARNING! Failed to create replenish keypool, please unlock your wallet to do so.\n", m_wallet->GetDisplayName());
-            strAutoCoinJoinResult = _("WARNING! Failed to replenish keypool, please unlock your wallet to do so.") + ", " + _("see debug.log for details.");
+            strAutoCoinJoinResult = _("WARNING! Failed to replenish keypool, please unlock your wallet to do so.").translated + ", " + _("see debug.log for details.").translated;
             return false;
     }
 
     if (m_wallet->nKeysLeftSinceAutoBackup < COINJOIN_KEYS_THRESHOLD_STOP) {
         // We should never get here via mixing itself but probably smth else is still actively using keypool
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CheckAutomaticBackup -- Very low number of keys left: %d, no mixing available.\n", m_wallet->GetDisplayName(), m_wallet->nKeysLeftSinceAutoBackup);
-        strAutoCoinJoinResult = strprintf(_("Very low number of keys left: %d") + ", " + _("no mixing available."), m_wallet->nKeysLeftSinceAutoBackup);
+        strAutoCoinJoinResult = strprintf(_("Very low number of keys left: %d").translated + ", " + _("no mixing available.").translated, m_wallet->nKeysLeftSinceAutoBackup);
         // It's getting really dangerous, stop mixing
         fEnableCoinJoin = false;
         return false;
     } else if (m_wallet->nKeysLeftSinceAutoBackup < COINJOIN_KEYS_THRESHOLD_WARNING) {
         // Low number of keys left but it's still more or less safe to continue
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CheckAutomaticBackup -- Very low number of keys left: %d\n", m_wallet->GetDisplayName(), m_wallet->nKeysLeftSinceAutoBackup);
-        strAutoCoinJoinResult = strprintf(_("Very low number of keys left: %d"), m_wallet->nKeysLeftSinceAutoBackup);
+        strAutoCoinJoinResult = strprintf(_("Very low number of keys left: %d").translated, m_wallet->nKeysLeftSinceAutoBackup);
 
         if (fCreateAutoBackups) {
             LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CheckAutomaticBackup -- Trying to create new backup.\n", m_wallet->GetDisplayName());
@@ -808,7 +808,7 @@ bool CCoinJoinClientManager::CheckAutomaticBackup()
                 if (!errorString.empty()) {
                     // Things are really broken
                     LogPrintf("%s CCoinJoinClientManager::CheckAutomaticBackup -- ERROR! Failed to create automatic backup: %s\n", m_wallet->GetDisplayName(), errorString);
-                    strAutoCoinJoinResult = strprintf(_("ERROR! Failed to create automatic backup") + ": %s", errorString);
+                    strAutoCoinJoinResult = strprintf(_("ERROR! Failed to create automatic backup").translated + ": %s", errorString);
                     return false;
                 }
             }
@@ -826,7 +826,7 @@ bool CCoinJoinClientManager::CheckAutomaticBackup()
 bool CCoinJoinClientSession::CreateSessionTransaction(std::vector<std::pair<CTxIn, CTxOut> >& vecPair, CAmount& nDenom, std::vector<CAmount>& vecAmounts)
 {
     nDenom = 0;
-    strAutoCoinJoinResult = _("Creating transaction");
+    strAutoCoinJoinResult = _("Creating transaction").translated;
 
     CAmount nValueRem = 0;
 
@@ -1086,13 +1086,13 @@ void CCoinJoinClientSession::CoinJoin(std::vector<std::pair<CTxIn, CTxOut> >& ve
     if (GetState() != POOL_STATE_IDLE) return;
 
     if (!m_wallet_session) {
-        strAutoCoinJoinResult = _("Wallet is not loaded!");
+        strAutoCoinJoinResult = _("Wallet is not loaded!").translated;
         SetState(POOL_STATE_ERROR);
         return;
     }
 
     if (m_wallet_session->IsLocked(true)) {
-        strAutoCoinJoinResult = _("Wallet is locked, please unlock first!");
+        strAutoCoinJoinResult = _("Wallet is locked, please unlock first!").translated;
         SetState(POOL_STATE_ERROR);
         return;
     }
@@ -1100,7 +1100,7 @@ void CCoinJoinClientSession::CoinJoin(std::vector<std::pair<CTxIn, CTxOut> >& ve
     TRY_LOCK(cs_coinjoin, lockDS);
     if (!lockDS) {
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientSession::CoinJoin -- mutex locked, returning\n", m_wallet_session->GetDisplayName());
-        strAutoCoinJoinResult = _("Client busy...");
+        strAutoCoinJoinResult = _("Client busy...").translated;
         SetState(POOL_STATE_ERROR);
         return;
     }
@@ -1111,7 +1111,7 @@ void CCoinJoinClientSession::CoinJoin(std::vector<std::pair<CTxIn, CTxOut> >& ve
 
     // Attemt to create our transaction
     if (!CreateSessionTransaction(vecPair, nSessionDenom, vecAmounts)) {
-        strAutoCoinJoinResult = _("Failed to create Transaction!");
+        strAutoCoinJoinResult = _("Failed to create Transaction!").translated;
         SetNull();
         SetState(POOL_STATE_IDLE);
         return;
@@ -1122,7 +1122,7 @@ void CCoinJoinClientSession::CoinJoin(std::vector<std::pair<CTxIn, CTxOut> >& ve
 
     // do not initiate queue if we are a liquidity provider to avoid useless inter-mixing
     if (m_wallet_session->coinjoinClient->nLiquidityProvider) {
-        strAutoCoinJoinResult = _("Liquidity Provider: Idle...");
+        strAutoCoinJoinResult = _("Liquidity Provider: Idle...").translated;
         SetNull();
         SetState(POOL_STATE_IDLE);
         return;
@@ -1142,21 +1142,21 @@ void CCoinJoinClientManager::CoinJoin()
     fStartup = true;
 
     if (!masternodeSync.IsMasternodeListSynced()) {
-        strAutoCoinJoinResult = _("Waiting for sync to finish...");
+        strAutoCoinJoinResult = _("Waiting for sync to finish...").translated;
         fActive = false;
         fStartup = false;
         return;
     }
 
     if (!m_wallet) {
-        strAutoCoinJoinResult = _("Wallet is not initialized.");
+        strAutoCoinJoinResult = _("Wallet is not initialized.").translated;
         fActive = false;
         fStartup = false;
         return;
     }
 
     if (m_wallet->IsLocked(true)) {
-        strAutoCoinJoinResult = _("Wallet is locked, will retry...");
+        strAutoCoinJoinResult = _("Wallet is locked, will retry...").translated;
         fActive = false;
         fStartup = false;
         return;
@@ -1164,7 +1164,7 @@ void CCoinJoinClientManager::CoinJoin()
 
     if (!CheckAutomaticBackup()) {
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CoinJoin -- Failed to create automatic backup\n", m_wallet->GetDisplayName());
-        strAutoCoinJoinResult = _("Failed to create automatic backup.");
+        strAutoCoinJoinResult = _("Failed to create automatic backup.").translated;
         fEnableCoinJoin = false;
         fActive = false;
         fStartup = false;
@@ -1196,16 +1196,16 @@ void CCoinJoinClientManager::CoinJoin()
     // anonymizable balance is way too small
     if (nBalanceDenominated + nBalanceNeedsDenom < COINJOIN_LOW_DENOM * COINJOIN_FEE_DENOM_THRESHOLD) {
         LogPrintf("%s CCoinJoinClientManager::CoinJoin -- Not enough funds to anonymize: %s available\n", m_wallet->GetDisplayName(), FormatMoney(nBalanceDenominated + nBalanceNeedsDenom));
-        strAutoCoinJoinResult = _("Not enough funds to anonymize, will retry...");
+        strAutoCoinJoinResult = _("Not enough funds to anonymize, will retry...").translated;
         fActive = false;
         fStartup = false;
         return;
     }
 
     if (nBalanceNeedsDenom >= COINJOIN_LOW_DENOM * COINJOIN_FEE_DENOM_THRESHOLD) {
-        strAutoCoinJoinResult = _("Creating denominated outputs.");
+        strAutoCoinJoinResult = _("Creating denominated outputs.").translated;
         if (!CreateDenominated(nBalanceNeedsDenom, vecAmounts)) {
-            strAutoCoinJoinResult = _("Failed to create denominated outputs.");
+            strAutoCoinJoinResult = _("Failed to create denominated outputs.").translated;
         }
     }
 
@@ -1218,7 +1218,7 @@ void CCoinJoinClientManager::CoinJoin()
 
     // anything there to work on?
     if (nBalanceDenominated <= COINJOIN_FEE_DENOM_THRESHOLD * COINJOIN_LOW_DENOM) {
-        strAutoCoinJoinResult = _("Low balance (denominated).");
+        strAutoCoinJoinResult = _("Low balance (denominated).").translated;
         fActive = false;
         fStartup = false;
         return;
@@ -1228,7 +1228,7 @@ void CCoinJoinClientManager::CoinJoin()
 
     if (nMnCountEnabled == 0) {
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CoinJoin -- No Masternodes detected\n", m_wallet->GetDisplayName());
-        strAutoCoinJoinResult = _("No Masternodes detected, will retry...");
+        strAutoCoinJoinResult = _("No Masternodes detected, will retry...").translated;
         fActive = false;
         fStartup = false;
         return;
@@ -1358,10 +1358,10 @@ bool CCoinJoinClientSession::JoinExistingQueue()
         LogPrintf("%s CCoinJoinClientSession::JoinExistingQueue -- pending connection (from queue): nSessionDenom: %d (%s), addr=%s\n",
                 m_wallet_session->GetDisplayName(),
                 nSessionDenom, CCoinJoin::GetDenominationsToString(nSessionDenom), infoMn.addr.ToString());
-        strAutoCoinJoinResult = _("Trying to connect...");
+        strAutoCoinJoinResult = _("Trying to connect...").translated;
         return true;
     }
-    strAutoCoinJoinResult = _("Failed to find mixing queue to join, will retry...");
+    strAutoCoinJoinResult = _("Failed to find mixing queue to join, will retry...").translated;
     return false;
 }
 
@@ -1377,7 +1377,7 @@ bool CCoinJoinClientSession::StartNewQueue()
 
         if (!infoMn.fInfoValid) {
             LogPrintf("%s CCoinJoinClientSession::StartNewQueue -- Can't find random masternode!\n", m_wallet_session->GetDisplayName());
-            strAutoCoinJoinResult = _("Can't find random Masternode, will retry...");
+            strAutoCoinJoinResult = _("Can't find random Masternode, will retry...").translated;
             return false;
         }
 
@@ -1405,12 +1405,12 @@ bool CCoinJoinClientSession::StartNewQueue()
         LogPrintf("%s CCoinJoinClientSession::StartNewQueue -- pending connection, nSessionDenom: %d (%s), addr=%s\n",
                   m_wallet_session->GetDisplayName(),
                   nSessionDenom, CCoinJoin::GetDenominationsToString(nSessionDenom), infoMn.addr.ToString());
-        strAutoCoinJoinResult = _("Trying to connect...");
+        strAutoCoinJoinResult = _("Trying to connect...").translated;
         return true;
     }
 
     // network is not ready, try later
-    strAutoCoinJoinResult = _("No compatible Masternode found, will retry...");
+    strAutoCoinJoinResult = _("No compatible Masternode found, will retry...").translated;
     SetState(POOL_STATE_ERROR);
     return false;
 }
@@ -1442,7 +1442,7 @@ void CCoinJoinClientManager::ProcessPendingCJaRequest()
     LOCK(cs_deqsessions);
     for (auto& session : deqSessions) {
         if (session.ProcessPendingCJaRequest(g_connman.get())) {
-            strAutoCoinJoinResult = _("Mixing in progress...");
+            strAutoCoinJoinResult = _("Mixing in progress...").translated;
         }
     }
 }

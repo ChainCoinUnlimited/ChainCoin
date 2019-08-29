@@ -382,7 +382,7 @@ void MasternodeList::ShowQRCode(const COutPoint& _outpoint) {
     interfaces::Masternode toShow = clientModel->node().getMasternode(_outpoint);
 
     std::string strAlias = toShow.alias;
-    std::string strMNPrivKey = _("<private keys are only available for self-owned masternodes>");
+    std::string strMNPrivKey = _("<private keys are only available for self-owned masternodes>").translated;
     if (strAlias != "")
         strMNPrivKey = clientModel->node().getMasternodeKey(strAlias);
     std::string strCollateral = toShow.outpoint.ToStringShort();

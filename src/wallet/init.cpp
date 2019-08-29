@@ -67,10 +67,10 @@ void WalletInit::AddWalletOptions() const
     gArgs.AddArg("-zapwallettxes=<mode>", "Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup"
                                " (1 = keep tx meta data e.g. payment request information, 2 = drop tx meta data)", false, OptionsCategory::WALLET);
 
-    gArgs.AddArg("-enableprivatesend=<n>", strprintf(_("Enable use of automated CoinJoin for funds stored in this wallet (0-1, default: %u)"), 0), false, OptionsCategory::WALLET);
-    gArgs.AddArg("-privatesendrounds=<n>", strprintf(_("Use N separate masternodes for each denominated input to mix funds (%u-%u, default: %u)"), MIN_COINJOIN_DEPTH, MAX_COINJOIN_DEPTH, DEFAULT_COINJOIN_DEPTH), false, OptionsCategory::WALLET);
-    gArgs.AddArg("-privatesendamount=<n>", strprintf(_("Keep N CHC anonymized (default: %u)"), DEFAULT_COINJOIN_AMOUNT), false, OptionsCategory::WALLET);
-    gArgs.AddArg("-liquidityprovider=<n>", strprintf(_("Provide liquidity to CoinJoin by infrequently mixing coins on a continual basis (%u-%u, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)"), MIN_COINJOIN_LIQUIDITY, MAX_COINJOIN_LIQUIDITY, DEFAULT_COINJOIN_LIQUIDITY), false, OptionsCategory::WALLET);
+    gArgs.AddArg("-enableprivatesend=<n>", strprintf(_("Enable use of automated CoinJoin for funds stored in this wallet (0-1, default: %u)").translated, 0), false, OptionsCategory::WALLET);
+    gArgs.AddArg("-privatesendrounds=<n>", strprintf(_("Use N separate masternodes for each denominated input to mix funds (%u-%u, default: %u)").translated, MIN_COINJOIN_DEPTH, MAX_COINJOIN_DEPTH, DEFAULT_COINJOIN_DEPTH), false, OptionsCategory::WALLET);
+    gArgs.AddArg("-privatesendamount=<n>", strprintf(_("Keep N CHC anonymized (default: %u)").translated, DEFAULT_COINJOIN_AMOUNT), false, OptionsCategory::WALLET);
+    gArgs.AddArg("-liquidityprovider=<n>", strprintf(_("Provide liquidity to CoinJoin by infrequently mixing coins on a continual basis (%u-%u, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)").translated, MIN_COINJOIN_LIQUIDITY, MAX_COINJOIN_LIQUIDITY, DEFAULT_COINJOIN_LIQUIDITY), false, OptionsCategory::WALLET);
 
     gArgs.AddArg("-dblogsize=<n>", strprintf("Flush wallet database activity from memory to disk log every <n> megabytes (default: %u)", DEFAULT_WALLET_DBLOGSIZE), true, OptionsCategory::WALLET_DEBUG_TEST);
     gArgs.AddArg("-flushwallet", strprintf("Run a thread to flush wallet periodically (default: %u)", DEFAULT_FLUSHWALLET), true, OptionsCategory::WALLET_DEBUG_TEST);
@@ -129,7 +129,7 @@ bool WalletInit::ParameterInteraction() const
     if (gArgs.GetBoolArg("-sysperms", false))
         return InitError("-sysperms is not allowed in combination with enabled wallet functionality");
     if (gArgs.GetArg("-prune", 0) && gArgs.GetBoolArg("-rescan", false))
-        return InitError(_("Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again."));
+        return InitError(_("Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.").translated);
 
 
     int nLiqProvTmp = gArgs.GetArg("-liquidityprovider", DEFAULT_COINJOIN_LIQUIDITY);
