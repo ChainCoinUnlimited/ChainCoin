@@ -21,3 +21,9 @@ if BUILD_BITCOIN_WALLET
   dist_man1_MANS+=chaincoin-wallet.1
 endif
 endif
+
+if ENABLE_WALLET
+if BUILD_BITCOIN_WALLET
+  dist_man1_MANS+=chaincoin-wallet.1
+endif
+endif

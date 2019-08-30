@@ -333,7 +333,7 @@ void CCoinJoinServer::CreateFinalTransaction(CConnman* connman)
     CCoinsViewCache view(&viewDummy);
     {
         LOCK2(cs_main, mempool.cs);
-        CCoinsViewCache &viewChain = *pcoinsTip;
+        CCoinsViewCache &viewChain = ::ChainstateActive().CoinsTip();
         CCoinsViewMemPool viewMempool(&viewChain, mempool);
         view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
 
@@ -389,7 +389,7 @@ void CCoinJoinServer::CommitFinalTransaction(CConnman* connman)
     {
         // See if the transaction is valid, don't run in dummy mode if we want to mine it
         LOCK(cs_main);
-        if (!AcceptToMemoryPool(mempool, validationState, finalTransaction, nullptr, nullptr, false, maxTxFee, false))
+        if (!AcceptToMemoryPool(mempool, validationState, finalTransaction, nullptr, nullptr, false, 0, false))
         {
             LogPrintf("CCoinJoinServer::CommitFinalTransaction -- AcceptToMemoryPool() error: Transaction not valid\n");
             // not much we can do in this case, just notify clients

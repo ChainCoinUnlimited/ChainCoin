@@ -19,7 +19,6 @@ struct CBlockLocator;
 
 class CConnman;
 class CDataStream;
-class CReserveScript;
 class CValidationInterface;
 class CValidationState;
 class CGovernanceVote;
@@ -139,8 +138,6 @@ protected:
      * Called on a background thread.
      */
     virtual void ChainStateFlushed(const CBlockLocator &locator) {}
-    /** Tells listeners to broadcast their data. */
-    virtual void ResendWalletTransactions(int64_t nBestBlockTime, CConnman* connman) {}    
     /**
      * Notifies listeners of a block validation result
      * If the provided CValidationState IsValid, the provided block
@@ -152,7 +149,7 @@ protected:
      * has been received and connected to the headers tree, though not validated yet
      */
     virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {}
-    virtual void ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv, CConnman* connman) {}
+    virtual void ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv) {}
 
     virtual void NotifyGovernanceVote(const CGovernanceVote &vote) {}
     virtual void NotifyGovernanceObject(const CGovernanceObject &object) {}
@@ -195,10 +192,9 @@ public:
     void BlockConnected(const std::shared_ptr<const CBlock> &, const CBlockIndex *pindex, const std::shared_ptr<const std::vector<CTransactionRef>> &);
     void BlockDisconnected(const std::shared_ptr<const CBlock> &);
     void ChainStateFlushed(const CBlockLocator &);
-    void Broadcast(int64_t nBestBlockTime, CConnman* connman);
     void BlockChecked(const CBlock&, const CValidationState&);
     void NewPoWValidBlock(const CBlockIndex *, const std::shared_ptr<const CBlock>&);
-    void ProcessModuleMessage(CNode*, const NetMsgDest&, const std::string&, CDataStream&, CConnman*);
+    void ProcessModuleMessage(CNode*, const NetMsgDest&, const std::string&, CDataStream&);
     void NotifyGovernanceVote(const CGovernanceVote&);
     void NotifyGovernanceObject(const CGovernanceObject&);
 };

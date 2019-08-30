@@ -8,6 +8,7 @@
 #include <messagesigner.h>
 #include <tinyformat.h>
 #include <util/strencodings.h>
+#include <util/validation.h>
 
 bool CMessageSigner::GetKeysFromSecret(const std::string strSecret, CKey& keyRet, CPubKey& pubkeyRet)
 {

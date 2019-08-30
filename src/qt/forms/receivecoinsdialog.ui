@@ -39,7 +39,7 @@
              </size>
             </property>
             <property name="text">
-             <string>&amp;Request payment</string>
+             <string>&amp;Create new receiving address</string>
             </property>
             <property name="icon">
              <iconset>
@@ -109,6 +109,13 @@
             </property>
             <property name="toolTip">
              <string>An optional amount to request. Leave this empty or zero to not request a specific amount.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="useLegacyAddress">
+            <property name="text">
+             <string>Generate legacx address</string>
             </property>
            </widget>
           </item>

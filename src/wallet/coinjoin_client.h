@@ -10,9 +10,8 @@
 #include <modules/coinjoin/coinjoin.h>
 
 class CCoinJoinClientManager;
-class CReserveKey;
+class ReserveDestination;
 class CWallet;
-class CConnman;
 
 static const int MIN_COINJOIN_AMOUNT             = 2;
 static const int MIN_COINJOIN_LIQUIDITY          = 0;
@@ -31,11 +30,11 @@ static const int COINJOIN_KEYS_THRESHOLD_STOP    = 50;
 class CKeyHolderStorage
 {
 private:
-    std::vector<std::shared_ptr<CReserveKey> > storage;
+    std::vector<std::shared_ptr<ReserveDestination> > storage;
     mutable CCriticalSection cs_storage;
 
 public:
-    void AddKey(std::shared_ptr<CReserveScript> &script, CWallet* pwalletIn);
+    void AddKey(CScript &script, CWallet* pwalletIn);
     void KeepAll();
     void ReturnAll();
 
@@ -145,7 +144,7 @@ public:
     {
     }
 
-    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman);
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
 
     std::string GetStatus(bool fWaitForBlock);
 
@@ -232,7 +231,7 @@ public:
     {
     }
 
-    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman);
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
 
     void SetMinBlocksToWait(int nMinBlocksToWaitIn) { nMinBlocksToWait = nMinBlocksToWaitIn; }
 

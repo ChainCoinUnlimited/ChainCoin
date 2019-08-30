@@ -11,6 +11,8 @@
 #include <interfaces/node.h>
 #include <key_io.h>
 
+#include <algorithm>
+
 #include <QColor>
 #include <QFont>
 #include <QDebug>
@@ -126,10 +128,10 @@ public:
                                                  masternode.banscore));
             }
         }
-        // qLowerBound() and qUpperBound() require our cachedAddressTable list to be sorted in asc order
+        // std::lower_bound() and std::upper_bound() require our cachedAddressTable list to be sorted in asc order
         // Even though the map is already sorted this re-sorting step is needed because the originating map
         // is sorted by binary address, not by base58() address.
-        qSort(cachedMasternodeTable.begin(), cachedMasternodeTable.end(), outpointEntryLessThan());
+        std::sort(cachedMasternodeTable.begin(), cachedMasternodeTable.end(), outpointEntryLessThan());
     }
 
     void updateMasternode(interfaces::Node& node, const COutPoint& outpoint, int status)
@@ -138,9 +140,9 @@ public:
 
         // Find bounds of this masternode in model
         QString strOutpoint = QString::fromStdString(outpoint.ToStringShort());
-        QList<MasternodeTableEntry>::iterator lower = qLowerBound(
+        QList<MasternodeTableEntry>::iterator lower = std::lower_bound(
             cachedMasternodeTable.begin(), cachedMasternodeTable.end(), strOutpoint, outpointEntryLessThan());
-        QList<MasternodeTableEntry>::iterator upper = qUpperBound(
+        QList<MasternodeTableEntry>::iterator upper = std::upper_bound(
             cachedMasternodeTable.begin(), cachedMasternodeTable.end(), strOutpoint, outpointEntryLessThan());
         int lowerIndex = (lower - cachedMasternodeTable.begin());
         int upperIndex = (upper - cachedMasternodeTable.begin());

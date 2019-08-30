@@ -8,6 +8,7 @@ src/chaincoin-tx
 src/test/test_chaincoin
 src/test/test_chaincoin_fuzzy
 src/qt/test/test_chaincoin-qt
+*.pdb
 
 # autoreconf
 Makefile.in
@@ -33,6 +34,7 @@ libtool
 src/config/chaincoin-config.h
 src/config/chaincoin-config.h.in
 src/config/stamp-h1
+src/obj
 share/setup.nsi
 share/qt/Info.plist
 
@@ -61,10 +63,10 @@ src/qt/chaincoin-qt.includes
 *.pyc
 *.o
 *.o-*
-*.patch
 *.a
 *.pb.cc
 *.pb.h
+*.dat
 
 *.log
 *.trs
@@ -73,6 +75,10 @@ src/qt/chaincoin-qt.includes
 *.json.h
 *.raw.h
 
+# Only ignore unexpected patches
+*.patch
+!depends/patches/**/*.patch
+
 #libtool object files
 *.lo
 *.la
@@ -80,9 +86,13 @@ src/qt/chaincoin-qt.includes
 # Compilation and Qt preprocessor part
 *.qm
 Makefile
+!depends/Makefile
 chaincoin-qt
 Chaincoin-Qt.app
 background.tiff*
+
+# Qt Creator
+Makefile.am.user
 
 # Unit-tests
 Makefile.test
@@ -123,3 +133,10 @@ chaincoin-wallet
 Chaincoin.cflags
 Chaincoin.creator.user.4.8-pre1
 Chaincoin.cxxflags
+
+# clang-check
+*.plist
+
+osx_volname
+dist/
+*.background.tiff

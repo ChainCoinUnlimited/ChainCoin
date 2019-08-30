@@ -17,6 +17,7 @@
 #include <modules/masternode/masternode_man.h>
 #include <messagesigner.h>
 #include <rpc/server.h>
+#include <rpc/util.h>
 #include <util/system.h>
 #include <util/strencodings.h>
 #include <util/moneystr.h>
@@ -844,7 +845,7 @@ static UniValue getfundinginfo(const JSONRPCRequest& request)
     LOCK(cs_main);
 
     int nLastSuperblock = 0, nNextSuperblock = 0;
-    int nBlockHeight = chainActive.Height();
+    int nBlockHeight = ::ChainActive().Height();
 
     CSuperblock::GetNearestSuperblocksHeights(nBlockHeight, nLastSuperblock, nNextSuperblock);
 

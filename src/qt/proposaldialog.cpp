@@ -188,11 +188,11 @@ void ProposalDialog::on_submitButton_clicked()
 
     if (sendStatus.status == WalletModel::OK) {
         CoinControlDialog::coinControl()->UnSelectAll();
-        Q_EMIT coinsSent(currentTransaction.getWtx()->get().GetHash());
+        Q_EMIT coinsSent(currentTransaction.getWtx()->GetHash());
     }
 
     // and finalize our proposal
-    hash = clientModel->node().validateProposal(data, currentTransaction.getWtx()->get().GetHash(), amount, errRet);
+    hash = clientModel->node().validateProposal(data, currentTransaction.getWtx()->GetHash(), amount, errRet);
 
     if(hash == uint256()) {
         ui->statusLabel->setStyleSheet("QLabel { color: red; }");
@@ -250,7 +250,7 @@ void ProposalDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn &
         msgParams.second = CClientUIInterface::MSG_ERROR;
         break;
     case WalletModel::AbsurdFee:
-        msgParams.first = tr("A fee higher than %1 is considered an absurdly high fee.").arg(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), model->node().getMaxTxFee()));
+        msgParams.first = tr("A fee higher than %1 is considered an absurdly high fee.").arg(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), model->wallet().getDefaultMaxTxFee()));
         break;
     case WalletModel::PaymentRequestExpired:
         msgParams.first = tr("Payment request expired.");

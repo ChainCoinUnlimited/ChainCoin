@@ -13,12 +13,19 @@
 #include <messagesigner.h>
 #include <netmessagemaker.h>
 #include <policy/policy.h>
+#include <policy/settings.h>
 #include <reverse_iterator.h>
-#include <util/system.h>
 #include <util/moneystr.h>
+#include <util/system.h>
+#include <util/translation.h>
 
 #include <numeric>
 #include <string>
+
+//! Discourage users to set fees higher than this amount (in satoshis) per kB
+constexpr CAmount HIGH_TX_FEE_PER_KB{COIN / 500};
+//! -maxtxfee will warn if called with a higher fee than this amount (in satoshis)
+constexpr CAmount HIGH_MAX_TX_FEE{100 * HIGH_TX_FEE_PER_KB};
 
 uint256 CCoinJoinQueue::GetSignatureHash() const
 {
@@ -318,45 +325,45 @@ std::string CCoinJoin::GetMessageByID(PoolMessage nMessageID)
 {
     switch (nMessageID) {
     case ERR_ALREADY_HAVE:
-        return _("Already have that input.");
+        return _("Already have that input.").translated;
     case ERR_DENOM:
-        return _("No matching denominations found for mixing.");
+        return _("No matching denominations found for mixing.").translated;
     case ERR_ENTRIES_FULL:
-        return _("Entries are full.");
+        return _("Entries are full.").translated;
     case ERR_INVALID_OUT:
-        return _("Not compatible with existing transactions.");
+        return _("Not compatible with existing transactions.").translated;
     case ERR_MN_FEES:
-        return _("Missing or high masternode fees.");
+        return _("Missing or high masternode fees.").translated;
     case ERR_INVALID_INPUT:
-        return _("Input is not valid.");
+        return _("Input is not valid.").translated;
     case ERR_FEES:
-        return _("Included fees too high or too low.");
+        return _("Included fees too high or too low.").translated;
     case ERR_INVALID_TX:
-        return _("Transaction not valid.");
+        return _("Transaction not valid.").translated;
     case ERR_MAXIMUM:
-        return _("Entry exceeds maximum size.");
+        return _("Entry exceeds maximum size.").translated;
     case ERR_MN_LIST:
-        return _("Not in the Masternode list.");
+        return _("Not in the Masternode list.").translated;
     case ERR_MODE:
-        return _("Incompatible mode.");
+        return _("Incompatible mode.").translated;
     case ERR_QUEUE_FULL:
-        return _("Masternode queue is full.");
+        return _("Masternode queue is full.").translated;
     case ERR_RECENT:
-        return _("Last CoinJoin was too recent.");
+        return _("Last CoinJoin was too recent.").translated;
     case ERR_SESSION:
-        return _("Session not complete!");
+        return _("Session not complete!").translated;
     case ERR_MISSING_TX:
-        return _("Missing input transaction information.");
+        return _("Missing input transaction information.").translated;
     case ERR_VERSION:
-        return _("Incompatible version.");
+        return _("Incompatible version.").translated;
     case MSG_NOERR:
-        return _("No errors detected.");
+        return _("No errors detected.").translated;
     case MSG_SUCCESS:
-        return _("Transaction created successfully.");
+        return _("Transaction created successfully.").translated;
     case MSG_ENTRIES_ADDED:
-        return _("Your entries added successfully.");
+        return _("Your entries added successfully.").translated;
     default:
-        return _("Unknown response.");
+        return _("Unknown response.").translated;
     }
 }
 

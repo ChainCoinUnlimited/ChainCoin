@@ -1,18 +1,19 @@
 Release Process
 ====================
 
-Before every release candidate:
+## Branch updates
 
-* Update translations (ping wumpus on IRC) see [translation_process.md](https://github.com/chaincoin/chaincoin/blob/master/doc/translation_process.md#synchronising-translations).
+### Before every release candidate
 
+* Update translations see [translation_process.md](https://github.com/chaincoin/chaincoin/blob/master/doc/translation_process.md#synchronising-translations).
 * Update manpages, see [gen-manpages.sh](https://github.com/chaincoin/chaincoin/blob/master/contrib/devtools/README.md#gen-manpagessh).
-* Update release candidate version in `configure.ac` (`CLIENT_VERSION_RC`)
+* Update release candidate version in `configure.ac` (`CLIENT_VERSION_RC`).
 
-Before every minor and major release:
+### Before every major and minor release
 
 * Update [bips.md](bips.md) to account for changes since the last release.
-* Update version in `configure.ac` (don't forget to set `CLIENT_VERSION_IS_RELEASE` to `true`) (don't forget to set `CLIENT_VERSION_RC` to `0`)
-* Write release notes (see below)
+* Update version in `configure.ac` (don't forget to set `CLIENT_VERSION_RC` to `0`).
+* Write release notes (see "Write the release notes" below).
 * Update `src/chainparams.cpp` nMinimumChainWork with information from the getblockchaininfo rpc.
 * Update `src/chainparams.cpp` defaultAssumeValid with information from the getblockhash rpc.
   - The selected value must not be orphaned so it may be useful to set the value two blocks back from the tip.
@@ -20,13 +21,40 @@ Before every minor and major release:
   - This update should be reviewed with a reindex-chainstate with assumevalid=0 to catch any defect
      that causes rejection of blocks in the past history.
 
-Before every major release:
+### Before every major release
 
 * Update hardcoded [seeds](/contrib/seeds/README.md), see [this pull request](https://github.com/bitcoin/bitcoin/pull/7415) for an example.
 * Update [`src/chainparams.cpp`](/src/chainparams.cpp) m_assumed_blockchain_size and m_assumed_chain_state_size with the current size plus some overhead.
 * Update `src/chainparams.cpp` chainTxData with statistics about the transaction count and rate. Use the output of the RPC `getchaintxstats`, see
-  [this pull request](https://github.com/chaincoin/chaincoin/pull/12270) for an example.
-* Update version of `contrib/gitian-descriptors/*.yml`: usually one'd want to do this on master after branching off the release - but be sure to at least do it before a new major release
+  [this pull request](https://github.com/bitcoin/bitcoin/pull/12270) for an example. Reviewers can verify the results by running `getchaintxstats <window_block_count> <window_last_block_hash>` with the `window_block_count` and `window_last_block_hash` from your output.
+* On both the master branch and the new release branch:
+  - update `CLIENT_VERSION_MINOR` in [`configure.ac`](../configure.ac)
+  - update `CLIENT_VERSION_MINOR`, `PACKAGE_VERSION`, and `PACKAGE_STRING` in [`build_msvc/chaincoincoin_config.h`](/build_msvc/chaincoin_config.h)
+* On the new release branch in [`configure.ac`](../configure.ac) and [`build_msvc/chaincoincoin_config.h`](/build_msvc/chaincoincoin_config.h) (see [this commit](https://github.com/bitcoin/bitcoin/commit/742f7dd)):
+  - set `CLIENT_VERSION_REVISION` to `0`
+  - set `CLIENT_VERSION_IS_RELEASE` to `true`
+
+#### Before branch-off
+
+- Clear the release notes and move them to the wiki (see "Write the release notes" below).
+
+#### After branch-off (on master)
+
+- Update the version of `contrib/gitian-descriptors/*.yml`.
+- Update the versions in `SECURITY.md` as per the software lifecycle [maintenance policy](https://bitcoincore.org/en/lifecycle/#maintenance-period), generally bumping all up one major version.
+
+#### After branch-off (on the major release branch)
+
+- Update the versions and the link to the release notes draft in `doc/release-notes.md`.
+- Delete `SECURITY.md`.
+
+#### Before final release
+
+- Merge the release notes from the wiki into the branch.
+- Ensure the "Needs release note" label is removed from all relevant pull requests and issues.
+
+
+## Building
 
 ### First time / New builders
 
@@ -40,22 +68,19 @@ Check out the source code in the following directory hierarchy.
     git clone https://github.com/devrandom/gitian-builder.git
     git clone https://github.com/chaincoin/chaincoin.git
 
-### Chaincoin maintainers/release engineers, suggestion for writing release notes
+### Write the release notes
 
-Write release notes. git shortlog helps a lot, for example:
+Write the release notes. `git shortlog` helps a lot, for example:
 
-    git shortlog --no-merges v(current version, e.g. 0.7.2)..v(new version, e.g. 0.8.0)
-
-(or ping @wumpus on IRC, he has specific tooling to generate the list of merged pulls
-and sort them into categories based on labels)
+    git shortlog --no-merges v(current version, e.g. 0.19.2)..v(new version, e.g. 0.20.0)
 
 Generate list of authors:
 
-    git log --format='- %aN' v(current version, e.g. 0.16.0)..v(new version, e.g. 0.16.1) | sort -fiu
+    git log --format='- %aN' v(current version, e.g. 0.20.0)..v(new version, e.g. 0.20.1) | sort -fiu
 
-Tag version (or release candidate) in git
+Tag the version (or release candidate) in git:
 
-    git tag -s v(new version, e.g. 0.8.0)
+    git tag -s v(new version, e.g. 0.20.0)
 
 ### Setup and perform Gitian builds
 
@@ -65,7 +90,7 @@ Setup Gitian descriptors:
 
     pushd ./chaincoin
     export SIGNER="(your Gitian key, ie bluematt, sipa, etc)"
-    export VERSION=(new version, e.g. 0.8.0)
+    export VERSION=(new version, e.g. 0.20.0)
     git fetch
     git checkout v${VERSION}
     popd
@@ -216,7 +241,6 @@ Create (and optionally verify) the signed Windows binaries:
     ./bin/gsign --signer "$SIGNER" --release ${VERSION}-win-signed --destination ../gitian.sigs/ ../chaincoin/contrib/gitian-descriptors/gitian-win-signer.yml
     ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-win-signed ../chaincoin/contrib/gitian-descriptors/gitian-win-signer.yml
     mv build/out/chaincoin-*win64-setup.exe ../chaincoin-${VERSION}-win64-setup.exe
-    mv build/out/chaincoin-*win32-setup.exe ../chaincoin-${VERSION}-win32-setup.exe
     popd
 
 Commit your signature for the signed macOS/Windows binaries:
@@ -224,7 +248,7 @@ Commit your signature for the signed macOS/Windows binaries:
     pushd gitian.sigs
     git add ${VERSION}-osx-signed/"${SIGNER}"
     git add ${VERSION}-win-signed/"${SIGNER}"
-    git commit -a
+    git commit -m "Add ${SIGNER} ${VERSION} signed binaries signatures"
     git push  # Assuming you can push to the gitian.sigs tree
     popd
 
@@ -241,12 +265,11 @@ The list of files should be:
 chaincoin-${VERSION}-aarch64-linux-gnu.tar.gz
 chaincoin-${VERSION}-arm-linux-gnueabihf.tar.gz
 chaincoin-${VERSION}-i686-pc-linux-gnu.tar.gz
+chaincoin-${VERSION}-riscv64-linux-gnu.tar.gz
 chaincoin-${VERSION}-x86_64-linux-gnu.tar.gz
 chaincoin-${VERSION}-osx64.tar.gz
 chaincoin-${VERSION}-osx.dmg
 chaincoin-${VERSION}.tar.gz
-chaincoin-${VERSION}-win32-setup.exe
-chaincoin-${VERSION}-win32.zip
 chaincoin-${VERSION}-win64-setup.exe
 chaincoin-${VERSION}-win64.zip
 ```
@@ -263,5 +286,12 @@ rm SHA256SUMS
 ```
 (the digest algorithm is forced to sha256 to avoid confusion of the `Hash:` header that GPG adds with the SHA256 used for the files)
 Note: check that SHA256SUMS itself doesn't end up in SHA256SUMS, which is a spurious/nonsensical entry.
+
+
+- Announce the release:
+
+  - Discord
+
+  - Optionally twitter, reddit /r/Chaincoin, ... but this will usually sort out itself
 
   - Celebrate

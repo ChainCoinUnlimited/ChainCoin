@@ -139,7 +139,7 @@ void CAnalyzer::Flush()
 {
     LOCK2(cs_main, cs);
     for (m_cache::iterator it = mDenomTx.begin(); it != mDenomTx.end(); ++it) {
-        const Coin& coin = AccessByTxid(*pcoinsTip, it->first);
+        const Coin& coin = AccessByTxid(::ChainstateActive().CoinsTip(), it->first);
         if (coin.IsSpent()) {
             mDenomTx.erase(it--);
         }

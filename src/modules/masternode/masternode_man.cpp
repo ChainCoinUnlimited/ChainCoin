@@ -20,6 +20,7 @@
 #include <shutdown.h>
 #include <ui_interface.h>
 #include <util/system.h>
+#include <util/translation.h>
 #include <warnings.h>
 
 #include <boost/algorithm/string/replace.hpp>
@@ -457,7 +458,7 @@ bool CMasternodeMan::GetMasternodeInfo(const CScript& payee, masternode_info_t& 
 {
     LOCK(cs);
     for (const auto& mnpair : mapMasternodes) {
-        CScript scriptCollateralAddress = GetScriptForDestination(mnpair.second.pubKeyCollateralAddress.GetID());
+        CScript scriptCollateralAddress = GetScriptForDestination(PKHash(mnpair.second.pubKeyCollateralAddress));
         if (scriptCollateralAddress == payee) {
             mnInfoRet = mnpair.second.GetInfo();
             return true;
@@ -474,10 +475,10 @@ bool CMasternodeMan::Has(const COutPoint& outpoint)
 
 bool CMasternodeMan::HasBlockHash(uint256& hashRet, int nBlockHeight)
 {
-    if (chainActive.Tip() == nullptr) return false;
-    if (nBlockHeight < -1 || nBlockHeight > chainActive.Height()) return false;
-    if (nBlockHeight == -1) nBlockHeight = chainActive.Height();
-    CBlockIndex* pblockindex = chainActive[nBlockHeight];
+    if (::ChainActive().Tip() == nullptr) return false;
+    if (nBlockHeight < -1 || nBlockHeight > ::ChainActive().Height()) return false;
+    if (nBlockHeight == -1) nBlockHeight = ::ChainActive().Height();
+    CBlockIndex* pblockindex = ::ChainActive()[nBlockHeight];
     hashRet = pblockindex->GetBlockHash();
     return true;
 }
@@ -525,10 +526,10 @@ bool CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight, bool f
 
         //check the output
         Coin coin;
-        if (!pcoinsTip->GetCoin(mnpair.first, coin)) continue;
+        if (!::ChainstateActive().CoinsTip().GetCoin(mnpair.first, coin)) continue;
 
         //make sure it has at least as many confirmations as there are masternodes
-        if ((chainActive.Height() - coin.nHeight + 1) < nMnCount) continue;
+        if ((::ChainActive().Height() - coin.nHeight + 1) < nMnCount) continue;
 
         vecMasternodeLastPaid.push_back(std::make_pair(mnpair.second.GetLastPaidBlock(), &mnpair.second));
     }
@@ -1689,11 +1690,11 @@ void CMasternodeMan::WarnMasternodeDaemonUpdates()
 
     std::string strWarning;
     if (nUpdatedMasternodes != size()) {
-        strWarning = strprintf(_("Warning: At least %d of %d masternodes are running on a newer software version. Please check latest releases, you might need to update too."),
+        strWarning = strprintf(_("Warning: At least %d of %d masternodes are running on a newer software version. Please check latest releases, you might need to update too.").translated,
                     nUpdatedMasternodes, size());
     } else {
         // someone was postponing this update for way too long probably
-        strWarning = strprintf(_("Warning: Every masternode (out of %d known ones) is running on a newer software version. Please check latest releases, it's very likely that you missed a major/critical update."),
+        strWarning = strprintf(_("Warning: Every masternode (out of %d known ones) is running on a newer software version. Please check latest releases, it's very likely that you missed a major/critical update.").translated,
                     size());
     }
 
