@@ -11,6 +11,8 @@
 #include <interfaces/node.h>
 #include <key_io.h>
 
+#include <algorithm>
+
 #include <QColor>
 #include <QFont>
 #include <QDebug>
@@ -129,7 +131,7 @@ public:
         // qLowerBound() and qUpperBound() require our cachedAddressTable list to be sorted in asc order
         // Even though the map is already sorted this re-sorting step is needed because the originating map
         // is sorted by binary address, not by base58() address.
-        qSort(cachedMasternodeTable.begin(), cachedMasternodeTable.end(), outpointEntryLessThan());
+        std::sort(cachedMasternodeTable.begin(), cachedMasternodeTable.end(), outpointEntryLessThan());
     }
 
     void updateMasternode(interfaces::Node& node, const COutPoint& outpoint, int status)

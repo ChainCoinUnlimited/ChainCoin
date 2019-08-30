@@ -10,7 +10,9 @@
 
 #include <interfaces/node.h>
 #include <key_io.h>
- 
+
+#include <algorithm>
+
 #include <QColor>
 #include <QDateTime>
 #include <QDebug>
@@ -116,7 +118,7 @@ public:
         }
 
         // qLowerBound() and qUpperBound() require our cachedAddressTable list to be sorted in asc order
-        qSort(cachedProposals.begin(), cachedProposals.end(), HashLessThan());
+        std::sort(cachedProposals.begin(), cachedProposals.end(), HashLessThan());
     }
 
     void updateProposal(interfaces::Node& node, const uint256& hash, int status)
