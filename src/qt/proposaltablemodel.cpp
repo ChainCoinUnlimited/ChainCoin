@@ -117,7 +117,7 @@ public:
                             percentage));
         }
 
-        // qLowerBound() and qUpperBound() require our cachedAddressTable list to be sorted in asc order
+        // std::lower_bound() and std::upper_bound() require our cachedAddressTable list to be sorted in asc order
         std::sort(cachedProposals.begin(), cachedProposals.end(), HashLessThan());
     }
 
@@ -126,9 +126,9 @@ public:
         qDebug() << "ProposalTablePriv::updateProposal"+ QString::fromStdString(hash.ToString()) + " " + QString::number(status);
 
         // Find bounds of this proposal in model
-        QList<ProposalRecord>::iterator lower = qLowerBound(
+        QList<ProposalRecord>::iterator lower = std::lower_bound(
             cachedProposals.begin(), cachedProposals.end(), hash, HashLessThan());
-        QList<ProposalRecord>::iterator upper = qUpperBound(
+        QList<ProposalRecord>::iterator upper = std::upper_bound(
             cachedProposals.begin(), cachedProposals.end(), hash, HashLessThan());
         int lowerIndex = (lower - cachedProposals.begin());
         int upperIndex = (upper - cachedProposals.begin());
