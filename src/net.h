@@ -903,10 +903,10 @@ public:
     {
         LOCK(cs_inventory);
         if (inv.type == MSG_TX && !filterInventoryKnown.contains(inv.hash)) {
-            LogPrint(BCLog::NET, "PushInventory --  inv: %s peer=%d\n", inv.ToString(), id);
+            LogPrint(BCLog::NET, "PushInventory --  tx: %s peer=%d\n", inv.ToString(), id);
             setInventoryTxToSend.insert(inv.hash);
         } else if (inv.type == MSG_BLOCK) {
-            LogPrint(BCLog::NET, "PushInventory --  inv: %s peer=%d\n", inv.ToString(), id);
+            LogPrint(BCLog::NET, "PushInventory --  block: %s peer=%d\n", inv.ToString(), id);
             vInventoryBlockToSend.push_back(inv.hash);
         } else if (!filterInventoryKnown.contains(inv.hash)) {
             LogPrint(BCLog::NET, "PushInventory --  inv: %s peer=%d\n", inv.ToString(), id);

@@ -292,6 +292,7 @@ BITCOIN_QT_H = \
 
 RES_ICONS = \
   qt/res/icons/chaincoin.ico \
+  qt/res/icons/chaincoin_testnet.ico \
   qt/res/icons/chaincoin.png \
   qt/res/icons/chevron.png \
   qt/res/icons/warning.png \
