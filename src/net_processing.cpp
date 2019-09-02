@@ -27,6 +27,7 @@
 #include <util/system.h>
 #include <util/strencodings.h>
 #include <util/validation.h>
+#include <validation.h>
 
 #include <modules/platform/funding.h>
 #include <modules/masternode/masternode_payments.h>
@@ -69,7 +70,7 @@ static constexpr int STALE_RELAY_AGE_LIMIT = 30 * 24 * 60 * 60;
 /// limiting block relay. Set to one week, denominated in seconds.
 static constexpr int HISTORICAL_BLOCK_AGE = 7 * 24 * 60 * 60;
 /** Maximum number of in-flight transactions from a peer */
-static constexpr int32_t MAX_PEER_INV_IN_FLIGHT = 100;
+static constexpr int32_t MAX_PEER_INV_IN_FLIGHT = 300;
 /** Maximum number of announced transactions from a peer */
 static constexpr int32_t MAX_PEER_INV_ANNOUNCEMENTS = 2 * MAX_INV_SZ;
 /** How many microseconds to delay requesting transactions from inbound peers */
@@ -340,7 +341,7 @@ struct CNodeState {
      *   peers.
      */
     struct InvDownloadState {
-        /* Track when to attempt download of announced transactions (process
+        /* Track when to attempt download of announced inventory (process
          * time in micros -> hash)
          */
         std::multimap<std::chrono::microseconds, CInv> m_inv_process_time;
@@ -4295,18 +4296,18 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
                     ++it;
                 }
             }
-            // On average, we do this check every TX_EXPIRY_INTERVAL. Randomize
+            // On average, we do this check every INV_EXPIRY_INTERVAL. Randomize
             // so that we're not doing this for all peers at the same time.
             state.m_inv_download.m_check_expiry_timer = current_time + INV_EXPIRY_INTERVAL / 2 + GetRandMicros(INV_EXPIRY_INTERVAL);
         }
 
         auto& inv_process_time = state.m_inv_download.m_inv_process_time;
         while (!inv_process_time.empty() && inv_process_time.begin()->first <= current_time && state.m_inv_download.m_inv_in_flight.size() < MAX_PEER_INV_IN_FLIGHT) {
+            const CInv _inv = inv_process_time.begin()->second;
+            const CInv& inv = _inv.type == MSG_TX ? CInv(MSG_TX | GetFetchFlags(pto), _inv.hash) : _inv;
             // Erase this entry from tx_process_time (it may be added back for
             // processing at a later time, see below)
             inv_process_time.erase(inv_process_time.begin());
-            const CInv& _inv = inv_process_time.begin()->second;
-            const CInv& inv = _inv.type == MSG_TX ? CInv(MSG_TX | GetFetchFlags(pto), _inv.hash) : _inv;
             if (!AlreadyHave(inv)) {
                 // If this inventory was last requested more than 1 minute ago,
                 // then request.
