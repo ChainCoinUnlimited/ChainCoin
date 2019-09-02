@@ -7,7 +7,11 @@
 #include <chain.h>
 #include <net.h>
 
+class CConnman;
+class CDataStream;
+class CNode;
 class CMasternodeSync;
+class CScheduler;
 
 static const int MASTERNODE_SYNC_FAILED          = -1;
 static const int MASTERNODE_SYNC_INITIAL         = 0; // sync just started, was reset recently or still in IDB
