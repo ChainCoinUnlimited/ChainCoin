@@ -149,7 +149,7 @@ For more info see <a href=\"https://coinjoin.biz\">https://coinjoin.biz</a> \
         ui->aboutLogo->setVisible(false);
     }
     // Theme dependent Gfx in About popup
-    QString helpMessageGfx = ":/images/" + GUIUtil::getThemeName() + "/about";
+    QString helpMessageGfx = ":/images/about";
     QPixmap pixmap = QPixmap(helpMessageGfx);
     ui->aboutLogo->setPixmap(pixmap);
 }

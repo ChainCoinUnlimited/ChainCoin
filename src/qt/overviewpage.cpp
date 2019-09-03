@@ -130,7 +130,6 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
 
 {
     ui->setupUi(this);
-    QString theme = GUIUtil::getThemeName();
 
     m_balances.balance = -1;
 

@@ -289,8 +289,6 @@ QVariant ProposalTableModel::data(const QModelIndex &index, int role) const
     if(!index.isValid())
         return QVariant();
 
-    QString theme = GUIUtil::getThemeName();
-
     ProposalRecord *rec = static_cast<ProposalRecord*>(index.internalPointer());
 
     switch(role)
@@ -322,7 +320,7 @@ QVariant ProposalTableModel::data(const QModelIndex &index, int role) const
         }
         case Endorsed:
             if (rec->funding == true)
-                return QIcon(":/icons/" + theme + "/transaction_confirmed");
+                return QIcon(":/icons/transaction_confirmed");
         }
         break;
     case Qt::TextAlignmentRole:

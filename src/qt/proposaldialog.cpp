@@ -37,19 +37,17 @@ ProposalDialog::ProposalDialog(const PlatformStyle *_platformStyle, QWidget *par
 {
     ui->setupUi(this);
 
-    QString theme = GUIUtil::getThemeName();
-
 #ifdef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
     ui->submitButton->setIcon(QIcon());
     ui->clearButton->setIcon(QIcon());
 #else
-    ui->submitButton->setIcon(QIcon(":/icons/" + theme + "/edit"));
-    ui->clearButton->setIcon(QIcon(":/icons/" + theme + "/remove"));
+    ui->submitButton->setIcon(QIcon(":/icons/edit"));
+    ui->clearButton->setIcon(QIcon(":/icons/remove"));
 #endif
 
     // These icons are needed on Mac also
-    ui->addressBookButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
-    ui->pasteButton->setIcon(QIcon(":/icons/" + theme + "/editpaste"));
+    ui->addressBookButton->setIcon(QIcon(":/icons/address-book"));
+    ui->pasteButton->setIcon(QIcon(":/icons/editpaste"));
 
     GUIUtil::setupAddressWidget(ui->addressIn, this);
 
