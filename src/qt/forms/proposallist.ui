@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>960</width>
-    <height>457</height>
+    <height>251</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,18 +31,18 @@
   <property name="windowTitle">
    <string>Proposal List</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
    <property name="leftMargin">
-    <number>0</number>
+    <number>9</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>9</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>9</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>9</number>
    </property>
    <item>
     <layout class="QVBoxLayout" name="vlayout_main">
@@ -141,9 +141,16 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="hlayout">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Choose your vote in the popup after selecting a type. Votes are sent trough all eligible Masternodes.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontal_layout">
        <property name="spacing">
-        <number>25</number>
+        <number>6</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -187,13 +194,6 @@
          </property>
          <property name="text">
           <string>Vote Endorse</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Choose your vote in the popup after selecting a type. Votes are sent trough all eligible Masternodes.</string>
          </property>
         </widget>
        </item>

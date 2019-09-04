@@ -2,8 +2,7 @@ WalletFrame {
 border-image: url(':/images/green/walletFrame_bg') 0 0 0 0 stretch stretch;
 border-top:0px solid #000;
 margin:0;
-padding-top:20px;
-padding-bottom: 20px;
+padding: 0px;
 }
 
 QStatusBar {
@@ -93,7 +92,7 @@ border: 1px solid #82C3E6;
 font-size:11px;
 min-height:25px;
 outline:0;
-padding:4px;
+padding:3px;
 background-color:#fcfcfc;
 }
 
@@ -113,8 +112,7 @@ border:0;
 border-radius:3px;
 color:#ffffff;
 font-size:12px;
-font-weight:normal;
-height: 26px;
+font-weight:bold;
 padding-left:25px;
 padding-right:25px;
 padding-top:5px;
@@ -137,8 +135,7 @@ border:1px solid #333;
 
 QComboBox { /* Dropdown Menus */
 border:1px solid #82C3E6;
-margin-right: 5px;
-padding: 4px 25px 4px 5px;
+padding: 3px 5px 3px 5px;
 background:#fcfcfc;
 min-height:25px;
 color:#818181;
@@ -903,8 +900,8 @@ max-width: 421px;
 min-width: 421px;
 background-color:#595a5c;
 color:#fff;
-margin-right: 5px;
-padding-right: 5px;
+margin-right: 0px;
+padding-right: 10px;
 font-weight:bold;
 font-size:14px;
 min-height:35px;
@@ -914,7 +911,7 @@ max-height:35px;
 QWidget .QFrame#frameCoinJoin .QLabel#labelCoinJoinSyncStatus { /* CoinJoin Sync Status */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 margin-left:2px;
-padding-right:5px;
+/* padding-right:5px; */
 }
 
 QWidget .QFrame#frameCoinJoin #coinJoinFormLayoutWidget {
@@ -1022,7 +1019,7 @@ outline:none;
 }
 
 QWidget .QFrame#frameCoinJoin .QPushButton#toggleCoinJoin { /* Start CoinJoin Mixing */
-min-height: 40px;
+/* min-height: 40px; */
 font-size:15px;
 font-weight:normal;
 color:#ffffff;
@@ -1076,7 +1073,7 @@ border:1px solid #9e9e9e;
 
 QWidget .QFrame#frame_2 { /* Transactions Widget */
 min-width:410px;
-margin-right:20px;
+/* margin-right:20px; */
 margin-left:0;
 margin-top:15px;
 background-image: url(':/images/green/chaincoin_logo_horizontal');
@@ -1096,13 +1093,13 @@ min-height:24px;
 }
 
 QPushButton#labelTransactionsStatus { /* Recent Transactions Sync Status */
-margin-top:83px;
+/* margin-top:83px; */
 border: none;
 background: none;
 background-color:transparent;
-width:30px;
+/* width:30px;
 height:30px;
-padding:5px;
+padding:5px; */
 }
 
 QWidget .QFrame#frame_2 QListView { /* Transaction List */

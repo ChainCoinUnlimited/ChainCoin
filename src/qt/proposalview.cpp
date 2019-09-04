@@ -12,7 +12,7 @@
 
 #include <interfaces/node.h>
 #include <util/system.h>
- 
+
 #include <QComboBox>
 #include <QDateTime>
 #include <QDateTimeEdit>
@@ -70,12 +70,11 @@ ProposalList::ProposalList(const PlatformStyle *platformStyle, QWidget *parent) 
 {
     ui->setupUi(this);
 
+    ui->horizontal_layout->setSpacing(5);
     if (platformStyle->getUseExtraSpacing()) {
-        ui->hlayout->setSpacing(5);
-        ui->hlayout->addSpacing(26);
+        ui->horizontal_layout->addSpacing(26);
     } else {
-        ui->hlayout->setSpacing(0);
-        ui->hlayout->addSpacing(23);
+        ui->horizontal_layout->addSpacing(23);
     }
 
     if (platformStyle->getUseExtraSpacing()) {
@@ -318,4 +317,3 @@ void ProposalList::dateRangeChanged()
             QDateTime(dateFrom->date()),
             QDateTime(dateTo->date()).addDays(1));
 }
-
