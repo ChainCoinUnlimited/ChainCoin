@@ -419,8 +419,10 @@ QVariant TransactionTableModel::addressColor(const TransactionRecord *wtx) const
     {
     case TransactionRecord::RecvWithAddress:
     case TransactionRecord::SendToAddress:
-    case TransactionRecord::Generated:
     case TransactionRecord::CoinJoin:
+    case TransactionRecord::CoinJoinCreateDenominations:
+    case TransactionRecord::CoinJoinDenominate:
+    case TransactionRecord::Generated:
     case TransactionRecord::RecvWithCoinJoin:
         {
         QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
@@ -428,12 +430,11 @@ QVariant TransactionTableModel::addressColor(const TransactionRecord *wtx) const
             return COLOR_BAREADDRESS;
         } break;
     case TransactionRecord::SendToSelf:
-    case TransactionRecord::CoinJoinCreateDenominations:
-    case TransactionRecord::CoinJoinDenominate:
+        return COLOR_BAREADDRESS;
     default:
         break;
     }
-    return QVariant();
+    return COLOR_BLACK;
 }
 
 QString TransactionTableModel::formatTxAmount(const TransactionRecord *wtx, bool showUnconfirmed, BitcoinUnits::SeparatorStyle separators) const
@@ -581,6 +582,7 @@ QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
         {
             return addressColor(rec);
         }
+        return COLOR_BLACK;
         break;
     case TypeRole:
         return rec->type;
