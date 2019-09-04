@@ -62,14 +62,14 @@
 #include <messagesigner.h>
 #include <netfulfilledman.h>
 
-#include <modules/masternode/activemasternode.h>
 #include <modules/coinjoin/coinjoin_analyzer.h>
+#include <modules/coinjoin/coinjoin_server.h>
+#include <modules/masternode/activemasternode.h>
+#include <modules/masternode/masternode_config.h>
+#include <modules/masternode/masternode_man.h>
 #include <modules/masternode/masternode_payments.h>
 #include <modules/masternode/masternode_sync.h>
-#include <modules/masternode/masternode_man.h>
-#include <modules/masternode/masternode_config.h>
 #include <modules/platform/funding.h>
-#include <modules/coinjoin/coinjoin_server.h>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -1914,7 +1914,6 @@ bool AppInitMain(InitInterfaces& interfaces)
     mnodeman.Controller(scheduler, g_connman.get());
     masternodeSync.Controller(scheduler, g_connman.get());
     mnpayments.Controller(scheduler);
-    funding.Controller(scheduler, g_connman.get());
 
     if (ShutdownRequested()) {
         return false;

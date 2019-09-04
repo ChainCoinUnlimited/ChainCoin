@@ -247,10 +247,6 @@ public:
     void SyncSingleObjAndItsVotes(CNode* pnode, const uint256& nProp, const CBloomFilter& filter, CConnman* connman);
     void SyncAll(CNode* pnode, CConnman* connman) const;
 
-    void ClientTask(CConnman* connman);
-
-    void Controller(CScheduler& scheduler, CConnman* connman);
-
     CGovernanceObject* FindGovernanceObject(const uint256& nHash);
 
     // These commands are only used in RPC
