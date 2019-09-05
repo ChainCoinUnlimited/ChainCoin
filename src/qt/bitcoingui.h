@@ -102,6 +102,7 @@ public:
     void unsubscribeFromCoreSignals();
 
 protected:
+    void resizeEvent(QResizeEvent* evt);
     void changeEvent(QEvent *e);
     void closeEvent(QCloseEvent *event);
     void showEvent(QShowEvent *event);
