@@ -83,6 +83,7 @@ public:
         consensus.BIP66Height = 1000000;
         consensus.CSVHeight = 1572480; // 0000000002296c27b6061bc0a22cf45c0157cdf8bab8e51fcbdee8b2e4320f9d
         consensus.SegwitHeight = 1572480; // 0000000002296c27b6061bc0a22cf45c0157cdf8bab8e51fcbdee8b2e4320f9d
+        consensus.MinBIP9WarningHeight = consensus.SegwitHeight + consensus.nMinerConfirmationWindow;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 90; // PM-Tech: ChainCoin re-target at every block
         consensus.nPowTargetSpacing = 90; // PM-Tech: ChainCoin 90 seconds
@@ -205,6 +206,7 @@ public:
         consensus.BIP66Height = 1;
         consensus.CSVHeight = 46368; // 00000360db550967f1afbb989584e76ea0981c5afdab2d1e9da72e6757d5ef30
         consensus.SegwitHeight = 48384; // 00000197ff79f8097f262612d28d4a27c73934502df024ca3a184475081ba812
+        consensus.MinBIP9WarningHeight = consensus.SegwitHeight + consensus.nMinerConfirmationWindow;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 90; // PM-Tech: ChainCoin
         consensus.nPowTargetSpacing = 90; // PM-Tech: ChainCoin
@@ -307,6 +309,7 @@ public:
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in functional tests)
         consensus.CSVHeight = 432; // CSV activated on regtest (Used in rpc activation tests)
         consensus.SegwitHeight = 0; // SEGWIT is always activated on regtest unless overridden
+        consensus.MinBIP9WarningHeight = 0;
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 90; // PM-Tech: ChainCoin 90s
         consensus.nPowTargetSpacing = 90; // PM-Tech: ChainCoin 90s
