@@ -20,19 +20,19 @@ static const bool DEFAULT_SPLASHSCREEN = true;
 /* Invalid field background style */
 #define STYLE_INVALID "background:#FF8080"
 
-/* Transaction list -- unconfirmed transaction */
+/* List view -- unconfirmed transaction */
 #define COLOR_UNCONFIRMED QColor(128, 128, 128)
-/* Transaction list -- negative amount */
+/* List view -- negative amount */
 #define COLOR_NEGATIVE QColor(255, 0, 0)
-/* Transaction list -- bare address (without label) */
+/* List view -- bare address (without label) */
 #define COLOR_BAREADDRESS QColor(140, 140, 140)
-/* Transaction list -- TX status decoration - open until date */
+/* List view -- status decoration - open until date */
 #define COLOR_TX_STATUS_OPENUNTILDATE QColor(64, 64, 255)
-/* Transaction list -- TX status decoration - danger, tx needs attention */
+/* List view -- status decoration - danger, tx needs attention */
 #define COLOR_TX_STATUS_DANGER QColor(200, 100, 100)
-/* Transaction list -- TX status decoration - default color */
-#define COLOR_BLACK QColor(0, 0, 0)
-/* General -- green */
+/* List view -- status decoration - default color */
+#define COLOR_BLACK QColor(3, 3, 3)
+/* List view -- general green */
 #define COLOR_GREEN QColor(23, 168, 26)
 
 /* Tooltips longer than this (in characters) are converted into rich text,

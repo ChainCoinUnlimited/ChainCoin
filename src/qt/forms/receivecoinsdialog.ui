@@ -115,7 +115,7 @@
           <item>
            <widget class="QCheckBox" name="useLegacyAddress">
             <property name="text">
-             <string>Generate legacx address</string>
+             <string>Generate legacy address</string>
             </property>
            </widget>
           </item>

@@ -447,7 +447,6 @@ RPCConsole::RPCConsole(interfaces::Node& node, const PlatformStyle *_platformSty
     platformStyle(_platformStyle)
 {
     ui->setupUi(this);
-    QString theme = GUIUtil::getThemeName();
     QSettings settings;
     if (!restoreGeometry(settings.value("RPCConsoleWindowGeometry").toByteArray())) {
         // Restore failed (perhaps missing setting), center the window
@@ -460,12 +459,12 @@ RPCConsole::RPCConsole(interfaces::Node& node, const PlatformStyle *_platformSty
     ui->openDebugLogfileButton->setToolTip(ui->openDebugLogfileButton->toolTip().arg(PACKAGE_NAME));
 
     if (platformStyle->getImagesOnButtons()) {
-        ui->openDebugLogfileButton->setIcon(QIcon(":/icons/" + theme + "/export"));
+        ui->openDebugLogfileButton->setIcon(QIcon(":/icons/export"));
     }
     // Needed on Mac also
-    ui->clearButton->setIcon(QIcon(":/icons/" + theme + "/remove"));
-    ui->fontBiggerButton->setIcon(QIcon(":/icons/" + theme + "/fontbigger"));
-    ui->fontSmallerButton->setIcon(QIcon(":/icons/" + theme + "/fontsmaller"));
+    ui->clearButton->setIcon(QIcon(":/icons/remove"));
+    ui->fontBiggerButton->setIcon(QIcon(":/icons/fontbigger"));
+    ui->fontSmallerButton->setIcon(QIcon(":/icons/fontsmaller"));
 
     // Install event filter for up and down arrow
     ui->lineEdit->installEventFilter(this);
@@ -782,7 +781,7 @@ void RPCConsole::clear(bool clearHistory)
 
     // Add smoothly scaled icon images.
     // (when using width/height on an img, Qt uses nearest instead of linear interpolation)
-    QString iconPath = ":/icons/" + GUIUtil::getThemeName() + "/";
+    QString iconPath = ":/icons/";
     QString iconName = "";
 
     for(int i=0; ICON_MAPPING[i].url; ++i)

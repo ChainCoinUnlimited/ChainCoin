@@ -547,21 +547,6 @@ struct sortProposalsByVotes {
     }
 };
 
-void CGovernanceManager::ClientTask(CConnman* connman)
-{
-    if(fLiteMode || !masternodeSync.IsSynced()) return;
-
-    // CHECK OBJECTS WE'VE ASKED FOR, REMOVE OLD ENTRIES
-
-    CleanOrphanObjects();
-
-    RequestOrphanObjects(connman);
-
-    // CHECK AND REMOVE - REPROCESS GOVERNANCE OBJECTS
-
-    UpdateCachesAndClean();
-}
-
 bool CGovernanceManager::ConfirmInventoryRequest(const CInv& inv)
 {
     // do not request objects until it's time to sync
@@ -1301,20 +1286,6 @@ UniValue CGovernanceManager::ToJson() const
     return jsonObj;
 }
 
-void CGovernanceManager::UpdatedBlockTip(const CBlockIndex *pindexNew, bool fInitialDownload, CConnman* connman)
-{
-    if(!pindexNew || fLiteMode || fInitialDownload) {
-        return;
-    }
-
-    nCachedBlockHeight = pindexNew->nHeight;
-    LogPrint(BCLog::GOV, "CGovernanceManager::UpdatedBlockTip -- nCachedBlockHeight: %d\n", nCachedBlockHeight);
-
-    CheckPostponedObjects(connman);
-
-    CSuperblockManager::ExecuteBestSuperblock(pindexNew->nHeight);
-}
-
 void CGovernanceManager::RequestOrphanObjects(CConnman* connman)
 {
     std::vector<CNode*> vNodesCopy = connman->CopyNodeVector();
@@ -1364,9 +1335,29 @@ void CGovernanceManager::CleanOrphanObjects()
     }
 }
 
-void CGovernanceManager::Controller(CScheduler& scheduler, CConnman* connman)
+void CGovernanceManager::UpdatedBlockTip(const CBlockIndex *pindexNew, bool fInitialDownload, CConnman* connman)
 {
-    if (!fLiteMode) {
-        scheduler.scheduleEvery(std::bind(&CGovernanceManager::ClientTask, this, connman), 60000*5);
+    if(!pindexNew || fLiteMode || fInitialDownload) {
+        return;
     }
+
+    nCachedBlockHeight = pindexNew->nHeight;
+    LogPrint(BCLog::GOV, "CGovernanceManager::UpdatedBlockTip -- nCachedBlockHeight: %d\n", nCachedBlockHeight);
+
+    CheckPostponedObjects(connman);
+
+    if(!masternodeSync.IsSynced()) return;
+
+    // CHECK OBJECTS WE'VE ASKED FOR, REMOVE OLD ENTRIES
+
+    CleanOrphanObjects();
+
+    RequestOrphanObjects(connman);
+
+    // CHECK AND REMOVE - REPROCESS GOVERNANCE OBJECTS
+
+    UpdateCachesAndClean();
+
+    CSuperblockManager::ExecuteBestSuperblock(pindexNew->nHeight);
 }
+

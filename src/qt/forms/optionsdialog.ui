@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tabMain">
       <attribute name="title">
@@ -768,20 +768,6 @@ https://www.transifex.com/projects/p/chaincoin/</string>
           <set>Qt::TextBrowserInteraction</set>
          </property>
         </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4_Display" stretch="0,0">
-         <item>
-          <widget class="QLabel" name="themeLabel">
-           <property name="text">
-            <string>User Interface Theme:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QValueComboBox" name="theme"/>
-         </item>
-        </layout>
        </item>
        <item>
         <widget class="Line" name="line">

@@ -50,6 +50,7 @@
 #include <QProgressDialog>
 #include <QSettings>
 #include <QTextDocument> // for Qt::mightBeRichText
+#include <QTextStream>
 #include <QThread>
 #include <QUrlQuery>
 
@@ -813,37 +814,15 @@ bool SetStartOnSystemStartup(bool fAutoStart) { return false; }
 
 #endif
 
-// Return name of current UI-theme or default theme if no theme was found
-QString getThemeName()
-{
-    QSettings settings;
-    QString theme = settings.value("theme", "").toString();
-
-    if(!theme.isEmpty()){
-        return theme;
-    }
-    return QString("green");  
-}
-
-// Open CSS when configured
+// Open QSS file
 QString loadStyleSheet()
 {
     QString styleSheet;
-    QSettings settings;
-    QString cssName;
-    QString theme = settings.value("theme", "").toString();
 
-    if(!theme.isEmpty()){
-        cssName = QString(":/css/") + theme; 
-    }
-    else {
-        cssName = QString(":/css/green");  
-        settings.setValue("theme", "green");
-    }
-    
-    QFile qFile(cssName);      
-    if (qFile.open(QFile::ReadOnly)) {
-        styleSheet = QLatin1String(qFile.readAll());
+    QFile qFile(QString(":/qss/style") );
+    if (qFile.open(QFile::ReadOnly | QFile::Text)) {
+        QTextStream stream(&qFile);
+        styleSheet = stream.readAll();
     }
         
     return styleSheet;
