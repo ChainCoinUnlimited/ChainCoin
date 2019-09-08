@@ -53,23 +53,23 @@ Paths
 
 All three configurations assume several paths that might need to be adjusted.
 
-Binary:              `/usr/bin/chaincoind`  
-Configuration file:  `/etc/chaincoin/chaincoin.conf`  
-Data directory:      `/var/lib/chaincoind`  
-PID file:            `/var/run/chaincoind/chaincoind.pid` (OpenRC and Upstart) or `/run/chaincoind/chaincoind.pid` (systemd)  
-Lock file:           `/var/lock/subsys/chaincoind` (CentOS)  
+Binary:              `/usr/bin/chaincoind`
+Configuration file:  `/etc/chaincoin/chaincoin.conf`
+Data directory:      `/var/lib/chaincoind`
+PID file:            `/var/run/chaincoind/chaincoind.pid` (OpenRC and Upstart) or `/run/chaincoind/chaincoind.pid` (systemd)
+Lock file:           `/var/lock/subsys/chincoind` (CentOS)
 
 The PID directory (if applicable) and data directory should both be owned by the
-bitcoin user and group. It is advised for security reasons to make the
+chaincoin user and group. It is advised for security reasons to make the
 configuration file and data directory only readable by the chaincoin user and
 group. Access to chaincoin-cli and other chaincoind rpc clients can then be
 controlled by group membership.
 
 NOTE: When using the systemd .service file, the creation of the aforementioned
 directories and the setting of their permissions is automatically handled by
-systemd. Directories are given a permission of 710, giving the bitcoin group
+systemd. Directories are given a permission of 710, giving the chaincoin group
 access to files under it _if_ the files themselves give permission to the
-bitcoin group to do so (e.g. when `-sysperms` is specified). This does not allow
+chaincoin group to do so (e.g. when `-sysperms` is specified). This does not allow
 for the listing of files under the directory.
 
 NOTE: It is not currently possible to override `datadir` in
@@ -78,15 +78,16 @@ files out-of-the-box. This is because the command line options specified in the
 init files take precedence over the configurations in
 `/etc/chaincoin/chaincoin.conf`. However, some init systems have their own
 configuration mechanisms that would allow for overriding the command line
-options specified in the init files (e.g. setting `BITCOIND_DATADIR` for
+options specified in the init files (e.g. setting `CHAINCOIND_DATADIR` for
 OpenRC).
 
 ### macOS
 
-Binary:              `/usr/local/bin/chaincoind`  
-Configuration file:  `~/Library/Application Support/Chaincoin/chaincoin.conf`  
-Data directory:      `~/Library/Application Support/Chaincoin`  
-Lock file:           `~/Library/Application Support/Chaincoin/.lock`  
+Binary:              `/usr/local/bin/chaincoind`
+Configuration file:  `~/Library/Application Support/Chaincoin/Chaincoin.conf`
+Data directory:      `~/Library/Application Support/Chaincoin`
+Lock file:           `~/Library/Application Support/Chaincoin/.lock`
+
 
 Installing Service Configuration
 -----------------------------------
