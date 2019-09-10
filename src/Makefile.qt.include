@@ -431,7 +431,8 @@ RES_IMAGES = \
   qt/res/images/splash_testnet.png \
   qt/res/images/unchecked.png \
   qt/res/images/upArrow_small.png \
-  qt/res/images/walletFrame_bg.png
+  qt/res/images/walletFrame_bg.png \
+  qt/res/images/overlayFrame_bg.png
 
 RES_QSS = \
   qt/res/qss/style.qss

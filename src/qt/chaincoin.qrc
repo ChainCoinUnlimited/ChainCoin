@@ -61,6 +61,7 @@
         <file alias="unchecked">res/images/unchecked.png</file>
         <file alias="upArrow_small">res/images/upArrow_small.png</file>
         <file alias="walletFrame_bg">res/images/walletFrame_bg.png</file>
+        <file alias="overlayFrame_bg">res/images/overlayFrame_bg.png</file>
     </qresource>
     <qresource prefix="/movies">
         <file alias="spinner-000">res/movies/spinner-000.png</file>

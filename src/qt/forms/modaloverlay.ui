@@ -7,11 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>401</height>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
    <property name="sizeConstraint">
@@ -31,6 +34,9 @@
    </property>
    <item>
     <widget class="QWidget" name="bgWidget" native="true">
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
      <property name="styleSheet">
       <string notr="true"/>
      </property>
@@ -49,8 +55,11 @@
       </property>
       <item>
        <widget class="QWidget" name="contentWidget" native="true">
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
         <property name="styleSheet">
-         <string notr="true"/>
+         <string notr="true">#contentWidget { border-image: url(':/images/overlayFrame_bg') 0 0 0 0 stretch stretch; }</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayoutSub" stretch="1,0,0,0,0">
          <property name="spacing">
@@ -346,11 +355,11 @@
            </item>
            <item>
             <widget class="QPushButton" name="closeButton">
-             <property name="text">
-              <string>Hide</string>
-             </property>
              <property name="focusPolicy">
               <enum>Qt::StrongFocus</enum>
+             </property>
+             <property name="text">
+              <string>Hide</string>
              </property>
              <property name="default">
               <bool>true</bool>
