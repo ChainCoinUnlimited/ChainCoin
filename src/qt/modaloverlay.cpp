@@ -28,8 +28,6 @@ userClosed(false)
         parent->installEventFilter(this);
         raise();
     }
-
-    ui->contentWidget->setStyleSheet(QString::fromUtf8("#contentWidget { border-image: url(':/images/overlayFrame_bg') 0 0 0 0 stretch stretch; }"));
     blockProcessTime.clear();
     setVisible(false);
 }
@@ -42,7 +40,7 @@ ModalOverlay::~ModalOverlay()
 bool ModalOverlay::eventFilter(QObject * obj, QEvent * ev) {
     if (obj == parent()) {
         if (ev->type() == QEvent::Resize) {
-            initBackground();
+            initBackground(true);
             QResizeEvent * rev = static_cast<QResizeEvent*>(ev);
             resize(rev->size());
             if (!layerIsVisible)
@@ -75,7 +73,6 @@ void ModalOverlay::setKnownBestHeight(int count, const QDateTime& blockDate)
         bestHeaderHeight = count;
         bestHeaderDate = blockDate;
         UpdateHeaderSyncLabel();
-        initBackground();
     }
 }
 
@@ -176,6 +173,7 @@ void ModalOverlay::showHide(bool hide, bool userRequested)
     animation->setEasingCurve(QEasingCurve::OutQuad);
     animation->start(QAbstractAnimation::DeleteWhenStopped);
     layerIsVisible = !hide;
+    if (layerIsVisible) initBackground();
 }
 
 void ModalOverlay::closeClicked()
@@ -184,13 +182,19 @@ void ModalOverlay::closeClicked()
     userClosed = true;
 }
 
-void ModalOverlay::initBackground()
+void ModalOverlay::initBackground(bool fForce)
 {
-    if (!bkgndInitialized) {
-        bkgndInitialized = true;
-        return;
-    }
     QPalette palette;
-    palette.setBrush(QPalette::Background, bkgnd.scaled(ui->contentWidget->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    if (!bkgndInitialized) {
+        palette.setBrush(QPalette::Window, Qt::NoBrush);
+        ui->contentWidget->setPalette(palette);
+        if (!fForce)
+            return;
+        else {
+            bkgndInitialized = true;
+            return;
+        }
+    }
+    palette.setBrush(QPalette::Window, bkgnd.scaled(ui->contentWidget->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     ui->contentWidget->setPalette(palette);
 }

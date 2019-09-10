@@ -34,7 +34,7 @@ public Q_SLOTS:
     void showHide(bool hide = false, bool userRequested = false);
     void closeClicked();
     bool isLayerVisible() const { return layerIsVisible; }
-    void initBackground();
+    void initBackground(bool fForce=false);
 
 protected:
     bool eventFilter(QObject * obj, QEvent * ev);
