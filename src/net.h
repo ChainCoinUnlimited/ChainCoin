@@ -917,10 +917,13 @@ public:
             LOCK(cs_inventory);
             LogPrint(BCLog::NET, "PushInventory --  block: %s peer=%d\n", inv.ToString(), id);
             vInventoryBlockToSend.push_back(inv.hash);
-        } else if (!m_tx_relay.filterInventoryKnown.contains(inv.hash)) {
+        } else {
             LOCK(m_tx_relay.cs_tx_inventory);
-            LogPrint(BCLog::NET, "PushInventory --  inv: %s peer=%d\n", inv.ToString(), id);
-            vInventoryOtherToSend.push_back(inv);
+            if (!m_tx_relay.filterInventoryKnown.contains(inv.hash)) {
+                LOCK(cs_inventory);
+                LogPrint(BCLog::NET, "PushInventory --  inv: %s peer=%d\n", inv.ToString(), id);
+                vInventoryOtherToSend.push_back(inv);
+            }
         }
     }
 
