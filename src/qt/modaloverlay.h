@@ -6,6 +6,7 @@
 #define BITCOIN_QT_MODALOVERLAY_H
 
 #include <QDateTime>
+#include <QPixmap>
 #include <QWidget>
 
 //! The required delta of headers to the estimated number of available headers until we show the IBD progress
@@ -33,6 +34,7 @@ public Q_SLOTS:
     void showHide(bool hide = false, bool userRequested = false);
     void closeClicked();
     bool isLayerVisible() const { return layerIsVisible; }
+    void initBackground();
 
 protected:
     bool eventFilter(QObject * obj, QEvent * ev);
@@ -43,6 +45,8 @@ private:
     int bestHeaderHeight; //best known height (based on the headers)
     QDateTime bestHeaderDate;
     QVector<QPair<qint64, double> > blockProcessTime;
+    QPixmap bkgnd;
+    bool bkgndInitialized;
     bool layerIsVisible;
     bool userClosed;
     void UpdateHeaderSyncLabel();
