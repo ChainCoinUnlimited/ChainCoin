@@ -27,6 +27,7 @@ userClosed(false)
         raise();
     }
 
+    ui->contentWidget->setStyleSheet(QString::fromUtf8("#contentWidget { border-image: url(':/images/overlayFrame_bg') 0 0 0 0 stretch stretch; }"));
     blockProcessTime.clear();
     setVisible(false);
 }

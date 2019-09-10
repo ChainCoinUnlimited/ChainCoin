@@ -59,7 +59,7 @@
          <bool>false</bool>
         </property>
         <property name="styleSheet">
-         <string notr="true">#contentWidget { border-image: url(':/images/overlayFrame_bg') 0 0 0 0 stretch stretch; }</string>
+         <string notr="true"/>
         </property>
         <layout class="QVBoxLayout" name="verticalLayoutSub" stretch="1,0,0,0,0">
          <property name="spacing">
