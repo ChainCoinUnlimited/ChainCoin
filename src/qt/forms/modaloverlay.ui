@@ -56,7 +56,7 @@
       <item>
        <widget class="QWidget" name="contentWidget" native="true">
         <property name="autoFillBackground">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="styleSheet">
          <string notr="true"/>
