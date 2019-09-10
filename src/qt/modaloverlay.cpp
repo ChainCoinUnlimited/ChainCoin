@@ -17,6 +17,8 @@ QWidget(parent),
 ui(new Ui::ModalOverlay),
 bestHeaderHeight(0),
 bestHeaderDate(QDateTime()),
+bkgnd(":/images/overlayFrame_bg"),
+bkgndInitialized(false),
 layerIsVisible(false),
 userClosed(false)
 {
@@ -40,11 +42,11 @@ ModalOverlay::~ModalOverlay()
 bool ModalOverlay::eventFilter(QObject * obj, QEvent * ev) {
     if (obj == parent()) {
         if (ev->type() == QEvent::Resize) {
+            initBackground();
             QResizeEvent * rev = static_cast<QResizeEvent*>(ev);
             resize(rev->size());
             if (!layerIsVisible)
                 setGeometry(0, height(), width(), height());
-
         }
         else if (ev->type() == QEvent::ChildAdded) {
             raise();
@@ -73,6 +75,7 @@ void ModalOverlay::setKnownBestHeight(int count, const QDateTime& blockDate)
         bestHeaderHeight = count;
         bestHeaderDate = blockDate;
         UpdateHeaderSyncLabel();
+        initBackground();
     }
 }
 
@@ -141,6 +144,7 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
         UpdateHeaderSyncLabel();
         ui->expectedTimeLeft->setText(tr("Unknown..."));
     }
+    initBackground();
 }
 
 void ModalOverlay::UpdateHeaderSyncLabel() {
@@ -178,4 +182,15 @@ void ModalOverlay::closeClicked()
 {
     showHide(true);
     userClosed = true;
+}
+
+void ModalOverlay::initBackground()
+{
+    if (!bkgndInitialized) {
+        bkgndInitialized = true;
+        return;
+    }
+    QPalette palette;
+    palette.setBrush(QPalette::Background, bkgnd.scaled(ui->contentWidget->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    ui->contentWidget->setPalette(palette);
 }
