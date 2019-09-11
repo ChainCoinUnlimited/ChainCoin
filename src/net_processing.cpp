@@ -4200,6 +4200,7 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
                 }
             }
             // Send non-tx/non-block inventory items
+            LOCK(pto->m_tx_relay->cs_tx_inventory);
             for (const auto& inv : pto->vInventoryOtherToSend) {
                 if (pto->m_tx_relay->filterInventoryKnown.contains(inv.hash)) {
                     continue;
