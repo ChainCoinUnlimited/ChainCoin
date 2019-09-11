@@ -4199,20 +4199,22 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
                     }
                 }
             }
-            // Send non-tx/non-block inventory items
-            LOCK(pto->m_tx_relay->cs_tx_inventory);
-            for (const auto& inv : pto->vInventoryOtherToSend) {
-                if (pto->m_tx_relay->filterInventoryKnown.contains(inv.hash)) {
-                    continue;
+            if (pto->m_tx_relay != nullptr) {
+                // Send non-tx/non-block inventory items
+                LOCK(pto->m_tx_relay->cs_tx_inventory);
+                for (const auto& inv : pto->vInventoryOtherToSend) {
+                    if (pto->m_tx_relay->filterInventoryKnown.contains(inv.hash)) {
+                        continue;
+                    }
+                    vInv.push_back(inv);
+                    pto->m_tx_relay->filterInventoryKnown.insert(inv.hash);
+                    if (vInv.size() == MAX_INV_SZ) {
+                        connman->PushMessage(pto, msgMaker.Make(NetMsgType::INV, vInv));
+                        vInv.clear();
+                    }
                 }
-                vInv.push_back(inv);
-                pto->m_tx_relay->filterInventoryKnown.insert(inv.hash);
-                if (vInv.size() == MAX_INV_SZ) {
-                    connman->PushMessage(pto, msgMaker.Make(NetMsgType::INV, vInv));
-                    vInv.clear();
-                }
+                pto->vInventoryOtherToSend.clear();
             }
-            pto->vInventoryOtherToSend.clear();
         }
         if (!vInv.empty())
             connman->PushMessage(pto, msgMaker.Make(NetMsgType::INV, vInv));
