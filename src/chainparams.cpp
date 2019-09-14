@@ -204,7 +204,7 @@ public:
         consensus.BIP65Height = 50000;
         consensus.BIP66Height = 1;
         consensus.CSVHeight = 46368; // 00000360db550967f1afbb989584e76ea0981c5afdab2d1e9da72e6757d5ef30
-        consensus.SegwitHeight = 46368; // 00000360db550967f1afbb989584e76ea0981c5afdab2d1e9da72e6757d5ef30
+        consensus.SegwitHeight = 48384; // 00000197ff79f8097f262612d28d4a27c73934502df024ca3a184475081ba812
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 90; // PM-Tech: ChainCoin
         consensus.nPowTargetSpacing = 90; // PM-Tech: ChainCoin
