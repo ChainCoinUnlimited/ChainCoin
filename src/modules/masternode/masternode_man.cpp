@@ -15,6 +15,7 @@
 #include <modules/masternode/masternode_sync.h>
 #include <netfulfilledman.h>
 #include <netmessagemaker.h>
+#include <node/context.h>
 #include <scheduler.h>
 #include <script/standard.h>
 #include <shutdown.h>

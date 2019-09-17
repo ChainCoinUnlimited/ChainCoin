@@ -16,6 +16,7 @@
 #include <modules/masternode/masternode_sync.h>
 #include <modules/masternode/masternode_man.h>
 #include <messagesigner.h>
+#include <node/context.h>
 #include <script/standard.h>
 #include <shutdown.h>
 #include <ui_interface.h>

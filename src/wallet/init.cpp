@@ -7,6 +7,7 @@
 #include <interfaces/chain.h>
 #include <interfaces/modules.h>
 #include <net.h>
+#include <node/context.h>
 #include <outputtype.h>
 #include <util/moneystr.h>
 #include <util/system.h>
