@@ -154,6 +154,7 @@ BITCOIN_CORE_H = \
   dbwrapper.h \
   limitedmap.h \
   logging.h \
+  logging/timer.h \
   memusage.h \
   merkleblock.h \
   messagesigner.h \
