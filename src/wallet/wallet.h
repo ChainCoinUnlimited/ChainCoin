@@ -39,11 +39,7 @@
 
 #include <boost/signals2/signal.hpp>
 
-//! Check MN Collateral
-bool CheckMNCollateral(COutPoint& outpointRet, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash, const std::string& strOutputIndex);
-
-//! Return MN mixing state
-void GetMixingMasternodesInfo(std::vector<masternode_info_t>& vecMnInfoRet);
+using LoadWalletFn = std::function<void(std::unique_ptr<interfaces::Wallet> wallet)>;
 
 //! Explicitly unload and delete the wallet.
 //! Blocks the current thread after signaling the unload intent so that all
@@ -55,9 +51,17 @@ void UnloadWallet(std::shared_ptr<CWallet>&& wallet);
 bool AddWallet(const std::shared_ptr<CWallet>& wallet);
 bool RemoveWallet(const std::shared_ptr<CWallet>& wallet);
 bool HasWallets();
+
+//! Check MN Collateral
+bool CheckMNCollateral(COutPoint& outpointRet, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash, const std::string& strOutputIndex);
+
+//! Return MN mixing state
+void GetMixingMasternodesInfo(std::vector<masternode_info_t>& vecMnInfoRet);
+
 std::vector<std::shared_ptr<CWallet>> GetWallets();
 std::shared_ptr<CWallet> GetWallet(const std::string& name);
 std::shared_ptr<CWallet> LoadWallet(interfaces::Chain& chain, const WalletLocation& location, std::string& error, std::vector<std::string>& warnings);
+std::unique_ptr<interfaces::Handler> HandleLoadWallet(LoadWalletFn load_wallet);
 
 enum class WalletCreationStatus {
     SUCCESS,
