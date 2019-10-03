@@ -46,7 +46,7 @@ static bool AppInit(int argc, char* argv[])
 
     bool fRet = false;
 
-    util::ThreadRename("init");
+    util::ThreadSetInternalName("init");
 
     //
     // Parameters
