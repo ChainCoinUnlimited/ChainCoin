@@ -286,7 +286,7 @@ public:
     virtual void toggleMixing(const bool& fOff = false) = 0;
 
     //! Return result of automatic wallet backup.
-    virtual bool DoAutoBackup(std::string walletIn, std::string& strBackupWarning, std::string& strBackupError) = 0;
+    virtual bool DoAutoBackup(std::string walletIn, std::vector<std::string>& warnings, std::string& strBackupError) = 0;
 
     //! Get max tx fee.
     virtual CAmount getDefaultMaxTxFee() = 0;

@@ -517,10 +517,10 @@ public:
         }
     }
 
-    bool DoAutoBackup(std::string walletIn, std::string& strBackupWarning, std::string& strBackupError) override
+    bool DoAutoBackup(std::string walletIn, std::vector<std::string>& warnings, std::string& strBackupError) override
     {
         std::shared_ptr<CWallet> const pwallet = GetWallet(walletIn);
-        return AutoBackupWallet(pwallet, WalletLocation(), strBackupWarning, strBackupError);
+        return AutoBackupWallet(pwallet, WalletLocation(), warnings, strBackupError);
     }
 
     CAmount getDefaultMaxTxFee() override { return m_wallet->m_default_max_tx_fee; }
