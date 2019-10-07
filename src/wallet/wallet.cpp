@@ -3664,9 +3664,6 @@ bool ReserveDestination::GetReservedDestination(CTxDestination& dest, bool inter
         return false;
     }
 
-    if (!pwallet->CanGetAddresses(internal)) {
-        return false;
-    }
 
     if (nIndex == -1)
     {
