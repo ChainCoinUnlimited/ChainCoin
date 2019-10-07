@@ -240,7 +240,7 @@ bool CCoinJoinBaseSession::CheckTransaction(PartiallySignedTransaction& psbtxIn,
     LogPrint(BCLog::CJOIN, "CCoinJoinBaseSession::CheckTransaction -- estimated_vsize: %d, estimated_feerate: %s\n", size, feerate.ToString());
 
     // There should be fee in mixing tx right now, but no sig data - simple check
-    if (feerate < ::minRelayTxFee.GetFeePerK() || feerate > HIGH_TX_FEE_PER_KB || nFeeRet > HIGH_MAX_TX_FEE) {
+    if (feerate.GetFeePerK() < ::minRelayTxFee.GetFeePerK() || feerate.GetFeePerK() > HIGH_TX_FEE_PER_KB || nFeeRet > HIGH_MAX_TX_FEE) {
         LogPrintf("CCoinJoinBaseSession::CheckTransaction -- there must be fee in mixing tx! feerate: %lld, tx=%s\n", feerate.ToString(), psbtxIn.tx->GetHash().ToString());
         errRet = ERR_FEES;
         return false;

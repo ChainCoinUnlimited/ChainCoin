@@ -13,6 +13,7 @@
 #include <script/sign.h>
 #include <shutdown.h>
 #include <util/moneystr.h>
+#include <util/string.h>
 #include <util/translation.h>
 #include <wallet/coincontrol.h>
 #include <wallet/fees.h>
@@ -805,7 +806,7 @@ bool CCoinJoinClientManager::CheckAutomaticBackup()
             if (!AutoBackupWallet(pwallet, WalletLocation(), warnings, errorString)) {
                 if (!warnings.empty()) {
                     // There were some issues saving backup but yet more or less safe to continue
-                    LogPrintf("%s CCoinJoinClientManager::CheckAutomaticBackup -- WARNING! Something went wrong on automatic backup: %s\n", m_wallet->GetDisplayName(), warnings);
+                    LogPrintf("%s CCoinJoinClientManager::CheckAutomaticBackup -- WARNING! Something went wrong on automatic backup: %s\n", m_wallet->GetDisplayName(), Join(warnings, "\n"));
                 }
                 if (!errorString.empty()) {
                     // Things are really broken

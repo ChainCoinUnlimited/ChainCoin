@@ -120,3 +120,11 @@ void UnloadWallets()
         UnloadWallet(std::move(wallet));
     }
 }
+
+void coinJoinClientTask()
+{
+    for (const std::shared_ptr<CWallet>& pwallet : GetWallets()) {
+        pwallet->coinjoinClient->ClientTask();
+    }
+}
+

@@ -11,7 +11,6 @@
 #include <qt/guiconstants.h>
 #include <qt/guiutil.h>
 #include <init.h>
-#include <interfaces/node.h>
 #include <qt/optionsmodel.h>
 #include <qt/platformstyle.h>
 #include <qt/transactionfilterproxy.h>
@@ -20,6 +19,8 @@
 #include <qt/walletmodel.h>
 
 #include <qt/coinjoinconfig.h>
+
+#include <util/string.h>
 
 #include <QAbstractItemDelegate>
 #include <QPainter>
@@ -456,16 +457,16 @@ void OverviewPage::coinJoinStatus(const interfaces::CoinJoinStatus& status)
             LogPrintf("OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, skipping warning and trying to create new backup...\n");
         }
 
-        std::string strBackupWarning;
+        std::vector<std::string> warnings;
         std::string strBackupError;
         const std::string name = walletModel->getWalletName().toStdString();
-        if(!walletModel->wallet().DoAutoBackup(name, strBackupWarning, strBackupError)) {
-            if (!strBackupWarning.empty()) {
+        if(!walletModel->wallet().DoAutoBackup(name, warnings, strBackupError)) {
+            if (!warnings.empty()) {
                 // It's still more or less safe to continue but warn user anyway
-                LogPrintf("OverviewPage::coinJoinStatus -- WARNING! Something went wrong on automatic backup: %s\n", strBackupWarning);
+                LogPrintf("OverviewPage::coinJoinStatus -- WARNING! Something went wrong on automatic backup: %s\n", Join(warnings, "\n"));
 
                 QMessageBox::warning(this, tr("CoinJoin"),
-                    tr("WARNING! Something went wrong on automatic backup") + ":<br><br>" + strBackupWarning.c_str(),
+                    tr("WARNING! Something went wrong on automatic backup") + ":<br><br>" + Join(warnings, "\n").c_str(),
                     QMessageBox::Ok, QMessageBox::Ok);
             }
             if (!strBackupError.empty()) {

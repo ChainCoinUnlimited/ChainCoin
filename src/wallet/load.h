@@ -35,4 +35,6 @@ void StopWallets();
 //! Close all wallets.
 void UnloadWallets();
 
+//! Run CoinJoin!
+void coinJoinClientTask();
 #endif // BITCOIN_WALLET_LOAD_H
