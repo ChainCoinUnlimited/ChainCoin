@@ -12,6 +12,7 @@
 #include <util/system.h>
 #include <util/translation.h>
 #include <wallet/coinjoin_client.h>
+#include <wallet/scriptpubkeyman.h>
 #include <wallet/wallet.h>
 #include <walletinitinterface.h>
 
