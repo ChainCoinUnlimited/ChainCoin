@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include <QDebug>
+#include <QThread>
 #include <QTimer>
 
 static int64_t nLastHeaderTipUpdateNotification = 0;
@@ -35,24 +36,27 @@ ClientModel::ClientModel(interfaces::Node& node, OptionsModel *_optionsModel, QO
     banTableModel(nullptr),
     masternodeTableModel(nullptr),
     proposalTableModel(nullptr),
-    cachedMasternodeCountString(""),
-    pollTimer(nullptr),
-    pollMnTimer(nullptr)
+    m_thread(new QThread(this))
 {
     cachedBestHeaderHeight = -1;
     cachedBestHeaderTime = -1;
     peerTableModel = new PeerTableModel(m_node, this);
     banTableModel = new BanTableModel(m_node, this);
-    masternodeTableModel = new MasternodeTableModel(this);
-    proposalTableModel = new ProposalTableModel(this);
-    pollTimer = new QTimer(this);
-    connect(pollTimer, &QTimer::timeout, this, &ClientModel::updateTimer);
-    pollTimer->start(MODEL_UPDATE_DELAY);
 
-    pollMnTimer = new QTimer(this);
-    connect(pollMnTimer, &QTimer::timeout, this, &ClientModel::updateMnTimer);
-    // no need to update as frequent as data for balances/txes/blocks
-    pollMnTimer->start(MODEL_UPDATE_DELAY * 4);
+    QTimer* timer = new QTimer;
+    timer->setInterval(MODEL_UPDATE_DELAY);
+    connect(timer, &QTimer::timeout, [this] {
+        // no locking required at this point
+        // the following calls will acquire the required lock
+        Q_EMIT mempoolSizeChanged(m_node.getMempoolSize(), m_node.getMempoolDynamicUsage());
+        Q_EMIT bytesChanged(m_node.getTotalBytesRecv(), m_node.getTotalBytesSent());
+        Q_EMIT strMasternodesChanged(getMasternodeCountString);
+    });
+    connect(m_thread, &QThread::finished, timer, &QObject::deleteLater);
+    connect(m_thread, &QThread::started, [timer] { timer->start(); });
+    // move timer to thread so that polling doesn't disturb main event loop
+    timer->moveToThread(m_thread);
+    m_thread->start();
 
     subscribeToCoreSignals();
 }
@@ -60,6 +64,9 @@ ClientModel::ClientModel(interfaces::Node& node, OptionsModel *_optionsModel, QO
 ClientModel::~ClientModel()
 {
     unsubscribeFromCoreSignals();
+
+    m_thread->quit();
+    m_thread->wait();
 }
 
 int ClientModel::getNumConnections(unsigned int flags) const
@@ -112,26 +119,6 @@ int64_t ClientModel::getHeaderTipTime() const
         }
     }
     return cachedBestHeaderTime;
-}
-
-void ClientModel::updateTimer()
-{
-    // no locking required at this point
-    // the following calls will acquire the required lock
-    Q_EMIT mempoolSizeChanged(m_node.getMempoolSize(), m_node.getMempoolDynamicUsage());
-    Q_EMIT bytesChanged(m_node.getTotalBytesRecv(), m_node.getTotalBytesSent());
-}
-
-void ClientModel::updateMnTimer()
-{
-    QString newMasternodeCountString = getMasternodeCountString();
-
-    if (cachedMasternodeCountString != newMasternodeCountString)
-    {
-        cachedMasternodeCountString = newMasternodeCountString;
-
-        Q_EMIT strMasternodesChanged(cachedMasternodeCountString);
-    }
 }
 
 void ClientModel::updateNumConnections(int numConnections)
