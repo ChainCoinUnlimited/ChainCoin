@@ -129,8 +129,6 @@ bool WalletInit::ParameterInteraction() const
 
     if (gArgs.GetBoolArg("-sysperms", false))
         return InitError("-sysperms is not allowed in combination with enabled wallet functionality");
-    if (gArgs.GetArg("-prune", 0) && gArgs.GetBoolArg("-rescan", false))
-        return InitError(_("Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.").translated);
 
 
     int nLiqProvTmp = gArgs.GetArg("-liquidityprovider", DEFAULT_COINJOIN_LIQUIDITY);
