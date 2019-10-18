@@ -7,20 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>564</width>
-    <height>109</height>
+    <height>131</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Open URI</string>
+   <string>Open chaincoin URI</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Open payment request from URI or file</string>
-     </property>
-    </widget>
-   </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
