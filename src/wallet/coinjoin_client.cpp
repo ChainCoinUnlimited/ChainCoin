@@ -1561,8 +1561,7 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
         CWalletTx wtx(m_wallet, tx);
 
         // Broadcast transaction
-        CValidationState state;
-        m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */, state);
+        m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */);
 
         keyHolderStorageDenom.KeepAll();
 

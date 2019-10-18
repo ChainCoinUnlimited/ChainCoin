@@ -4,7 +4,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <amount.h>
-#include <consensus/validation.h>
 #include <core_io.h>
 #include <init.h>
 #include <interfaces/chain.h>
@@ -343,8 +342,7 @@ static CTransactionRef SendMoney(interfaces::Chain::Lock& locked_chain, CWallet 
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
-    CValidationState state;
-    pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, state, nUseCoinJoin);
+    pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, nUseCoinJoin);
     return tx;
 }
 
@@ -934,8 +932,7 @@ static UniValue sendmany(const JSONRPCRequest& request)
                                                coin_control, true, nUseCoinJoin ? ONLY_DENOMINATED : ALL_COINS);
     if (!fCreated)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strFailReason);
-    CValidationState state;
-    pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, state, nUseCoinJoin);
+    pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, nUseCoinJoin);
     return tx->GetHash().GetHex();
 }
 
@@ -4271,8 +4268,7 @@ static UniValue prepareproposal(const JSONRPCRequest& request)
     }
 
     // -- send the tx to the network
-    CValidationState state;
-    pwallet->CommitTransaction(tx, {} /* mapValue */, {} /* orderForm */, state);
+    pwallet->CommitTransaction(tx, {} /* mapValue */, {} /* orderForm */);
 
     return tx->GetHash().ToString();
 }

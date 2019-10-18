@@ -1204,10 +1204,9 @@ public:
      * @param tx[in] The transaction to be broadcast.
      * @param mapValue[in] key-values to be set on the transaction.
      * @param orderForm[in] BIP 70 / BIP 21 order form details to be set on the transaction.
-     * @param state[in,out] CValidationState object returning information about whether the transaction was accepted
      * @param nCoinJoin[in] CoinJoin level to be achieved
      */
-    void CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::vector<std::pair<std::string, std::string>> orderForm, CValidationState& state, int nCoinJoin = 0);
+    void CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::vector<std::pair<std::string, std::string>> orderForm, int nCoinJoin = 0);
 
     bool DummySignTx(CMutableTransaction &txNew, const std::set<CTxOut> &txouts, bool use_max_sig = false) const
     {
