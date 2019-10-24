@@ -382,12 +382,12 @@ void CCoinJoinServer::CommitFinalTransaction(CConnman* connman)
 
     LogPrint(BCLog::CJOIN, "CCoinJoinServer::CommitFinalTransaction -- finalTransaction=%s\n", finalTransaction->ToString());
 
-    CValidationState validationState;
+    BlockValidationState state;
 
     {
         // See if the transaction is valid, don't run in dummy mode if we want to mine it
         LOCK(cs_main);
-        if (!AcceptToMemoryPool(mempool, validationState, finalTransaction, nullptr, nullptr, false, 0, false))
+        if (!AcceptToMemoryPool(mempool, state, finalTransaction, nullptr, nullptr, false, 0, false))
         {
             LogPrintf("CCoinJoinServer::CommitFinalTransaction -- AcceptToMemoryPool() error: Transaction not valid\n");
             // not much we can do in this case, just notify clients
@@ -467,7 +467,7 @@ void CCoinJoinServer::BanAbusive(CConnman* connman)
 
         LOCK(cs_main);
 
-        CValidationState state;
+        BlockValidationState state;
         if (!AcceptToMemoryPool(mempool, state, vecOffendersCollaterals[0], nullptr, nullptr, false, maxTxFee)) {
             // should never really happen
             LogPrintf("CCoinJoinServer::ChargeFees -- ERROR: AcceptToMemoryPool failed!\n");

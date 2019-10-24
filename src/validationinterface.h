@@ -13,6 +13,7 @@
 #include <memory>
 
 extern CCriticalSection cs_main;
+class BlockValidationState;
 class CBlock;
 class CBlockIndex;
 struct CBlockLocator;
@@ -20,7 +21,6 @@ struct CBlockLocator;
 class CConnman;
 class CDataStream;
 class CValidationInterface;
-class CValidationState;
 class CGovernanceVote;
 class CGovernanceObject;
 class CNode;
@@ -139,11 +139,11 @@ protected:
      */
     virtual void ChainStateFlushed(const CBlockLocator &locator) {}
     /**
-     * Notifies listeners of a block validation result
-     * If the provided CValidationState IsValid, the provided block
+     * Notifies listeners of a block validation result.
+     * If the provided BlockValidationState IsValid, the provided block
      * is guaranteed to be the current best block at the time the
      */
-    virtual void BlockChecked(const CBlock&, const CValidationState&) {}
+    virtual void BlockChecked(const CBlock&, const BlockValidationState&) {}
     /**
      * Notifies listeners that a block which builds directly on our current tip
      * has been received and connected to the headers tree, though not validated yet
@@ -192,7 +192,7 @@ public:
     void BlockConnected(const std::shared_ptr<const CBlock> &, const CBlockIndex *pindex, const std::shared_ptr<const std::vector<CTransactionRef>> &);
     void BlockDisconnected(const std::shared_ptr<const CBlock> &);
     void ChainStateFlushed(const CBlockLocator &);
-    void BlockChecked(const CBlock&, const CValidationState&);
+    void BlockChecked(const CBlock&, const BlockValidationState&);
     void NewPoWValidBlock(const CBlockIndex *, const std::shared_ptr<const CBlock>&);
     void ProcessModuleMessage(CNode*, const NetMsgDest&, const std::string&, CDataStream&);
     void NotifyGovernanceVote(const CGovernanceVote&);
