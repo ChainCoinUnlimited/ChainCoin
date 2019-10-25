@@ -609,6 +609,8 @@ struct CoinSelectionParams
     CFeeRate effective_fee = CFeeRate(0);
     size_t tx_noinputs_size = 0;
     AvailableCoinsType nCoinType = ALL_COINS;
+    //! Indicate that we are subtracting the fee from outputs
+    bool m_subtract_fee_outputs = false;
 
     CoinSelectionParams(bool use_bnb, bool use_private, size_t change_output_size, size_t change_spend_size, CFeeRate effective_fee, size_t tx_noinputs_size, AvailableCoinsType nCoinType) :
         use_bnb(use_bnb), use_private(use_private), change_output_size(change_output_size), change_spend_size(change_spend_size), effective_fee(effective_fee), tx_noinputs_size(tx_noinputs_size), nCoinType(nCoinType) {}
