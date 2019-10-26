@@ -377,7 +377,7 @@ static UniValue sendtoaddress(const JSONRPCRequest& request)
             "                             to which you're sending the transaction. This is not part of the \n"
             "                             transaction, just kept in your wallet."},
                     {"subtractfeefromamount", RPCArg::Type::BOOL, /* default */ "false", "The fee will be deducted from the amount being sent.\n"
-            "                             The recipient will receive less bitcoins than you enter in the amount field."},
+            "                             The recipient will receive less chaincoins than you enter in the amount field."},
                     {"replaceable", RPCArg::Type::BOOL, /* default */ "wallet default", "Allow this transaction to be replaced by a transaction with higher fees via BIP 125"},
                     {"conf_target", RPCArg::Type::NUM, /* default */ "wallet default", "Confirmation target (in blocks)"},
                     {"estimate_mode", RPCArg::Type::STR, /* default */ "UNSET", "The fee estimate mode, must be one of:\n"
@@ -834,7 +834,7 @@ static UniValue sendmany(const JSONRPCRequest& request)
                     {"comment", RPCArg::Type::STR, RPCArg::Optional::OMITTED_NAMED_ARG, "A comment"},
                     {"subtractfeefrom", RPCArg::Type::ARR, RPCArg::Optional::OMITTED_NAMED_ARG, "A json array with addresses.\n"
             "                           The fee will be equally deducted from the amount of each selected address.\n"
-            "                           Those recipients will receive less bitcoins than you enter in their corresponding amount field.\n"
+            "                           Those recipients will receive less chaincoins than you enter in their corresponding amount field.\n"
             "                           If no addresses are specified here, the sender pays the fee.",
                         {
                             {"address", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "Subtract fee from this address"},
@@ -969,7 +969,7 @@ static UniValue addmultisigaddress(const JSONRPCRequest& request)
                 "If 'label' is specified, assign address to that label.\n",
                 {
                     {"nrequired", RPCArg::Type::NUM, RPCArg::Optional::NO, "The number of required signatures out of the n keys or addresses."},
-                    {"keys", RPCArg::Type::ARR, RPCArg::Optional::NO, "A json array of bitcoin addresses or hex-encoded public keys",
+                    {"keys", RPCArg::Type::ARR, RPCArg::Optional::NO, "A json array of chaincoin addresses or hex-encoded public keys",
                         {
                             {"key", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "chaincoin address or hex-encoded public key"},
                         },
@@ -1906,7 +1906,7 @@ static UniValue walletpassphrase(const JSONRPCRequest& request)
 
             RPCHelpMan{"walletpassphrase",
                 "\nStores the wallet decryption key in memory for 'timeout' seconds.\n"
-                "This is needed prior to performing transactions related to private keys such as sending bitcoins\n"
+                "This is needed prior to performing transactions related to private keys such as sending chaincoins\n"
             "\nNote:\n"
             "Issuing the walletpassphrase command while the wallet is already unlocked will set a new unlock\n"
             "time that overrides the old one.\n",
@@ -2828,9 +2828,9 @@ static UniValue listunspent(const JSONRPCRequest& request)
                 {
                     {"minconf", RPCArg::Type::NUM, /* default */ "1", "The minimum confirmations to filter"},
                     {"maxconf", RPCArg::Type::NUM, /* default */ "9999999", "The maximum confirmations to filter"},
-                    {"addresses", RPCArg::Type::ARR, /* default */ "empty array", "A json array of bitcoin addresses to filter",
+                    {"addresses", RPCArg::Type::ARR, /* default */ "empty array", "A json array of chaincoin addresses to filter",
                         {
-                            {"address", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "bitcoin address"},
+                            {"address", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "chaincoin address"},
                         },
                     },
                     {"include_unsafe", RPCArg::Type::BOOL, /* default */ "true", "Include outputs that are not safe to spend\n"
@@ -3738,41 +3738,45 @@ UniValue getaddressinfo(const JSONRPCRequest& request)
     }
 
             RPCHelpMan{"getaddressinfo",
-                "\nReturn information about the given chaincoin address. Some information requires the address\n"
-                "to be in the wallet.\n",
+                "\nReturn information about the given chaincoin address.\n"
+                "Some information requires the address to be in the wallet.\n",
                 {
                     {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The chaincoin address to get the information of."},
                 },
                 RPCResult{
             "{\n"
-            "  \"address\" : \"address\",        (string) The chaincoin address validated\n"
-            "  \"scriptPubKey\" : \"hex\",       (string) The hex-encoded scriptPubKey generated by the address\n"
-            "  \"ismine\" : true|false,        (boolean) If the address is yours or not\n"
-            "  \"iswatchonly\" : true|false,   (boolean) If the address is watchonly\n"
-            "  \"solvable\" : true|false,      (boolean) Whether we know how to spend coins sent to this address, ignoring the possible lack of private keys\n"
-            "  \"desc\" : \"desc\",            (string, optional) A descriptor for spending coins sent to this address (only when solvable)\n"
-            "  \"isscript\" : true|false,      (boolean) If the key is a script\n"
-            "  \"ischange\" : true|false,      (boolean) If the address was used for change output\n"
-            "  \"iswitness\" : true|false,     (boolean) If the address is a witness address\n"
-            "  \"witness_version\" : version   (numeric, optional) The version number of the witness program\n"
-            "  \"witness_program\" : \"hex\"     (string, optional) The hex value of the witness program\n"
-            "  \"script\" : \"type\"             (string, optional) The output script type. Only if \"isscript\" is true and the redeemscript is known. Possible types: nonstandard, pubkey, pubkeyhash, scripthash, multisig, nulldata, witness_v0_keyhash, witness_v0_scripthash, witness_unknown\n"
-            "  \"hex\" : \"hex\",                (string, optional) The redeemscript for the p2sh address\n"
-            "  \"pubkeys\"                     (string, optional) Array of pubkeys associated with the known redeemscript (only if \"script\" is \"multisig\")\n"
+            "  \"address\" : \"address\",              (string) The chaincoin address validated\n"
+            "  \"scriptPubKey\" : \"hex\",             (string) The hex-encoded scriptPubKey generated by the address\n"
+            "  \"ismine\" : true|false,              (boolean) If the address is yours or not\n"
+            "  \"iswatchonly\" : true|false,         (boolean) If the address is watchonly\n"
+            "  \"solvable\" : true|false,            (boolean) Whether we know how to spend coins sent to this address, ignoring the possible lack of private keys\n"
+            "  \"desc\" : \"desc\",                    (string, optional) A descriptor for spending coins sent to this address (only when solvable)\n"
+            "  \"isscript\" : true|false,            (boolean) If the key is a script\n"
+            "  \"ischange\" : true|false,            (boolean) If the address was used for change output\n"
+            "  \"iswitness\" : true|false,           (boolean) If the address is a witness address\n"
+            "  \"witness_version\" : version         (numeric, optional) The version number of the witness program\n"
+            "  \"witness_program\" : \"hex\"           (string, optional) The hex value of the witness program\n"
+            "  \"script\" : \"type\"                   (string, optional) The output script type. Only if \"isscript\" is true and the redeemscript is known. Possible\n"
+            "                                                         types: nonstandard, pubkey, pubkeyhash, scripthash, multisig, nulldata, witness_v0_keyhash,\n"
+            "                                                         witness_v0_scripthash, witness_unknown\n"
+            "  \"hex\" : \"hex\",                      (string, optional) The redeemscript for the p2sh address\n"
+            "  \"pubkeys\"                           (string, optional) Array of pubkeys associated with the known redeemscript (only if \"script\" is \"multisig\")\n"
             "    [\n"
             "      \"pubkey\"\n"
             "      ,...\n"
             "    ]\n"
-            "  \"sigsrequired\" : xxxxx        (numeric, optional) Number of signatures required to spend multisig output (only if \"script\" is \"multisig\")\n"
-            "  \"pubkey\" : \"publickeyhex\",    (string, optional) The hex value of the raw public key, for single-key addresses (possibly embedded in P2SH or P2WSH)\n"
-            "  \"embedded\" : {...},           (object, optional) Information about the address embedded in P2SH or P2WSH, if relevant and known. It includes all getaddressinfo output fields for the embedded address, excluding metadata (\"timestamp\", \"hdkeypath\", \"hdseedid\") and relation to the wallet (\"ismine\", \"iswatchonly\").\n"
-            "  \"iscompressed\" : true|false,  (boolean, optional) If the pubkey is compressed\n"
-            "  \"label\" :  \"label\"         (string) The label associated with the address, \"\" is the default label\n"
-            "  \"timestamp\" : timestamp,      (number, optional) The creation time of the key if available in seconds since epoch (Jan 1 1970 GMT)\n"
-            "  \"hdkeypath\" : \"keypath\"       (string, optional) The HD keypath if the key is HD and available\n"
-            "  \"hdseedid\" : \"<hash160>\"      (string, optional) The Hash160 of the HD seed\n"
+            "  \"sigsrequired\" : xxxxx              (numeric, optional) Number of signatures required to spend multisig output (only if \"script\" is \"multisig\")\n"
+            "  \"pubkey\" : \"publickeyhex\",          (string, optional) The hex value of the raw public key, for single-key addresses (possibly embedded in P2SH or P2WSH)\n"
+            "  \"embedded\" : {...},                 (object, optional) Information about the address embedded in P2SH or P2WSH, if relevant and known. It includes all\n"
+            "                                                         getaddressinfo output fields for the embedded address, excluding metadata (\"timestamp\", \"hdkeypath\",\n"
+            "                                                         \"hdseedid\") and relation to the wallet (\"ismine\", \"iswatchonly\").\n"
+            "  \"iscompressed\" : true|false,        (boolean, optional) If the pubkey is compressed\n"
+            "  \"label\" :  \"label\"                  (string) The label associated with the address, \"\" is the default label\n"
+            "  \"timestamp\" : timestamp,            (number, optional) The creation time of the key if available in seconds since epoch (Jan 1 1970 GMT)\n"
+            "  \"hdkeypath\" : \"keypath\"             (string, optional) The HD keypath if the key is HD and available\n"
+            "  \"hdseedid\" : \"<hash160>\"            (string, optional) The Hash160 of the HD seed\n"
             "  \"hdmasterfingerprint\" : \"<hash160>\" (string, optional) The fingperint of the master key.\n"
-            "  \"labels\"                      (object) Array of labels associated with the address.\n"
+            "  \"labels\"                            (object) Array of labels associated with the address.\n"
             "    [\n"
             "      { (json object of label data)\n"
             "        \"name\": \"labelname\" (string) The label\n"
@@ -4145,7 +4149,7 @@ UniValue walletcreatefundedpsbt(const JSONRPCRequest& request)
                     {"locktime", RPCArg::Type::NUM, /* default */ "0", "Raw locktime. Non-0 value also locktime-activates inputs"},
                     {"options", RPCArg::Type::OBJ, RPCArg::Optional::OMITTED_NAMED_ARG, "",
                         {
-                            {"changeAddress", RPCArg::Type::STR_HEX, /* default */ "pool address", "The bitcoin address to receive the change"},
+                            {"changeAddress", RPCArg::Type::STR_HEX, /* default */ "pool address", "The chaincoin address to receive the change"},
                             {"changePosition", RPCArg::Type::NUM, /* default */ "random", "The index of the change output"},
                             {"change_type", RPCArg::Type::STR, /* default */ "set by -changetype", "The output type to use. Only valid if changeAddress is not specified. Options are \"legacy\", \"p2sh-segwit\", and \"bech32\"."},
                             {"includeWatching", RPCArg::Type::BOOL, /* default */ "true for watch-only wallets, otherwise false", "Also select inputs which are watch only"},
@@ -4153,7 +4157,7 @@ UniValue walletcreatefundedpsbt(const JSONRPCRequest& request)
                             {"feeRate", RPCArg::Type::AMOUNT, /* default */ "not set: makes wallet determine the fee", "Set a specific fee rate in " + CURRENCY_UNIT + "/kB"},
                             {"subtractFeeFromOutputs", RPCArg::Type::ARR, /* default */ "empty array", "A json array of integers.\n"
                             "                              The fee will be equally deducted from the amount of each specified output.\n"
-                            "                              Those recipients will receive less bitcoins than you enter in their corresponding amount field.\n"
+                            "                              Those recipients will receive less chaincoins than you enter in their corresponding amount field.\n"
                             "                              If no outputs are specified here, the sender pays the fee.",
                                 {
                                     {"vout_index", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "The zero-based output index, before a change output is added."},
