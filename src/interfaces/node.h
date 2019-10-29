@@ -6,7 +6,6 @@
 #define BITCOIN_INTERFACES_NODE_H
 
 #include <amount.h>                                 // For CAmount
-#include <cachedb.h>                                // For banmap_t
 #include <modules/masternode/masternode_config.h>   // For CMasternodeConfig::CMasternodeEntry
 #include <net.h>                                    // For CConnman::NumConnections
 #include <netaddress.h>                             // For Network
