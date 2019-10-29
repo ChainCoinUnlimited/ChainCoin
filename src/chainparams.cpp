@@ -64,7 +64,7 @@ static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits
 class CMainParams : public CChainParams {
 public:
     CMainParams() {
-        strNetworkID = "main";
+        strNetworkID = CBaseChainParams::MAIN;
         consensus.nSubsidyHalvingInterval = 700800; // PM-Tech: ChainCoin // 2 years
         consensus.nMasternodePaymentsStartBlock = 1572480; // PM-Tech: SegWit activation block
         consensus.nMasternodePaymentsIncreaseBlock = 2250000; // PM-Tech: estimation
@@ -187,7 +187,7 @@ public:
 class CTestNetParams : public CChainParams {
 public:
     CTestNetParams() {
-        strNetworkID = "test";
+        strNetworkID = CBaseChainParams::TESTNET;
         consensus.nSubsidyHalvingInterval = 56600;
         consensus.nMasternodePaymentsStartBlock = 48384; // PM-Tech: SegWit activation block
         consensus.nMasternodePaymentsIncreaseBlock = 4030;
@@ -290,7 +290,7 @@ public:
 class CRegTestParams : public CChainParams {
 public:
     explicit CRegTestParams(const ArgsManager& args) {
-        strNetworkID = "regtest";
+        strNetworkID =  CBaseChainParams::REGTEST;
         consensus.nSubsidyHalvingInterval = 150;
         consensus.nMasternodePaymentsStartBlock = 240;
         consensus.nMasternodePaymentsIncreaseBlock = 350;
