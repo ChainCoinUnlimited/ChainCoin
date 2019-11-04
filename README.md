@@ -1,4 +1,4 @@
-Chaincoin Core staging tree 0.17.99
+Chaincoin Core staging tree 0.19.99
 ===============================
 
 master is the working branch, [for releases follow here](https://github.com/chaincoin/chaincoin/releases)
@@ -15,7 +15,7 @@ to operate with no central authority: managing transactions and issuing money
 are carried out collectively by the network. Chaincoin Core is the name of the open
 source software which enables the use of this currency.
 
-For more information, as well as an immediately useable, binary version of
+For more information, as well as an immediately usable, binary version of
 the Chaincoin Core software, see https://www.chaincoin.org/get-chaincoin/.
 
 What is CoinJoin(TM)?
