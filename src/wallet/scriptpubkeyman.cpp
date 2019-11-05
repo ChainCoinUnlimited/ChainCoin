@@ -265,10 +265,8 @@ bool LegacyScriptPubKeyMan::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
 
 bool LegacyScriptPubKeyMan::GetReservedDestination(const OutputType type, bool internal, int64_t& index, CKeyPool& keypool)
 {
-    {
-        if (!ReserveKeyFromKeyPool(index, keypool, internal)) {
-            return false;
-        }
+    if (!ReserveKeyFromKeyPool(index, keypool, internal)) {
+        return false;
     }
     return true;
 }
