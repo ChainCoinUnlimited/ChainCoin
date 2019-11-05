@@ -6,9 +6,9 @@ sense to simply use this framework rather than require developers to
 configure some other framework (we want as few impediments to creating
 unit tests as possible).
 
-The build system is set up to compile an executable called `test_chaincoin`
-that runs all of the unit tests. The main source file is called
-`setup_common.cpp`.
+he build system is set up to compile an executable called `test_chaincoin`
+that runs all of the unit tests. The main source file for the test library is found in
+`util/setup_common.cpp`.
 
 ### Compiling/running unit tests
 
