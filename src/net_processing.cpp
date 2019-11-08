@@ -25,7 +25,6 @@
 #include <txmempool.h>
 #include <util/system.h>
 #include <util/strencodings.h>
-#include <util/validation.h>
 #include <validation.h>
 
 #include <modules/platform/funding.h>
@@ -1481,7 +1480,7 @@ void static ProcessGetBlockData(CNode* pfrom, const CChainParams& chainparams, c
     if (need_activate_chain) {
         BlockValidationState state;
         if (!ActivateBestChain(state, Params(), a_recent_block)) {
-            LogPrint(BCLog::NET, "failed to activate chain (%s)\n", FormatStateMessage(state));
+            LogPrint(BCLog::NET, "failed to activate chain (%s)\n", state.ToString());
         }
     }
 
@@ -2462,7 +2461,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             }
             BlockValidationState state;
             if (!ActivateBestChain(state, Params(), a_recent_block)) {
-                LogPrint(BCLog::NET, "failed to activate chain (%s)\n", FormatStateMessage(state));
+                LogPrint(BCLog::NET, "failed to activate chain (%s)\n", state.ToString());
             }
         }
 
@@ -2727,7 +2726,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 // Never relay transactions that might result in being
                 // disconnected (or banned).
                 if (state.IsInvalid() && TxRelayMayResultInDisconnect(state)) {
-                    LogPrintf("Not relaying invalid transaction %s from whitelisted peer=%d (%s)\n", tx.GetHash().ToString(), pfrom->GetId(), FormatStateMessage(state));
+                    LogPrintf("Not relaying invalid transaction %s from whitelisted peer=%d (%s)\n", tx.GetHash().ToString(), pfrom->GetId(), state.ToString());
                 } else {
                     LogPrintf("Force relaying tx %s from whitelisted peer=%d\n", tx.GetHash().ToString(), pfrom->GetId());
                     RelayTransaction(tx.GetHash(), *connman);
@@ -2759,7 +2758,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         {
             LogPrint(BCLog::MEMPOOLREJ, "%s from peer=%d was not accepted: %s\n", tx.GetHash().ToString(),
                 pfrom->GetId(),
-                FormatStateMessage(state));
+                state.ToString());
             MaybePunishNodeForTx(pfrom->GetId(), state);
         }
         return true;

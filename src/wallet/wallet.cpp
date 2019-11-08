@@ -33,7 +33,6 @@
 #include <util/string.h>
 #include <util/time.h>
 #include <util/translation.h>
-#include <util/validation.h>
 #include <wallet/coincontrol.h>
 #include <wallet/fees.h>
 
