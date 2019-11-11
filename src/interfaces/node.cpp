@@ -45,6 +45,8 @@
 
 #include <univalue.h>
 
+#include <boost/signals2/signal.hpp>
+
 class CWallet;
 fs::path GetWalletDir();
 std::vector<fs::path> ListWalletDir();
