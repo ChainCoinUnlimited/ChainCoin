@@ -1,14 +1,16 @@
 *.tar.gz
 
 *.exe
+*.pdb
 src/chaincoin
 src/chaincoind
 src/chaincoin-cli
 src/chaincoin-tx
+src/chaincoin-wallet
+src/test/fuzz
+!src/test/fuzz/*.*
 src/test/test_chaincoin
-src/test/test_chaincoin_fuzzy
 src/qt/test/test_chaincoin-qt
-*.pdb
 
 # autoreconf
 Makefile.in
@@ -27,7 +29,6 @@ build-aux/m4/ltversion.m4
 build-aux/missing
 build-aux/compile
 build-aux/test-driver
-config.cache
 config.log
 config.status
 configure
@@ -130,10 +131,6 @@ contrib/devtools/split-debug.sh
 
 # Output from running db4 installation
 db4/
-chaincoin-wallet
-Chaincoin.cflags
-Chaincoin.creator.user.4.8-pre1
-Chaincoin.cxxflags
 
 # clang-check
 *.plist
