@@ -51,10 +51,10 @@ const struct {
     const char *url;
     const char *source;
 } ICON_MAPPING[] = {
-    {"cmd-request", ":/icons/green/tx_input"},
-    {"cmd-reply", ":/icons/green/tx_output"},
-    {"cmd-error", ":/icons/green/tx_output"},
-    {"misc", ":/icons/green/tx_inout"},
+    {"cmd-request", ":/icons/tx_input"},
+    {"cmd-reply", ":/icons/tx_output"},
+    {"cmd-error", ":/icons/tx_output"},
+    {"misc", ":/icons/tx_inout"},
     {nullptr, nullptr}
 };
 
@@ -949,6 +949,7 @@ void RPCConsole::on_lineEdit_returnPressed()
             history.removeFirst();
         // Set pointer to end of history
         historyPtr = history.size();
+
         // Scroll console view to end
         scrollToEnd();
     }
