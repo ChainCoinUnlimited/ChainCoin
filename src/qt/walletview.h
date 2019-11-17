@@ -131,8 +131,6 @@ public Q_SLOTS:
     /** Update selected CHC amount from transactionview */
     void trxAmount(QString amount);
 Q_SIGNALS:
-    /** Signal that we want to show the main window */
-    void showNormalIfMinimized();
     /**  Fired when a message should be reported to the user */
     void message(const QString &title, const QString &message, unsigned int style);
     /** Encryption status of wallet changed */
