@@ -1660,8 +1660,10 @@ static UniValue gettransaction(const JSONRPCRequest& request)
                 "\nGet detailed information about in-wallet transaction <txid>\n",
                 {
                     {"txid", RPCArg::Type::STR, RPCArg::Optional::NO, "The transaction id"},
-                    {"include_watchonly", RPCArg::Type::BOOL, /* default */ "true for watch-only wallets, otherwise false", "Whether to include watch-only addresses in balance calculation and details[]"},
-                    {"decode", RPCArg::Type::BOOL, /* default */ "false", "Whether to add a field with the decoded transaction"},
+                    {"include_watchonly", RPCArg::Type::BOOL, /* default */ "true for watch-only wallets, otherwise false",
+                            "Whether to include watch-only addresses in balance calculation and details[]"},
+                    {"verbose", RPCArg::Type::BOOL, /* default */ "false",
+                            "Whether to include a `decoded` field containing the decoded transaction (equivalent to RPC decoderawtransaction)"},
                 },
                 RPCResult{
             "{\n"
@@ -1696,7 +1698,8 @@ static UniValue gettransaction(const JSONRPCRequest& request)
             "    ,...\n"
             "  ],\n"
             "  \"hex\" : \"data\"         (string) Raw data for transaction\n"
-            "  \"decoded\" : transaction         (json object) Optional, the decoded transaction\n"
+            "  \"decoded\" : transaction         (json object) Optional, the decoded transaction (only present when `verbose` is passed), equivalent to the\n"
+            "                                                RPC decoderawtransaction method, or the RPC getrawtransaction method when `verbose` is passed.\n"
             "}\n"
                 },
                 RPCExamples{
@@ -1722,7 +1725,7 @@ static UniValue gettransaction(const JSONRPCRequest& request)
         filter |= ISMINE_WATCH_ONLY;
     }
 
-    bool decode_tx = request.params[2].isNull() ? false : request.params[2].get_bool();
+    bool verbose = request.params[2].isNull() ? false : request.params[2].get_bool();
 
     UniValue entry(UniValue::VOBJ);
     auto it = pwallet->mapWallet.find(hash);
@@ -1749,7 +1752,7 @@ static UniValue gettransaction(const JSONRPCRequest& request)
     std::string strHex = EncodeHexTx(*wtx.tx, pwallet->chain().rpcSerializationFlags());
     entry.pushKV("hex", strHex);
 
-    if (decode_tx) {
+    if (verbose) {
         UniValue decoded(UniValue::VOBJ);
         TxToUniv(*wtx.tx, uint256(), decoded, false);
         entry.pushKV("decoded", decoded);
@@ -3160,7 +3163,9 @@ static UniValue fundrawtransaction(const JSONRPCRequest& request)
                             {"changeAddress", RPCArg::Type::STR, /* default */ "pool address", "The chaincoin address to receive the change"},
                             {"changePosition", RPCArg::Type::NUM, /* default */ "random", "The index of the change output"},
                             {"change_type", RPCArg::Type::STR, /* default */ "set by -changetype", "The output type to use. Only valid if changeAddress is not specified. Options are \"legacy\", \"p2sh-segwit\", and \"bech32\"."},
-                            {"includeWatching", RPCArg::Type::BOOL, /* default */ "true for watch-only wallets, otherwise false", "Also select inputs which are watch only"},
+                            {"includeWatching", RPCArg::Type::BOOL, /* default */ "true for watch-only wallets, otherwise false", "Also select inputs which are watch only.\n"
+                                                          "Only solvable inputs can be used. Watch-only destinations are solvable if the public key and/or output script was imported,\n"
+                                                          "e.g. with 'importpubkey' or 'importmulti' with the 'pubkeys' or 'desc' field."},
                             {"lockUnspents", RPCArg::Type::BOOL, /* default */ "false", "Lock selected unspent outputs"},
                             {"feeRate", RPCArg::Type::AMOUNT, /* default */ "not set: makes wallet determine the fee", "Set a specific fee rate in " + CURRENCY_UNIT + "/kB"},
                             {"subtractFeeFromOutputs", RPCArg::Type::ARR, /* default */ "empty array", "A json array of integers.\n"
@@ -3332,7 +3337,7 @@ static UniValue bumpfee(const JSONRPCRequest& request)
                 "The command will fail if the wallet or mempool contains a transaction that spends one of T's outputs.\n"
                 "By default, the new fee will be calculated automatically using estimatesmartfee.\n"
                 "The user can specify a confirmation target for estimatesmartfee.\n"
-                "Alternatively, the user can specify totalFee (DEPRECATED), or use RPC settxfee to set a higher fee rate.\n"
+                "Alternatively, the user can specify totalFee (DEPRECATED), or fee_rate (" + CURRENCY_UNIT + " per kB) for the new transaction .\n"
                 "At a minimum, the new fee rate must be high enough to pay an additional new relay fee (incrementalfee\n"
                 "returned by getnetworkinfo) to enter the node's mempool.\n",
                 {
@@ -3344,6 +3349,9 @@ static UniValue bumpfee(const JSONRPCRequest& request)
             "                         In rare cases, the actual fee paid might be slightly higher than the specified\n"
             "                         totalFee if the tx change output has to be removed because it is too close to\n"
             "                         the dust threshold."},
+                            {"fee_rate", RPCArg::Type::NUM, /* default */ "fallback to 'confTarget'", "FeeRate (NOT total fee) to pay, in " + CURRENCY_UNIT + " per kB\n"
+            "                         Specify a fee rate instead of relying on the built-in fee estimator.\n"
+            "                         Must be at least 0.0001 BTC per kB higher than the current transaction fee rate.\n"},
                             {"replaceable", RPCArg::Type::BOOL, /* default */ "true", "Whether the new transaction should still be\n"
             "                         marked bip-125 replaceable. If true, the sequence numbers in the transaction will\n"
             "                         be left unchanged from the original. If false, any input sequence numbers in the\n"
@@ -3385,13 +3393,15 @@ static UniValue bumpfee(const JSONRPCRequest& request)
             {
                 {"confTarget", UniValueType(UniValue::VNUM)},
                 {"totalFee", UniValueType(UniValue::VNUM)},
+                {"fee_rate", UniValueType(UniValue::VNUM)},
                 {"replaceable", UniValueType(UniValue::VBOOL)},
                 {"estimate_mode", UniValueType(UniValue::VSTR)},
             },
             true, true);
-
-        if (options.exists("confTarget") && options.exists("totalFee")) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "confTarget and totalFee options should not both be set. Please provide either a confirmation target for fee estimation or an explicit total fee for the transaction.");
+        if (options.exists("confTarget") && (options.exists("totalFee") || options.exists("fee_rate"))) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "confTarget can't be set with totalFee or fee_rate. Please provide either a confirmation target in blocks for automatic fee estimation, or an explicit fee rate.");
+        } else if (options.exists("fee_rate") && options.exists("totalFee")) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "fee_rate can't be set along with totalFee.");
         } else if (options.exists("confTarget")) { // TODO: alias this to conf_target
             coin_control.m_confirm_target = ParseConfirmTarget(options["confTarget"], pwallet->chain().estimateMaxBlocks());
         } else if (options.exists("totalFee")) {
@@ -3402,6 +3412,12 @@ static UniValue bumpfee(const JSONRPCRequest& request)
             if (totalFee <= 0) {
                 throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid totalFee %s (must be greater than 0)", FormatMoney(totalFee)));
             }
+        } else if (options.exists("fee_rate")) {
+            CFeeRate fee_rate(AmountFromValue(options["fee_rate"]));
+            if (fee_rate <= 0) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid fee_rate %s (must be greater than 0)", fee_rate.ToString()));
+            }
+            coin_control.m_feerate = fee_rate;
         }
 
         if (options.exists("replaceable")) {
@@ -4422,7 +4438,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "getrawchangeaddress",              &getrawchangeaddress,           {"address_type"} },
     { "wallet",             "getreceivedbyaddress",             &getreceivedbyaddress,          {"address","minconf"} },
     { "wallet",             "getreceivedbylabel",               &getreceivedbylabel,            {"label","minconf"} },
-    { "wallet",             "gettransaction",                   &gettransaction,                {"txid","include_watchonly","decode"} },
+    { "wallet",             "gettransaction",                   &gettransaction,                {"txid","include_watchonly","verbose"} },
     { "wallet",             "getunconfirmedbalance",            &getunconfirmedbalance,         {} },
     { "wallet",             "getbalances",                      &getbalances,                   {} },
     { "wallet",             "getwalletinfo",                    &getwalletinfo,                 {} },

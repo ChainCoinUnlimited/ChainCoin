@@ -229,10 +229,10 @@ AC_ARG_ENABLE([zmq],
   [use_zmq=$enableval],
   [use_zmq=yes])
 AC_ARG_ENABLE([bip70],
-  [AS_HELP_STRING([--disable-bip70],
-  [disable BIP70 (payment protocol) support in GUI (enabled by default)])],
+  [AS_HELP_STRING([--enable-bip70],
+  [enable BIP70 (payment protocol) support in the GUI (default is to disable)])],
   [enable_bip70=$enableval],
-  [enable_bip70=auto])
+  [enable_bip70=no])
 
 AC_ARG_WITH([protoc-bindir],[AS_HELP_STRING([--with-protoc-bindir=BIN_DIR],[specify protoc bin path])], [protoc_bin_path=$withval], [])
 
@@ -782,6 +782,39 @@ if test x$TARGET_OS = xdarwin; then
 fi
 
 AC_CHECK_HEADERS([endian.h sys/endian.h byteswap.h stdio.h stdlib.h unistd.h strings.h sys/types.h sys/stat.h sys/select.h sys/prctl.h])
+
+# FD_ZERO may be dependent on a declaration of memcpy, e.g. in SmartOS
+# check that it fails to build without memcpy, then that it builds with
+AC_MSG_CHECKING(FD_ZERO memcpy dependence)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    #include <cstddef>
+    #if HAVE_SYS_SELECT_H
+    #include <sys/select.h>
+    #endif
+  ]],[[
+    #if HAVE_SYS_SELECT_H
+    fd_set fds;
+    FD_ZERO(&fds);
+    #endif
+  ]])],
+  [ AC_MSG_RESULT(no) ],
+  [
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+          #include <cstring>
+          #if HAVE_SYS_SELECT_H
+          #include <sys/select.h>
+          #endif
+        ]], [[
+          #if HAVE_SYS_SELECT_H
+          fd_set fds;
+          FD_ZERO(&fds);
+          #endif
+        ]])],
+        [ AC_MSG_RESULT(yes); AC_DEFINE(HAVE_CSTRING_DEPENDENT_FD_ZERO, 1, [Define this symbol if FD_ZERO is dependent of a memcpy declaration being available]) ],
+        [ AC_MSG_ERROR(failed with cstring include) ]
+      )
+  ]
+)
 
 AC_CHECK_DECLS([getifaddrs, freeifaddrs],,,
     [#include <sys/types.h>

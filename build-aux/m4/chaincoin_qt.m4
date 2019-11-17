@@ -228,7 +228,11 @@ AC_DEFUN([BITCOIN_QT_CONFIGURE],[
   ],[
     chaincoin_enable_qt=no
   ])
-  AC_MSG_RESULT([$chaincoin_enable_qt (Qt5)])
+  if test x$chaincoin_enable_qt = xyes; then
+    AC_MSG_RESULT([$chaincoin_enable_qt ($QT_LIB_PREFIX)])
+  else
+    AC_MSG_RESULT([$chaincoin_enable_qt])
+  fi
 
   AC_SUBST(QT_PIE_FLAGS)
   AC_SUBST(QT_INCLUDES)
