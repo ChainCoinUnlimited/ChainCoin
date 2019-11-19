@@ -9,9 +9,11 @@
 #include <net.h>
 #include <node/context.h>
 #include <outputtype.h>
+#include <ui_interface.h>
 #include <util/moneystr.h>
 #include <util/system.h>
 #include <util/translation.h>
+#include <wallet/coincontrol.h>
 #include <wallet/coinjoin_client.h>
 #include <wallet/wallet.h>
 #include <walletinitinterface.h>

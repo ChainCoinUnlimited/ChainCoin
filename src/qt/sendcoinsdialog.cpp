@@ -30,6 +30,7 @@
 #include <wallet/coincontrol.h>
 #include <wallet/fees.h>
 #include <wallet/psbtwallet.h>
+#include <wallet/wallet.h>
 
 #include <modules/coinjoin/coinjoin.h>
 
