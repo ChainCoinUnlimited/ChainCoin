@@ -36,6 +36,7 @@
 #include <config/chaincoin-config.h>
 #endif
 
+#include <qt/sendcoinsrecipient.h>
 #include <qt/walletmodel.h>
 
 #include <QObject>
