@@ -246,6 +246,7 @@ BITCOIN_CORE_H = \
   util/system.h \
   util/macros.h \
   util/memory.h \
+  util/message.h \
   util/moneystr.h \
   util/rbf.h \
   util/settings.h \
@@ -594,6 +595,7 @@ libchaincoin_util_a_SOURCES = \
   util/error.cpp \
   util/fees.cpp \
   util/system.cpp \
+  util/message.cpp \
   util/moneystr.cpp \
   util/rbf.cpp \
   util/settings.cpp \
