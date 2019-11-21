@@ -32,23 +32,23 @@ shut down (which might take a few minutes for older versions), then run the
 installer (on Windows) or just copy over `/Applications/Chaincoin-Qt` (on Mac)
 or `chaincoind`/`chaincoin-qt` (on Linux).
 
-Upgrading directly from a version of Chaincoin Core that has reached its EOL is
+Upgrading directly from a version of Chaincoin that has reached its EOL is
 possible, but it might take some time if the datadir needs to be migrated. Old
-wallet versions of Chaincoin Core are generally supported.
+wallet versions of Chaincoin are generally supported.
 
 Compatibility
 ==============
 
-Chaincoin Core is supported and extensively tested on operating systems using
-the Linux kernel, macOS 10.10+, and Windows 7 and newer. It is not recommended
-to use Chaincoin Core on unsupported systems.
+Chaincoin is supported and extensively tested on operating systems using
+the Linux kernel, macOS 10.12+, and Windows 7 and newer. It is not recommended
+to use Chaincoin on unsupported systems.
 
-Chaincoin Core should also work on most other Unix-like systems but is not
+Chaincoin should also work on most other Unix-like systems but is not
 as frequently tested on them.
 
-From Chaincoin Core 0.17.0 onwards, macOS versions earlier than 10.10 are no
-longer supported, as Chaincoin Core is now built using Qt 5.9.x which requires
-macOS 10.10+. Additionally, Chaincoin Core does not yet change appearance when
+From Chaincoin 0.20.0 onwards, macOS versions earlier than 10.12 are no
+longer supported, as Chaincoin is now built using Qt 5.9.x which requires
+macOS 10.10+. Additionally, Chaincoin does not yet change appearance when
 macOS "dark mode" is activated.
 
 In addition to previously supported CPU platforms, this release's pre-compiled
