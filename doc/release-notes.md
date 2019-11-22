@@ -85,6 +85,8 @@ Low-level Changes section below.
 GUI changes
 -----------
 
+- The "Start Chaincoin on system login" option has been removed on macOS.
+
 Wallet
 ------
 
