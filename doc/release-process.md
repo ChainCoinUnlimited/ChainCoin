@@ -45,8 +45,8 @@ Release Process
 
 #### After branch-off (on the major release branch)
 
-- Update the versions and the link to the release notes draft in `doc/release-notes.md`.
-- Delete `SECURITY.md`.
+- Update the versions.
+- Create a pinned meta-issue for testing the release candidate (see [this issue](https://github.com/bitcoin/bitcoin/issues/17079) for an example) and provide a link to it in the release announcements where useful.
 
 #### Before final release
 
@@ -285,6 +285,12 @@ rm SHA256SUMS
 (the digest algorithm is forced to sha256 to avoid confusion of the `Hash:` header that GPG adds with the SHA256 used for the files)
 Note: check that SHA256SUMS itself doesn't end up in SHA256SUMS, which is a spurious/nonsensical entry.
 
+
+  - This repo
+
+      - Archive the release notes for the new version to `doc/release-notes/` (branch `master` and branch of the release)
+
+      - Create a [new GitHub release](https://github.com/chaincoin/chaincoin/releases/new) with a link to the archived release notes
 
 - Announce the release:
 
