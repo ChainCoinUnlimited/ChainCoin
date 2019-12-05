@@ -630,8 +630,6 @@ private:
     //! if fOnlyMixingAllowed is true, only mixing should be allowed in unlocked wallet
     bool fOnlyMixingAllowed;
 
-    //! keeps track of whether Unlock has run a thorough check before
-    bool fDecryptionThoroughlyChecked;
 
     bool SetCrypted();
     bool Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no_keys = false, bool fForMixingOnly = false);
@@ -767,7 +765,6 @@ public:
     CWallet(interfaces::Chain* chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database)
         : fUseCrypto(false),
           fOnlyMixingAllowed(false),
-          fDecryptionThoroughlyChecked(false),
           m_chain(chain),
           m_location(location),
           database(std::move(database))
