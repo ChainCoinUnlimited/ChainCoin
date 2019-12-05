@@ -623,15 +623,10 @@ class CWallet final : public WalletStorage, private interfaces::Chain::Notificat
 private:
     CKeyingMaterial vMasterKey GUARDED_BY(cs_KeyStore);
 
-    //! if fUseCrypto is true, mapKeys must be empty
-    //! if fUseCrypto is false, vMasterKey must be empty
-    std::atomic<bool> fUseCrypto;
 
     //! if fOnlyMixingAllowed is true, only mixing should be allowed in unlocked wallet
     bool fOnlyMixingAllowed;
 
-
-    bool SetCrypted();
     bool Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no_keys = false, bool fForMixingOnly = false);
 
     std::atomic<bool> fAbortRescan{false};
@@ -763,8 +758,7 @@ public:
 
     /** Construct wallet with specified name and database implementation. */
     CWallet(interfaces::Chain* chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database)
-        : fUseCrypto(false),
-          fOnlyMixingAllowed(false),
+        : fOnlyMixingAllowed(false),
           m_chain(chain),
           m_location(location),
           database(std::move(database))
@@ -777,7 +771,7 @@ public:
         assert(NotifyUnload.empty());
     }
 
-    bool IsCrypted() const { return fUseCrypto; }
+    bool IsCrypted() const;
     bool IsLocked(bool fForMixing = false) const override;
     bool Lock(bool fAllowMixing = false);
 
