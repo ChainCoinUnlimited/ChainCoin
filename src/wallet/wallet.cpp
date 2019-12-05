@@ -4575,6 +4575,22 @@ bool CWallet::Lock(bool fAllowMixing)
     return true;
 }
 
+bool CWallet::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no_keys, bool fForMixingOnly)
+{
+    {
+        LOCK(cs_KeyStore);
+        if (m_spk_man) {
+            if (!m_spk_man->CheckDecryptionKey(vMasterKeyIn, accept_no_keys)) {
+                return false;
+            }
+        }
+        vMasterKey = vMasterKeyIn;
+    }
+    NotifyStatusChanged(this);
+    fOnlyMixingAllowed = fForMixingOnly;
+    return true;
+}
+
 ScriptPubKeyMan* CWallet::GetScriptPubKeyMan(const CScript& script) const
 {
     return m_spk_man.get();
