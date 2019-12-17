@@ -20,13 +20,13 @@ BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
             VALUE "CompanyName",        "Chaincoin"
-            VALUE "FileDescription",    "Chaincoin Core (GUI node for Chaincoin)"
+            VALUE "FileDescription",    "Chaincoin (GUI node for Chaincoin)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "chaincoin-qt"
             VALUE "LegalCopyright",     COPYRIGHT_STR
             VALUE "LegalTrademarks1",   "Distributed under the MIT software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
             VALUE "OriginalFilename",   "chaincoin-qt.exe"
-            VALUE "ProductName",        "Chaincoin Core"
+            VALUE "ProductName",        "Chaincoin"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END

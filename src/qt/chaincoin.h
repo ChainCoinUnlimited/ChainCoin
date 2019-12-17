@@ -26,7 +26,7 @@ class Handler;
 class Node;
 } // namespace interfaces
 
-/** Class encapsulating Chaincoin Core startup and shutdown.
+/** Class encapsulating Chaincoin startup and shutdown.
  * Allows running startup and shutdown in a different thread from the UI thread.
  */
 class BitcoinCore: public QObject

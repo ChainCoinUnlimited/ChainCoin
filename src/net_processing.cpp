@@ -37,7 +37,7 @@
 #include <memory>
 
 #if defined(NDEBUG)
-# error "Chaincoin Core cannot be compiled without assertions."
+# error "Chaincoin cannot be compiled without assertions."
 #endif
 
 /** Expiration time for orphan transactions in seconds */

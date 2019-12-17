@@ -454,7 +454,7 @@
         <translation>入金 (&amp;R)</translation>
     </message>
     <message>
-        <source>&amp;About Chaincoin Core</source>
+        <source>&amp;About Chaincoin</source>
         <translation>&amp;Chaincoin Coreについて</translation>
     </message>
     <message>
@@ -534,8 +534,8 @@
         <translation>chaincoin: URIまたは送金リクエストを開く</translation>
     </message>
     <message>
-        <source>Show the Chaincoin Core help message to get a list with possible Chaincoin Core command-line options</source>
-        <translation>有効な Chaincoin Core のコマンドラインオプションを見るためにヘルプメッセージを表示します。</translation>
+        <source>Show the Chaincoin help message to get a list with possible Chaincoin command-line options</source>
+        <translation>有効な Chaincoin のコマンドラインオプションを見るためにヘルプメッセージを表示します。</translation>
     </message>
     <message>
         <source>&amp;PrivateSend information</source>
@@ -586,8 +586,8 @@
         <translation>追加のデータを同期しています： %p%</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>Date: %1
@@ -982,15 +982,15 @@
         <translation>バージョン</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1ビット)</translation>
     </message>
     <message>
-        <source>About Chaincoin Core</source>
+        <source>About Chaincoin</source>
         <translation>Chaincoin Coreについて</translation>
     </message>
     <message>
@@ -1409,7 +1409,7 @@
         <translation>匿名化を維持するChaincoinの額</translation>
     </message>
     <message>
-        <source>Automatically open the Chaincoin Core client port on the router. This only works when your router  UPnP and it is enabled.</source>
+        <source>Automatically open the Chaincoin client port on the router. This only works when your router  UPnP and it is enabled.</source>
         <translation>自動的にルーター上の Chaincoin クライアントのポートを開きます。ルーターが UPnP に対応しており、有効になっている場合に作動します。</translation>
     </message>
     <message>
@@ -1469,11 +1469,11 @@
         <translation>ネットワーク (&amp;N)</translation>
     </message>
     <message>
-        <source>Automatically start Chaincoin Core after logging in to the system.</source>
-        <translation>システムにログインした際、自動的に Chaincoin Core を起動する。</translation>
+        <source>Automatically start Chaincoin after logging in to the system.</source>
+        <translation>システムにログインした際、自動的に Chaincoin を起動する。</translation>
     </message>
     <message>
-        <source>&amp;Start Chaincoin Core on system login</source>
+        <source>&amp;Start Chaincoin on system login</source>
         <translation>&amp;システムログイン時にChaincoin Coreを起動</translation>
     </message>
     <message>
@@ -1577,7 +1577,7 @@
         <translation>コインコントロール機能を表示するかどうか。</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin Core.</source>
+        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin.</source>
         <translation>ユーザインタフェースの言語はここで設定できます。Chaincoin Coreを再起動したのちに設定は有効になります。</translation>
     </message>
     <message>
@@ -2470,8 +2470,8 @@ https://www.transifex.com/projects/p/chaincoin/</translation>
         <translation>メモリ使用量</translation>
     </message>
     <message>
-        <source>Open the Chaincoin Core debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>現在のデータディレクトリから Chaincoin Core のデバッグ用ログファイルを開きます。ログファイルが巨大な場合、数秒かかることがあります。</translation>
+        <source>Open the Chaincoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>現在のデータディレクトリから Chaincoin のデバッグ用ログファイルを開きます。ログファイルが巨大な場合、数秒かかることがあります。</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -3263,7 +3263,7 @@ https://www.transifex.com/projects/p/chaincoin/</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Chaincoin Core is shutting down...</source>
+        <source>Chaincoin is shutting down...</source>
         <translation>Chaincoin Coreを終了しています・・・</translation>
     </message>
     <message>
@@ -3429,7 +3429,7 @@ https://www.transifex.com/projects/p/chaincoin/</translation>
         <translation>Dash Core 開発者</translation>
     </message>
     <message>
-        <source>The Chaincoin Core developers</source>
+        <source>The Chaincoin developers</source>
         <translation>Chaincoin Core開発者</translation>
     </message>
 </context>

@@ -775,7 +775,7 @@ static void ThreadImport(std::vector<fs::path> vImportFiles)
 }
 
 /** Sanity checks
- *  Ensure that Chaincoin Core is running in a usable environment with all
+ *  Ensure that Chaincoin is running in a usable environment with all
  *  necessary library support.
  */
 static bool InitSanityCheck()

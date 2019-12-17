@@ -584,15 +584,15 @@ fs::path static StartupShortcutPath()
 {
     std::string chain = gArgs.GetChainName();
     if (chain == CBaseChainParams::MAIN)
-        return GetSpecialFolderPath(CSIDL_STARTUP) / "Chaincoin Core.lnk";
+        return GetSpecialFolderPath(CSIDL_STARTUP) / "Chaincoin.lnk";
     if (chain == CBaseChainParams::TESTNET) // Remove this special case when CBaseChainParams::TESTNET = "testnet4"
-        return GetSpecialFolderPath(CSIDL_STARTUP) / "Chaincoin Core (testnet).lnk";
-    return GetSpecialFolderPath(CSIDL_STARTUP) / strprintf("Chaincoin Core (%s).lnk", chain);
+        return GetSpecialFolderPath(CSIDL_STARTUP) / "Chaincoin (testnet).lnk";
+    return GetSpecialFolderPath(CSIDL_STARTUP) / strprintf("Chaincoin (%s).lnk", chain);
 }
 
 bool GetStartOnSystemStartup()
 {
-    // check for "Chaincoin Core*.lnk"
+    // check for "Chaincoin*.lnk"
     return fs::exists(StartupShortcutPath());
 }
 
@@ -712,7 +712,7 @@ bool SetStartOnSystemStartup(bool fAutoStart)
         optionFile << "[Desktop Entry]\n";
         optionFile << "Type=Application\n";
         if (chain == CBaseChainParams::MAIN)
-            optionFile << "Name=Chaincoin Core\n";
+            optionFile << "Name=Chaincoin\n";
         else
             optionFile << strprintf("Name=Chaincoin (%s)\n", chain);
         optionFile << "Exec=" << pszExePath << strprintf(" -min -chain=%s\n", chain);

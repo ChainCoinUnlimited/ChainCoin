@@ -58,7 +58,7 @@
 #include <boost/thread.hpp>
 
 #if defined(NDEBUG)
-# error "Chaincoin Core cannot be compiled without assertions."
+# error "Chaincoin cannot be compiled without assertions."
 #endif
 
 #define MICRO 0.000001

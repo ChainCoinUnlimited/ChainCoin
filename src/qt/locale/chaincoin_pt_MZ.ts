@@ -446,8 +446,8 @@
         <translation>&amp;Receber</translation>
     </message>
     <message>
-        <source>&amp;About Chaincoin Core</source>
-        <translation>&amp;Sobre Chaincoin Core</translation>
+        <source>&amp;About Chaincoin</source>
+        <translation>&amp;Sobre Chaincoin</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -526,8 +526,8 @@
         <translation>Abrir um chaincoin: URI ou cobrança</translation>
     </message>
     <message>
-        <source>Show the Chaincoin Core help message to get a list with possible Chaincoin Core command-line options</source>
-        <translation>Mostrar a ajuda do Chaincoin Core para receber uma lista com as possíveis opções de linha de comando</translation>
+        <source>Show the Chaincoin help message to get a list with possible Chaincoin command-line options</source>
+        <translation>Mostrar a ajuda do Chaincoin para receber uma lista com as possíveis opções de linha de comando</translation>
     </message>
     <message>
         <source>&amp;PrivateSend information</source>
@@ -578,8 +578,8 @@
         <translation>Sincronizando dados adicionais: %p%</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>Date: %1
@@ -974,16 +974,16 @@
         <translation>versão</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Chaincoin Core</source>
-        <translation>Sobre o Chaincoin Core</translation>
+        <source>About Chaincoin</source>
+        <translation>Sobre o Chaincoin</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1407,7 +1407,7 @@ Esta sincronização inicial é muito exigente e pode expor problemas de hardwar
         <translation>Quantia de Chaincoins para manter anônimas</translation>
     </message>
     <message>
-        <source>Automatically open the Chaincoin Core client port on the router. This only works when your router  UPnP and it is enabled.</source>
+        <source>Automatically open the Chaincoin client port on the router. This only works when your router  UPnP and it is enabled.</source>
         <translation>Abrir as portas do cliente Chaincoin automaticamente no roteador. Isto só funcionará se seu roteador suportar UPnP e esta função estiver habilitada.</translation>
     </message>
     <message>
@@ -1467,12 +1467,12 @@ Esta sincronização inicial é muito exigente e pode expor problemas de hardwar
         <translation>Rede</translation>
     </message>
     <message>
-        <source>Automatically start Chaincoin Core after logging in to the system.</source>
-        <translation>Iniciar o Chaincoin Core automaticamente após logar no sistema</translation>
+        <source>Automatically start Chaincoin after logging in to the system.</source>
+        <translation>Iniciar o Chaincoin automaticamente após logar no sistema</translation>
     </message>
     <message>
-        <source>&amp;Start Chaincoin Core on system login</source>
-        <translation>&amp;Iniciar o Chaincoin Core ao logar no sistema</translation>
+        <source>&amp;Start Chaincoin on system login</source>
+        <translation>&amp;Iniciar o Chaincoin ao logar no sistema</translation>
     </message>
     <message>
         <source>(0 = auto, &lt;0 = leave that many cores free)</source>
@@ -1575,7 +1575,7 @@ Esta sincronização inicial é muito exigente e pode expor problemas de hardwar
         <translation>Mostrar ou não opções de controle da moeda.</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin Core.</source>
+        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin.</source>
         <translation>O idioma da interface pode ser definido aqui. Essa configuração só terá efeito após reiniciar o Chaincoin core.</translation>
     </message>
     <message>
@@ -2279,7 +2279,7 @@ https://www.transifex.com/projects/p/chaincoin/</source>
         <translation>Uso de memória</translation>
     </message>
     <message>
-        <source>Open the Chaincoin Core debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <source>Open the Chaincoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
         <translation>Abrir o arquivo de log de depuração do Chaincoin localizado no diretório atual de dados. Isso pode levar alguns segundos para arquivos grandes.</translation>
     </message>
     <message>
@@ -2936,7 +2936,7 @@ https://www.transifex.com/projects/p/chaincoin/</source>
     </message>
     <message>
         <source>The transaction was rejected with the following reason: %1</source>
-        <translation>A transação foi negada pela seguinte razão: %1</translation>
+        <translation>A transação foi negada pela seguinte razão: %1</translation>
     </message>
     <message>
         <source>A fee higher than %1 is considered an absurdly high fee.</source>
@@ -3072,8 +3072,8 @@ https://www.transifex.com/projects/p/chaincoin/</source>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Chaincoin Core is shutting down...</source>
-        <translation>Chaincoin Core está desligando...</translation>
+        <source>Chaincoin is shutting down...</source>
+        <translation>Chaincoin está desligando...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -3238,8 +3238,8 @@ https://www.transifex.com/projects/p/chaincoin/</source>
         <translation>Dash Core developers</translation>
     </message>
     <message>
-        <source>The Chaincoin Core developers</source>
-        <translation>Chaincoin Core developers</translation>
+        <source>The Chaincoin developers</source>
+        <translation>Chaincoin developers</translation>
     </message>
 </context>
 <context>
@@ -3345,7 +3345,7 @@ https://www.transifex.com/projects/p/chaincoin/</source>
     </message>
     <message numerus="yes">
         <source>matures in %n more block(s)</source>
-        <translation><numerusform>maduro em mais %n bloco</numerusform><numerusform>maduro em mais %n blocos</numerusform></translation>
+        <translation><numerusform>maduro em mais %n bloco</numerusform><numerusform>maduro em mais %n blocos</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>

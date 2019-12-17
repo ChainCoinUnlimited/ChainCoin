@@ -451,8 +451,8 @@ Questi sono i tuoi indirizzi Chaincoin per ricevere pagamenti. Si consiglia di u
         <translation>&amp;Ricevi</translation>
     </message>
     <message>
-        <source>&amp;About Chaincoin Core</source>
-        <translation>&amp;Informazioni su Chaincoin Core</translation>
+        <source>&amp;About Chaincoin</source>
+        <translation>&amp;Informazioni su Chaincoin</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -531,8 +531,8 @@ Questi sono i tuoi indirizzi Chaincoin per ricevere pagamenti. Si consiglia di u
         <translation>Apri una chaincoin: URI o richiesta di pagamento</translation>
     </message>
     <message>
-        <source>Show the Chaincoin Core help message to get a list with possible Chaincoin Core command-line options</source>
-        <translation>Mostra il messaggio di aiuto Chaincoin Core per ottenere un elenco con le possibili opzioni della riga di comando Chaincoin Core</translation>
+        <source>Show the Chaincoin help message to get a list with possible Chaincoin command-line options</source>
+        <translation>Mostra il messaggio di aiuto Chaincoin per ottenere un elenco con le possibili opzioni della riga di comando Chaincoin</translation>
     </message>
     <message>
         <source>&amp;PrivateSend information</source>
@@ -575,8 +575,8 @@ Questi sono i tuoi indirizzi Chaincoin per ricevere pagamenti. Si consiglia di u
         <translation>In aggiornamento...</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>Date: %1
@@ -972,16 +972,16 @@ Wallet crittografato e attualmente sbloccato per la solamente per il mixing</tra
         <translation>versione</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Chaincoin Core</source>
-        <translation>Informazioni Chaincoin Core</translation>
+        <source>About Chaincoin</source>
+        <translation>Informazioni Chaincoin</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1454,12 +1454,12 @@ Assicurati di avere sempre un backup (automatico) del portafogli recente in un l
         <translation>Rete</translation>
     </message>
     <message>
-        <source>Automatically start Chaincoin Core after logging in to the system.</source>
-        <translation>Avvia automaticamente Chaincoin Core dopo aver effettuato l'accesso al sistema.</translation>
+        <source>Automatically start Chaincoin after logging in to the system.</source>
+        <translation>Avvia automaticamente Chaincoin dopo aver effettuato l'accesso al sistema.</translation>
     </message>
     <message>
-        <source>&amp;Start Chaincoin Core on system login</source>
-        <translation>&amp;Avvia Chaincoin Core all'avvio del sistema</translation>
+        <source>&amp;Start Chaincoin on system login</source>
+        <translation>&amp;Avvia Chaincoin all'avvio del sistema</translation>
     </message>
     <message>
         <source>(0 = auto, &lt;0 = leave that many cores free)</source>
@@ -1562,8 +1562,8 @@ Assicurati di avere sempre un backup (automatico) del portafogli recente in un l
         <translation>Specifica se le funzionalita di coin control saranno visualizzate.</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin Core.</source>
-        <translation>La lingua dell'interfaccia utente può essere impostata qui. Questa impostazione avrà effetto dopo aver riavviato Chaincoin Core.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin.</source>
+        <translation>La lingua dell'interfaccia utente può essere impostata qui. Questa impostazione avrà effetto dopo aver riavviato Chaincoin.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
@@ -2421,8 +2421,8 @@ https://www.transifex.com/projects/p/chaincoin/</source>
         <translation>Utilizzo memoria</translation>
     </message>
     <message>
-        <source>Open the Chaincoin Core debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Aprire il file di log di debug di Chaincoin Core dalla directory dei dati corrente. Questo può richiedere alcuni secondi per i file di registro di grandi dimensioni.</translation>
+        <source>Open the Chaincoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Aprire il file di log di debug di Chaincoin dalla directory dei dati corrente. Questo può richiedere alcuni secondi per i file di registro di grandi dimensioni.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -2926,7 +2926,7 @@ https://www.transifex.com/projects/p/chaincoin/</source>
     </message>
     <message>
         <source>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</source>
-        <translation>Con Replace-By-Fee (BIP-125) si puo' aumentare la commissione sulla transazione dopo averla inviata. Senza questa, una commissione piu' alta e' consigliabile per compensare l'aumento del rischio dovuto al ritardo della transazione.</translation>
+        <translation>Con Replace-By-Fee (BIP-125) si puo' aumentare la commissione sulla transazione dopo averla inviata. Senza questa, una commissione piu' alta e' consigliabile per compensare l'aumento del rischio dovuto al ritardo della transazione.</translation>
     </message>
     <message>
         <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until your have validated the complete chain.</source>
@@ -3210,8 +3210,8 @@ https://www.transifex.com/projects/p/chaincoin/</source>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Chaincoin Core is shutting down...</source>
-        <translation>Chaincoin Core in spegnimento...</translation>
+        <source>Chaincoin is shutting down...</source>
+        <translation>Chaincoin in spegnimento...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -3376,8 +3376,8 @@ https://www.transifex.com/projects/p/chaincoin/</source>
         <translation>Gli sviluppatori di Dash Core</translation>
     </message>
     <message>
-        <source>The Chaincoin Core developers</source>
-        <translation>Gli sviluppatori di Chaincoin Core</translation>
+        <source>The Chaincoin developers</source>
+        <translation>Gli sviluppatori di Chaincoin</translation>
     </message>
 </context>
 <context>
