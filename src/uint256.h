@@ -160,4 +160,6 @@ public:
     }
 };
 
+uint256& UINT256_ONE();
+
 #endif // BITCOIN_UINT256_H
