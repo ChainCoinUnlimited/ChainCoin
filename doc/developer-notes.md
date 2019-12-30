@@ -288,6 +288,7 @@ $ valgrind --suppressions=contrib/valgrind.supp src/test/test_chaincoin
 $ valgrind --suppressions=contrib/valgrind.supp --leak-check=full \
       --show-leak-kinds=all src/test/test_chaincoin --log_level=test_suite
 $ valgrind -v --leak-check=full src/chaincoind -printtoconsole
+$ ./test/functional/test_runner.py --valgrind
 ```
 
 ### Compiling for test coverage
