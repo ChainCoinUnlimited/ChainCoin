@@ -35,6 +35,7 @@
 #include <modules/coinjoin/coinjoin_server.h>
 
 #include <memory>
+#include <typeinfo>
 
 #if defined(NDEBUG)
 # error "Chaincoin cannot be compiled without assertions."

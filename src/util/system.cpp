@@ -68,6 +68,7 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include <thread>
+#include <typeinfo>
 #include <univalue.h>
 
 // Application startup time (used for uptime calculation)
