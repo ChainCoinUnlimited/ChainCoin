@@ -31,7 +31,7 @@ class CKeyHolderStorage
 {
 private:
     std::vector<std::shared_ptr<ReserveDestination> > storage;
-    mutable CCriticalSection cs_storage;
+    mutable RecursiveMutex cs_storage;
 
 public:
     void AddKey(CScript &script, CWallet* pwalletIn);
@@ -175,7 +175,7 @@ private:
     std::vector<COutPoint> vecMasternodesUsed;
 
     std::deque<CCoinJoinClientSession> deqSessions;
-    mutable CCriticalSection cs_deqsessions;
+    mutable RecursiveMutex cs_deqsessions;
 
     int nCachedLastSuccessBlock;
     int nMinBlocksToWait;

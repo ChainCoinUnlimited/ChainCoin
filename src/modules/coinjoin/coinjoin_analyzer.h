@@ -17,7 +17,7 @@ class CAnalyzer
 {
 private:
     m_cache mDenomTx;
-    CCriticalSection cs;
+    RecursiveMutex cs;
 
     static const std::string SERIALIZATION_VERSION_STRING;
 

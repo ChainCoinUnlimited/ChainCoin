@@ -133,7 +133,7 @@ class CMasternode : public masternode_info_t
 {
 private:
     // critical section to protect the inner data structures
-    mutable CCriticalSection cs;
+    mutable RecursiveMutex cs;
 
 public:
     enum state {

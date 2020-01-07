@@ -15,7 +15,8 @@
 #include <util/translation.h>
 #include <warnings.h>
 
-static CCriticalSection cs_nTimeOffset;
+
+static RecursiveMutex cs_nTimeOffset;
 static int64_t nTimeOffset GUARDED_BY(cs_nTimeOffset) = 0;
 
 /**

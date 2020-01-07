@@ -23,8 +23,8 @@ static const int MNPAYMENTS_SIGNATURES_TOTAL            = 10;
 //  vote for masternode and be elected as a payment winner
 static const int MIN_MASTERNODE_PAYMENT_PROTO_VERSION = 70015;
 
-extern CCriticalSection cs_vecPayees;
-extern CCriticalSection cs_mapMasternodeBlocks;
+extern RecursiveMutex cs_vecPayees;
+extern RecursiveMutex cs_mapMasternodeBlocks;
 
 extern CMasternodePayments mnpayments;
 

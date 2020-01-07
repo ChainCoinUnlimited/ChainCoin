@@ -216,7 +216,7 @@ private:
         bool fPrevValue;
 
     public:
-        ScopedLockBool(CCriticalSection& _cs, bool& _ref, bool _value) : ref(_ref)
+        ScopedLockBool(RecursiveMutex& _cs, bool& _ref, bool _value) : ref(_ref)
         {
             AssertLockHeld(_cs);
             fPrevValue = ref;
@@ -231,7 +231,7 @@ private:
 
 public:
     // critical section to protect the inner data structures
-    mutable CCriticalSection cs;
+    mutable RecursiveMutex cs;
 
     CGovernanceManager();
 
