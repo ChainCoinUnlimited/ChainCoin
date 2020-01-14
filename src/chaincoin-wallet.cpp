@@ -40,9 +40,10 @@ static bool WalletAppInit(int argc, char* argv[])
         return false;
     }
     if (argc < 2 || HelpRequested(gArgs)) {
+
         std::string usage = strprintf("%s chaincoin-wallet version", PACKAGE_NAME) + " " + FormatFullVersion() + "\n\n" +
-                                      "chaincoin-wallet is an offline tool for creating and interacting with Chaincoin wallet files.\n" +
-                                      "By default chaincoin-wallet will act on wallets in the default mainnet wallet directory in the datadir.\n" +
+                                      "chaincoin-wallet is an offline tool for creating and interacting with " PACKAGE_NAME " wallet files.\n" +
+                                      "By default bitcoin-wallet will act on wallets in the default mainnet wallet directory in the datadir.\n" +
                                       "To change the target wallet, use the -datadir, -wallet and -testnet/-regtest arguments.\n\n" +
                                       "Usage:\n" +
                                      "  chaincoin-wallet [options] <command>\n\n" +
