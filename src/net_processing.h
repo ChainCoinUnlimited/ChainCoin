@@ -7,10 +7,12 @@
 #define BITCOIN_NET_PROCESSING_H
 
 #include <interfaces/modules.h>
-#include <net.h>
-#include <validation.h>
 #include <consensus/params.h>
+#include <net.h>
 #include <sync.h>
+#include <validationinterface.h>
+
+class CTxMemPool;
 
 extern RecursiveMutex cs_main;
 
@@ -24,11 +26,12 @@ class PeerLogicValidation final : public CValidationInterface, public NetEventsI
 private:
     CConnman* const connman;
     BanMan* const m_banman;
+    CTxMemPool& m_mempool;
 
     bool CheckIfBanned(CNode* pnode) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
 public:
-    PeerLogicValidation(CConnman* connman, BanMan* banman, CScheduler& scheduler);
+    PeerLogicValidation(CConnman* connman, BanMan* banman, CScheduler& scheduler, CTxMemPool& pool);
 
     /**
      * Overridden from CValidationInterface.
