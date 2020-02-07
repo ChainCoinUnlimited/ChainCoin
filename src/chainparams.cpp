@@ -150,6 +150,7 @@ public:
         fRequireStandard = true;
         fAllowMultiplePorts = false;
         m_is_test_chain = false;
+        m_is_mockable_chain = false;
 
         nPoolMinInputs = 3;
         nPoolMaxInputs = 8;
@@ -262,6 +263,7 @@ public:
         fRequireStandard = false;
         fAllowMultiplePorts = true;
         m_is_test_chain = true;
+        m_is_mockable_chain = false;
 
         nPoolMinInputs = 3;
         nPoolMaxInputs = 8;
@@ -353,6 +355,7 @@ public:
         fRequireStandard = false;
         fAllowMultiplePorts = true;
         m_is_test_chain = true;
+        m_is_mockable_chain = true;
 
         nPoolMinInputs = 3;
         nPoolMaxInputs = 8;
