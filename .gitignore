@@ -89,7 +89,7 @@ src/qt/chaincoin-qt.includes
 *.qm
 Makefile
 !depends/Makefile
-chaincoin-qt
+src/qt/chaincoin-qt
 Chaincoin-Qt.app
 background.tiff*
 
