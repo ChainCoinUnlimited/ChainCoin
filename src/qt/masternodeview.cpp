@@ -406,7 +406,7 @@ void MasternodeList::ShowQRCode(const COutPoint& _outpoint) {
     strHTML += "<b>" + tr("Sentinel") +         ": </b>" + (toShow.sentinel > 0 ? GUIUtil::HtmlEscape(SafeIntVersionToString(toShow.sentinel)) : tr("unknown")) + "<br>";
     strHTML += "<b>" + tr("Status") +           ": </b>" + GUIUtil::HtmlEscape(toShow.status) + "<br>";
     strHTML += "<b>" + tr("Payee") +            ": </b>" + GUIUtil::HtmlEscape(toShow.payee) + "<br>";
-    strHTML += "<b>" + tr("Active") +           ": </b>" + GUIUtil::HtmlEscape(DurationToDHMS(toShow.active)) + "<br>";
+    strHTML += "<b>" + tr("Active") +           ": </b>" + GUIUtil::HtmlEscape(GUIUtil::formatNiceTimeOffset(toShow.active)) + "<br>";
     strHTML += "<b>" + tr("Last Seen") +        ": </b>" + (toShow.last_seen > 0 ? GUIUtil::HtmlEscape(QDateTime::fromTime_t(toShow.last_seen).toString(Qt::SystemLocaleLongDate)) : tr("unknown")) + "<br>";
     strHTML += "<b>" + tr("Last Paid") +        ": </b>" + (toShow.lastpaid > 0 ? GUIUtil::HtmlEscape(QDateTime::fromTime_t(toShow.lastpaid).toString(Qt::SystemLocaleLongDate)) : tr("unknown")) + "<br>";
     strHTML += "<b>" + tr("Ban Score") +        ": </b>" + QString::number(toShow.banscore) + "<br>";

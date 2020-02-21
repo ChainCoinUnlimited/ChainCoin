@@ -328,7 +328,7 @@ QVariant MasternodeTableModel::data(const QModelIndex &index, int role) const
         case Score:
             return int(rec->banscore);
         case Active:
-            return QString::fromStdString(DurationToDHMS(rec->active));
+            return GUIUtil::formatNiceTimeOffset(rec->active);
         case Last_Seen:
             if (rec->lastseen > 0)
                 return (QDateTime::fromTime_t(rec->lastseen)).date().toString(Qt::SystemLocaleLongDate);

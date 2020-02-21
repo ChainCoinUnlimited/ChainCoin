@@ -4420,13 +4420,12 @@ bool AutoBackupWallet (std::shared_ptr<CWallet> pwallet, const WalletLocation& l
     const fs::path& wallet_path = pwallet ? pwallet->GetLocation().GetPath() : location.GetPath();
 
     // Create backup of the ...
-    std::string dateTimeStr = DateTimeStrFormat(".%Y-%m-%d-%H-%M", GetTime());
     if (pwallet)
     {
         // ... opened wallet
         auto locked_chain = pwallet->chain().lock();
         LOCK(pwallet->cs_wallet);
-        fs::path backupFile = backupsDir / (pwallet->GetDisplayName() + dateTimeStr);
+        fs::path backupFile = backupsDir / (pwallet->GetDisplayName() + FormatISO8601DateTime(GetSystemTimeInSeconds()));
         if(!pwallet->BackupWallet(backupFile.string())) {
             warnings.push_back(strprintf(_("Failed to create backup %s!").translated, backupFile.string()));
             pwallet->WalletLogPrintf("%s\n", Join(warnings, "\n"));
@@ -4447,7 +4446,7 @@ bool AutoBackupWallet (std::shared_ptr<CWallet> pwallet, const WalletLocation& l
         std::string strWallet = location.GetName();
         if (strWallet == "") strWallet = "wallet.dat";
         fs::path sourceFile = location.GetPath() / "wallet.dat";
-        fs::path backupFile = backupsDir / (strWallet + dateTimeStr);
+        fs::path backupFile = backupsDir / (strWallet + FormatISO8601DateTime(GetSystemTimeInSeconds()));
         sourceFile.make_preferred();
         backupFile.make_preferred();
         if (fs::exists(backupFile))
