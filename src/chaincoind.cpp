@@ -30,7 +30,7 @@ static void WaitForShutdown(NodeContext& node)
 {
     while (!ShutdownRequested())
     {
-        MilliSleep(200);
+        UninterruptibleSleep(std::chrono::milliseconds{200});
     }
     Interrupt(node);
 }
