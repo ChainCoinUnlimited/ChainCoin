@@ -57,7 +57,7 @@ class BIP65Test(BitcoinTestFramework):
         super().__init__()
         self.num_nodes = 1
         self.extra_args = [[
-            '-whitelist=127.0.0.1',
+            '-whitelist=noban@127.0.0.1',
             '-par=1',  # Use only one script thread to get the exact reject reason for testing
             '-acceptnonstdtxn=1',  # cltv_invalidate is nonstandard
         ]]
