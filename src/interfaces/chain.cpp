@@ -169,28 +169,28 @@ public:
     }
     void TransactionAddedToMempool(const CTransactionRef& tx) override
     {
-        m_notifications->TransactionAddedToMempool(tx);
+        m_notifications->transactionAddedToMempool(tx);
     }
     void TransactionRemovedFromMempool(const CTransactionRef& tx) override
     {
-        m_notifications->TransactionRemovedFromMempool(tx);
+        m_notifications->transactionRemovedFromMempool(tx);
     }
     void BlockConnected(const std::shared_ptr<const CBlock>& block, const CBlockIndex* index) override
     {
-        m_notifications->BlockConnected(*block, index->nHeight);
+        m_notifications->blockConnected(*block, index->nHeight);
     }
     void BlockDisconnected(const std::shared_ptr<const CBlock>& block, const CBlockIndex* index) override
     {
-        m_notifications->BlockDisconnected(*block, index->nHeight);
+        m_notifications->blockDisconnected(*block, index->nHeight);
     }
     void UpdatedBlockTip(const CBlockIndex* index, const CBlockIndex* fork_index, bool is_ibd) override
     {
-        m_notifications->UpdatedBlockTip();
+        m_notifications->updatedBlockTip();
     }
-    void ChainStateFlushed(const CBlockLocator& locator) override { m_notifications->ChainStateFlushed(locator); }
+    void ChainStateFlushed(const CBlockLocator& locator) override { m_notifications->chainStateFlushed(locator); }
     void ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv) override
     {
-        m_notifications->ProcessModuleMessage(pfrom, dest, strCommand, vRecv);
+        m_notifications->processModuleMessage(pfrom, dest, strCommand, vRecv);
     }
     Chain& m_chain;
     Chain::Notifications* m_notifications;
@@ -373,7 +373,7 @@ public:
     {
         LOCK2(::cs_main, ::mempool.cs);
         for (const CTxMemPoolEntry& entry : ::mempool.mapTx) {
-            notifications.TransactionAddedToMempool(entry.GetSharedTx());
+            notifications.transactionAddedToMempool(entry.GetSharedTx());
         }
     }
     bool processCJRequest(const CService& addr, std::string sCommand, CAmount denom) override
