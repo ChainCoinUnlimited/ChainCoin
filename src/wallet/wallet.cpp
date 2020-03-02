@@ -4390,7 +4390,7 @@ void CWallet::postInitProcess()
     }
 }
 
-bool CWallet::BackupWallet(const std::string& strDest)
+bool CWallet::BackupWallet(const std::string& strDest) const
 {
     return database->Backup(strDest);
 }
