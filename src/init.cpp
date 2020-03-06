@@ -101,11 +101,10 @@ static const bool DEFAULT_PROXYRANDOMIZE = true;
 static const bool DEFAULT_REST_ENABLE = false;
 static const bool DEFAULT_STOPAFTERBLOCKIMPORT = false;
 
-// Dump addresses to banlist.dat every 15 minutes (900s)
-static constexpr int DUMP_BANS_INTERVAL = 60 * 15;
-// Clean coinjoin cache every 60 minutes (3600s)
-static constexpr int CJ_CLEAN_INTERVAL = 60 * 60;
-
+// How often to dump addresses to banlist.dat
+static constexpr std::chrono::minutes DUMP_BANS_INTERVAL{15};
+// How often to clean up the CoinJoin! cache
+static constexpr std::chrono::minutes CJ_CLEAN_INTERVAL{60};
 
 
 static ModuleInterface* pModuleNotificationInterface = nullptr;
@@ -1349,7 +1348,7 @@ bool AppInitMain(NodeContext& node)
     // Gather some entropy once per minute.
     node.scheduler->scheduleEvery([]{
         RandAddPeriodic();
-    }, 60000);
+    }, std::chrono::minutes{1});
 
     GetMainSignals().RegisterBackgroundSignalScheduler(*node.scheduler);
 
@@ -2048,11 +2047,11 @@ bool AppInitMain(NodeContext& node)
     BanMan* banman = node.banman.get();
     node.scheduler->scheduleEvery([banman]{
         banman->DumpBanlist();
-    }, DUMP_BANS_INTERVAL * 1000);
+    }, DUMP_BANS_INTERVAL);
 
     node.scheduler->scheduleEvery([]{
         g_analyzer->Flush();
-    }, CJ_CLEAN_INTERVAL * 1000);
+    }, CJ_CLEAN_INTERVAL);
 
     return true;
 }
