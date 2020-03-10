@@ -151,22 +151,12 @@ class LockImpl : public Chain::Lock, public UniqueLock<RecursiveMutex>
     using UniqueLock::UniqueLock;
 };
 
-class NotificationsHandlerImpl : public Handler, CValidationInterface
+class NotificationsProxy : public CValidationInterface
 {
 public:
-    explicit NotificationsHandlerImpl(Chain& chain, Chain::Notifications& notifications)
-        : m_chain(chain), m_notifications(&notifications)
-    {
-        RegisterValidationInterface(this);
-    }
-    ~NotificationsHandlerImpl() override { disconnect(); }
-    void disconnect() override
-    {
-        if (m_notifications) {
-            m_notifications = nullptr;
-            UnregisterValidationInterface(this);
-        }
-    }
+    explicit NotificationsProxy(std::shared_ptr<Chain::Notifications> notifications)
+        : m_notifications(std::move(notifications)) {}
+    virtual ~NotificationsProxy() = default;
     void TransactionAddedToMempool(const CTransactionRef& tx) override
     {
         m_notifications->transactionAddedToMempool(tx);
@@ -187,13 +177,34 @@ public:
     {
         m_notifications->updatedBlockTip();
     }
-    void ChainStateFlushed(const CBlockLocator& locator) override { m_notifications->chainStateFlushed(locator); }
+    void ChainStateFlushed(const CBlockLocator& locator) override
+    {
+        m_notifications->chainStateFlushed(locator);
+    }
     void ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv) override
     {
         m_notifications->processModuleMessage(pfrom, dest, strCommand, vRecv);
     }
-    Chain& m_chain;
-    Chain::Notifications* m_notifications;
+    std::shared_ptr<Chain::Notifications> m_notifications;
+};
+
+class NotificationsHandlerImpl : public Handler
+{
+public:
+    explicit NotificationsHandlerImpl(std::shared_ptr<Chain::Notifications> notifications)
+        : m_proxy(std::make_shared<NotificationsProxy>(std::move(notifications)))
+    {
+        RegisterSharedValidationInterface(m_proxy);
+    }
+    ~NotificationsHandlerImpl() override { disconnect(); }
+    void disconnect() override
+    {
+        if (m_proxy) {
+            UnregisterSharedValidationInterface(m_proxy);
+            m_proxy.reset();
+        }
+    }
+    std::shared_ptr<NotificationsProxy> m_proxy;
 };
 
 class RpcHandlerImpl : public Handler
@@ -349,9 +360,9 @@ public:
     {
         ::uiInterface.ShowProgress(title, progress, resume_possible);
     }
-    std::unique_ptr<Handler> handleNotifications(Notifications& notifications) override
+    std::unique_ptr<Handler> handleNotifications(std::shared_ptr<Notifications> notifications) override
     {
-        return MakeUnique<NotificationsHandlerImpl>(*this, notifications);
+        return MakeUnique<NotificationsHandlerImpl>(std::move(notifications));
     }
     void waitForNotificationsIfTipChanged(const uint256& old_tip) override
     {
