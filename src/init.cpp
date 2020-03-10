@@ -101,8 +101,6 @@ static const bool DEFAULT_PROXYRANDOMIZE = true;
 static const bool DEFAULT_REST_ENABLE = false;
 static const bool DEFAULT_STOPAFTERBLOCKIMPORT = false;
 
-// How often to dump addresses to banlist.dat
-static constexpr std::chrono::minutes DUMP_BANS_INTERVAL{15};
 // How often to clean up the CoinJoin! cache
 static constexpr std::chrono::minutes CJ_CLEAN_INTERVAL{60};
 
