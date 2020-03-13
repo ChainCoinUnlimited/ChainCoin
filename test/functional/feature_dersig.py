@@ -36,7 +36,6 @@ def unDERify(tx):
     tx.vin[0].scriptSig = CScript(newscript)
 
 
-
 class BIP66Test(BitcoinTestFramework):
 
     def __init__(self):
@@ -47,7 +46,7 @@ class BIP66Test(BitcoinTestFramework):
             '-par=1',  # Use only one script thread to get the exact log msg for testing
         ]]
         self.setup_clean_chain = True
-        self.rpc_timeout = 120
+        self.rpc_timeout = 240
 
     def skip_test_if_missing_module(self):
         self.skip_if_no_wallet()
