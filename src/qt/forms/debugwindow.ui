@@ -524,7 +524,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../chaincoin.qrc">
              <normaloff>:/icons/fontsmaller</normaloff>:/icons/fontsmaller</iconset>
            </property>
            <property name="iconSize">
@@ -556,7 +556,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../chaincoin.qrc">
              <normaloff>:/icons/fontbigger</normaloff>:/icons/fontbigger</iconset>
            </property>
            <property name="iconSize">
@@ -591,7 +591,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../chaincoin.qrc">
              <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
            </property>
            <property name="shortcut">
@@ -646,7 +646,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../chaincoin.qrc">
              <normaloff>:/icons/prompticon</normaloff>
              <disabledoff>:/icons/prompticon</disabledoff>:/icons/prompticon</iconset>
            </property>
@@ -666,11 +666,11 @@
          </item>
          <item>
           <widget class="QLineEdit" name="lineEdit">
-           <property name="placeholderText">
-            <string/>
-           </property>
            <property name="enabled">
             <bool>false</bool>
+           </property>
+           <property name="placeholderText">
+            <string/>
            </property>
           </widget>
          </item>
@@ -1089,7 +1089,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>300</width>
-                <height>472</height>
+                <height>496</height>
                </rect>
               </property>
               <property name="minimumSize">
@@ -1099,102 +1099,44 @@
                </size>
               </property>
               <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1">
-               <item row="18" column="1">
-                <widget class="QLabel" name="timeoffset">
-                 <property name="cursor">
-                  <cursorShape>IBeamCursor</cursorShape>
+               <item row="7" column="0">
+                <widget class="QLabel" name="label_29">
+                 <property name="text">
+                  <string>Starting Block</string>
                  </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_23">
+                 <property name="text">
+                  <string>Direction</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLabel" name="peerMasternode">
                  <property name="text">
                   <string>N/A</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::PlainText</enum>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="18" column="0">
-                <widget class="QLabel" name="label_timeoffset">
-                 <property name="text">
-                  <string>Time Offset</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="17" column="1">
-                <widget class="QLabel" name="peerMinPing">
-                 <property name="cursor">
-                  <cursorShape>IBeamCursor</cursorShape>
-                 </property>
-                 <property name="text">
-                  <string>N/A</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::PlainText</enum>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="16" column="1">
-                <widget class="QLabel" name="peerPingWait">
-                 <property name="cursor">
-                  <cursorShape>IBeamCursor</cursorShape>
-                 </property>
-                 <property name="text">
-                  <string>N/A</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::PlainText</enum>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="17" column="0">
-                <widget class="QLabel" name="peerMinPingLabel">
-                 <property name="text">
-                  <string>Min Ping</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="16" column="0">
-                <widget class="QLabel" name="peerPingWaitLabel">
-                 <property name="toolTip">
-                  <string>The duration of a currently outstanding ping.</string>
-                 </property>
-                 <property name="text">
-                  <string>Ping Wait</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="15" column="1">
-                <widget class="QLabel" name="peerPingTime">
-                 <property name="cursor">
-                  <cursorShape>IBeamCursor</cursorShape>
-                 </property>
-                 <property name="text">
-                  <string>N/A</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::PlainText</enum>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="15" column="0">
-                <widget class="QLabel" name="label_26">
-                 <property name="text">
-                  <string>Ping Time</string>
                  </property>
                 </widget>
                </item>
                <item row="14" column="1">
+                <widget class="QLabel" name="peerBytesSent">
+                 <property name="cursor">
+                  <cursorShape>IBeamCursor</cursorShape>
+                 </property>
+                 <property name="text">
+                  <string>N/A</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::PlainText</enum>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="15" column="1">
                 <widget class="QLabel" name="peerBytesRecv">
                  <property name="cursor">
                   <cursorShape>IBeamCursor</cursorShape>
@@ -1211,14 +1153,21 @@
                 </widget>
                </item>
                <item row="14" column="0">
-                <widget class="QLabel" name="label_20">
+                <widget class="QLabel" name="label_18">
                  <property name="text">
-                  <string>Received</string>
+                  <string>Sent</string>
                  </property>
                 </widget>
                </item>
-               <item row="13" column="1">
-                <widget class="QLabel" name="peerBytesSent">
+               <item row="10" column="0">
+                <widget class="QLabel" name="label_24">
+                 <property name="text">
+                  <string>Ban Score</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="peerDirection">
                  <property name="cursor">
                   <cursorShape>IBeamCursor</cursorShape>
                  </property>
@@ -1233,22 +1182,40 @@
                  </property>
                 </widget>
                </item>
-               <item row="12" column="0">
-                <widget class="QLabel" name="label_19">
+               <item row="10" column="1">
+                <widget class="QLabel" name="peerBanScore">
+                 <property name="cursor">
+                  <cursorShape>IBeamCursor</cursorShape>
+                 </property>
                  <property name="text">
-                  <string>Last Receive</string>
+                  <string>N/A</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::PlainText</enum>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
                  </property>
                 </widget>
                </item>
-               <item row="13" column="0">
-                <widget class="QLabel" name="label_18">
+               <item row="19" column="1">
+                <widget class="QLabel" name="timeoffset">
+                 <property name="cursor">
+                  <cursorShape>IBeamCursor</cursorShape>
+                 </property>
                  <property name="text">
-                  <string>Sent</string>
+                  <string>N/A</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::PlainText</enum>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
                  </property>
                 </widget>
                </item>
-               <item row="12" column="1">
-                <widget class="QLabel" name="peerLastRecv">
+               <item row="2" column="1">
+                <widget class="QLabel" name="peerVersion">
                  <property name="cursor">
                   <cursorShape>IBeamCursor</cursorShape>
                  </property>
@@ -1264,7 +1231,7 @@
                 </widget>
                </item>
                <item row="11" column="1">
-                <widget class="QLabel" name="peerLastSend">
+                <widget class="QLabel" name="peerConnTime">
                  <property name="cursor">
                   <cursorShape>IBeamCursor</cursorShape>
                  </property>
@@ -1279,10 +1246,70 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_30">
+               <item row="7" column="1">
+                <widget class="QLabel" name="peerHeight">
+                 <property name="cursor">
+                  <cursorShape>IBeamCursor</cursorShape>
+                 </property>
                  <property name="text">
-                  <string>Whitelisted</string>
+                  <string>N/A</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::PlainText</enum>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="11" column="0">
+                <widget class="QLabel" name="label_22">
+                 <property name="text">
+                  <string>Connection Time</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="12" column="0">
+                <widget class="QLabel" name="label_15">
+                 <property name="text">
+                  <string>Last Send</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="0">
+                <widget class="QLabel" name="label_27">
+                 <property name="text">
+                  <string>Synced Headers</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="17" column="1">
+                <widget class="QLabel" name="peerPingWait">
+                 <property name="cursor">
+                  <cursorShape>IBeamCursor</cursorShape>
+                 </property>
+                 <property name="text">
+                  <string>N/A</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::PlainText</enum>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="0">
+                <widget class="QLabel" name="label_25">
+                 <property name="text">
+                  <string>Synced Blocks</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Masternode</string>
                  </property>
                 </widget>
                </item>
@@ -1302,15 +1329,80 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_23">
+               <item row="19" column="0">
+                <widget class="QLabel" name="label_timeoffset">
                  <property name="text">
-                  <string>Direction</string>
+                  <string>Time Offset</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
-                <widget class="QLabel" name="peerDirection">
+               <item row="13" column="1">
+                <widget class="QLabel" name="peerLastRecv">
+                 <property name="cursor">
+                  <cursorShape>IBeamCursor</cursorShape>
+                 </property>
+                 <property name="text">
+                  <string>N/A</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::PlainText</enum>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="12" column="1">
+                <widget class="QLabel" name="peerLastSend">
+                 <property name="cursor">
+                  <cursorShape>IBeamCursor</cursorShape>
+                 </property>
+                 <property name="text">
+                  <string>N/A</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::PlainText</enum>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="17" column="0">
+                <widget class="QLabel" name="peerPingWaitLabel">
+                 <property name="toolTip">
+                  <string>The duration of a currently outstanding ping.</string>
+                 </property>
+                 <property name="text">
+                  <string>Ping Wait</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="13" column="0">
+                <widget class="QLabel" name="label_19">
+                 <property name="text">
+                  <string>Last Receive</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="18" column="1">
+                <widget class="QLabel" name="peerMinPing">
+                 <property name="cursor">
+                  <cursorShape>IBeamCursor</cursorShape>
+                 </property>
+                 <property name="text">
+                  <string>N/A</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::PlainText</enum>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="1">
+                <widget class="QLabel" name="peerCommonHeight">
                  <property name="cursor">
                   <cursorShape>IBeamCursor</cursorShape>
                  </property>
@@ -1332,8 +1424,8 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
-                <widget class="QLabel" name="peerVersion">
+               <item row="16" column="1">
+                <widget class="QLabel" name="peerPingTime">
                  <property name="cursor">
                   <cursorShape>IBeamCursor</cursorShape>
                  </property>
@@ -1345,13 +1437,6 @@
                  </property>
                  <property name="textInteractionFlags">
                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_28">
-                 <property name="text">
-                  <string>User Agent</string>
                  </property>
                 </widget>
                </item>
@@ -1371,14 +1456,35 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="0">
-                <widget class="QLabel" name="label_4">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_30">
                  <property name="text">
-                  <string>Services</string>
+                  <string>Whitelisted</string>
                  </property>
                 </widget>
                </item>
-               <item row="5" column="1">
+               <item row="16" column="0">
+                <widget class="QLabel" name="label_26">
+                 <property name="text">
+                  <string>Ping Time</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_28">
+                 <property name="text">
+                  <string>User Agent</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="15" column="0">
+                <widget class="QLabel" name="label_20">
+                 <property name="text">
+                  <string>Received</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="1">
                 <widget class="QLabel" name="peerServices">
                  <property name="cursor">
                   <cursorShape>IBeamCursor</cursorShape>
@@ -1395,36 +1501,20 @@
                 </widget>
                </item>
                <item row="6" column="0">
-                <widget class="QLabel" name="label_29">
+                <widget class="QLabel" name="label_4">
                  <property name="text">
-                  <string>Starting Block</string>
+                  <string>Services</string>
                  </property>
                 </widget>
                </item>
-               <item row="6" column="1">
-                <widget class="QLabel" name="peerHeight">
-                 <property name="cursor">
-                  <cursorShape>IBeamCursor</cursorShape>
-                 </property>
+               <item row="18" column="0">
+                <widget class="QLabel" name="peerMinPingLabel">
                  <property name="text">
-                  <string>N/A</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::PlainText</enum>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  <string>Min Ping</string>
                  </property>
                 </widget>
                </item>
-               <item row="7" column="0">
-                <widget class="QLabel" name="label_27">
-                 <property name="text">
-                  <string>Synced Headers</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="7" column="1">
+               <item row="8" column="1">
                 <widget class="QLabel" name="peerSyncHeight">
                  <property name="cursor">
                   <cursorShape>IBeamCursor</cursorShape>
@@ -1440,91 +1530,15 @@
                  </property>
                 </widget>
                </item>
-               <item row="8" column="0">
-                <widget class="QLabel" name="label_25">
+               <item row="5" column="0">
+                <widget class="QLabel" name="label_5">
                  <property name="text">
-                  <string>Synced Blocks</string>
+                  <string>Mapped AS</string>
                  </property>
                 </widget>
                </item>
-               <item row="8" column="1">
-                <widget class="QLabel" name="peerCommonHeight">
-                 <property name="cursor">
-                  <cursorShape>IBeamCursor</cursorShape>
-                 </property>
-                 <property name="text">
-                  <string>N/A</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::PlainText</enum>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="9" column="0">
-                <widget class="QLabel" name="label_24">
-                 <property name="text">
-                  <string>Ban Score</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="9" column="1">
-                <widget class="QLabel" name="peerBanScore">
-                 <property name="cursor">
-                  <cursorShape>IBeamCursor</cursorShape>
-                 </property>
-                 <property name="text">
-                  <string>N/A</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::PlainText</enum>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="10" column="0">
-                <widget class="QLabel" name="label_22">
-                 <property name="text">
-                  <string>Connection Time</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="10" column="1">
-                <widget class="QLabel" name="peerConnTime">
-                 <property name="cursor">
-                  <cursorShape>IBeamCursor</cursorShape>
-                 </property>
-                 <property name="text">
-                  <string>N/A</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::PlainText</enum>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="11" column="0">
-                <widget class="QLabel" name="label_15">
-                 <property name="text">
-                  <string>Last Send</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>Masternode</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QLabel" name="peerMasternode">
+               <item row="5" column="1">
+                <widget class="QLabel" name="peerMappedAS">
                  <property name="text">
                   <string>N/A</string>
                  </property>
@@ -1555,6 +1569,8 @@
    </slots>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../chaincoin.qrc"/>
+ </resources>
  <connections/>
 </ui>
