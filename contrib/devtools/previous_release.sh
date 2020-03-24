@@ -139,7 +139,10 @@ pushd "$TARGET" || exit 1
         fi
         URL="https://chaincoin.org/$BIN_PATH/chaincoin-${tag:1}-$PLATFORM.tar.gz"
         echo "Fetching: $URL"
-        curl -O $URL
+        if ! curl -O -f $URL; then
+            echo "Download failed."
+            exit 1
+        fi
         tar -zxf "chaincoin-${tag:1}-$PLATFORM.tar.gz" -C "$tag" --strip-components=1 "chaincoin-${tag:1}"
         rm "chaincoin-${tag:1}-$PLATFORM.tar.gz"
       fi
