@@ -519,6 +519,7 @@ private:
     std::atomic<int64_t> m_next_send_inv_to_incoming{0};
 
     friend struct CConnmanTest;
+    friend struct ConnmanTestMsg;
 };
 void Discover();
 void StartMapPort();
@@ -759,6 +760,8 @@ public:
 class CNode
 {
     friend class CConnman;
+    friend struct ConnmanTestMsg;
+
 public:
     std::unique_ptr<TransportDeserializer> m_deserializer;
     std::unique_ptr<TransportSerializer> m_serializer;
