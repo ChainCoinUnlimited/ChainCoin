@@ -180,11 +180,7 @@ protected:
 
     virtual void NotifyGovernanceVote(const CGovernanceVote &vote) {}
     virtual void NotifyGovernanceObject(const CGovernanceObject &object) {}
-    friend void ::RegisterSharedValidationInterface(std::shared_ptr<CValidationInterface>);
-    friend void ::UnregisterValidationInterface(CValidationInterface*);
-    friend void ::UnregisterAllValidationInterfaces();
-
-public:
+    friend class CMainSignals;
 };
 
 struct MainSignalsInstance;
