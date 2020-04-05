@@ -2031,9 +2031,9 @@ void static ProcessOrphanTx(CConnman* connman, CTxMemPool& mempool, std::set<uin
     }
 }
 
-bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams, CTxMemPool& mempool, CConnman* connman, BanMan* banman, const std::atomic<bool>& interruptMsgProc)
+bool ProcessMessage(CNode* pfrom, const std::string& msg_type, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams, CTxMemPool& mempool, CConnman* connman, BanMan* banman, const std::atomic<bool>& interruptMsgProc)
 {
-    LogPrint(BCLog::NET, "received: %s (%u bytes) peer=%d\n", SanitizeString(strCommand), vRecv.size(), pfrom->GetId());
+    LogPrint(BCLog::NET, "received: %s (%u bytes) peer=%d\n", SanitizeString(msg_type), vRecv.size(), pfrom->GetId());
     if (gArgs.IsArgSet("-dropmessagestest") && GetRand(gArgs.GetArg("-dropmessagestest", 0)) == 0)
     {
         LogPrintf("dropmessagestest DROPPING RECV MESSAGE\n");
@@ -2042,8 +2042,8 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
 
 
     if (!(pfrom->GetLocalServices() & NODE_BLOOM) &&
-              (strCommand == NetMsgType::FILTERLOAD ||
-               strCommand == NetMsgType::FILTERADD))
+              (msg_type == NetMsgType::FILTERLOAD ||
+               msg_type == NetMsgType::FILTERADD))
     {
         if (pfrom->nVersion >= NO_BLOOM_VERSION) {
             LOCK(cs_main);
@@ -2055,7 +2055,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         }
     }
 
-    if (strCommand == NetMsgType::VERSION) {
+    if (msg_type == NetMsgType::VERSION) {
         // Each connection can only send one version message
         if (pfrom->nVersion != 0)
         {
@@ -2227,7 +2227,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
     // At this point, the outgoing message serialization version can't change.
     CNetMsgMaker msgMaker(pfrom->GetSendVersion());
 
-    if (strCommand == NetMsgType::VERACK)
+    if (msg_type == NetMsgType::VERACK)
     {
         pfrom->SetRecvVersion(std::min(pfrom->nVersion.load(), PROTOCOL_VERSION));
 
@@ -2272,7 +2272,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return false;
     }
 
-    if (strCommand == NetMsgType::ADDR) {
+    if (msg_type == NetMsgType::ADDR) {
         std::vector<CAddress> vAddr;
         vRecv >> vAddr;
 
@@ -2326,13 +2326,13 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::SENDHEADERS) {
+    if (msg_type == NetMsgType::SENDHEADERS) {
         LOCK(cs_main);
         State(pfrom->GetId())->fPreferHeaders = true;
         return true;
     }
 
-    if (strCommand == NetMsgType::SENDCMPCT) {
+    if (msg_type == NetMsgType::SENDCMPCT) {
         bool fAnnounceUsingCMPCTBLOCK = false;
         uint64_t nCMPCTBLOCKVersion = 0;
         vRecv >> fAnnounceUsingCMPCTBLOCK >> nCMPCTBLOCKVersion;
@@ -2355,7 +2355,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::INV) {
+    if (msg_type == NetMsgType::INV) {
         std::vector<CInv> vInv;
         vRecv >> vInv;
         if (vInv.size() > MAX_INV_SZ)
@@ -2417,7 +2417,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::GETDATA) {
+    if (msg_type == NetMsgType::GETDATA) {
         std::vector<CInv> vInv;
         vRecv >> vInv;
         if (vInv.size() > MAX_INV_SZ)
@@ -2438,7 +2438,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::GETBLOCKS) {
+    if (msg_type == NetMsgType::GETBLOCKS) {
         CBlockLocator locator;
         uint256 hashStop;
         vRecv >> locator >> hashStop;
@@ -2506,7 +2506,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::GETBLOCKTXN) {
+    if (msg_type == NetMsgType::GETBLOCKTXN) {
         BlockTransactionsRequest req;
         vRecv >> req;
 
@@ -2555,7 +2555,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::GETHEADERS) {
+    if (msg_type == NetMsgType::GETHEADERS) {
         CBlockLocator locator;
         uint256 hashStop;
         vRecv >> locator >> hashStop;
@@ -2622,7 +2622,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::TX) {
+    if (msg_type == NetMsgType::TX) {
         // Stop processing the transaction early if
         // We are in blocks only mode and peer is either not whitelisted or whitelistrelay is off
         // or if this peer is supposed to be a block-relay-only peer
@@ -2767,7 +2767,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::MNANNOUNCE)
+    if (msg_type == NetMsgType::MNANNOUNCE)
     {
         if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
@@ -2779,8 +2779,8 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
             CInv inv(MSG_MASTERNODE_ANNOUNCE, mnb.GetHash());
             pfrom->AddInventoryKnown(inv);
 
-            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_MN_MAN, strCommand, vRecv);
-            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(strCommand), pfrom->GetId());
+            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_MN_MAN, msg_type, vRecv);
+            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(msg_type), pfrom->GetId());
 
             CNodeState* nodestate = State(pfrom->GetId());
 
@@ -2791,7 +2791,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         }
     }
 
-    if (strCommand == NetMsgType::MNPING)
+    if (msg_type == NetMsgType::MNPING)
     {
         if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
@@ -2803,8 +2803,8 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
             CInv inv(MSG_MASTERNODE_PING, mnp.GetHash());
             pfrom->AddInventoryKnown(inv);
 
-            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_MN_MAN, strCommand, vRecv);
-            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(strCommand), pfrom->GetId());
+            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_MN_MAN, msg_type, vRecv);
+            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(msg_type), pfrom->GetId());
 
             CNodeState* nodestate = State(pfrom->GetId());
 
@@ -2815,7 +2815,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         }
     }
 
-    if (strCommand == NetMsgType::MNVERIFY)
+    if (msg_type == NetMsgType::MNVERIFY)
     {
         if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
@@ -2827,8 +2827,8 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
             CInv inv(MSG_MASTERNODE_VERIFY, mnv.GetHash());
             pfrom->AddInventoryKnown(inv);
 
-            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_MN_MAN, strCommand, vRecv);
-            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(strCommand), pfrom->GetId());
+            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_MN_MAN, msg_type, vRecv);
+            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(msg_type), pfrom->GetId());
 
             CNodeState* nodestate = State(pfrom->GetId());
 
@@ -2839,7 +2839,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         }
     }
 
-    if (strCommand == NetMsgType::MASTERNODEPAYMENTVOTE)
+    if (msg_type == NetMsgType::MASTERNODEPAYMENTVOTE)
     {
         if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
@@ -2851,8 +2851,8 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
             CInv inv(MSG_MASTERNODE_PAYMENT_VOTE, mnv.GetHash());
             pfrom->AddInventoryKnown(inv);
 
-            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_MN_PAY, strCommand, vRecv);
-            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(strCommand), pfrom->GetId());
+            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_MN_PAY, msg_type, vRecv);
+            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(msg_type), pfrom->GetId());
 
             CNodeState* nodestate = State(pfrom->GetId());
 
@@ -2863,7 +2863,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         }
     }
 
-    if (strCommand == NetMsgType::MNGOVERNANCEOBJECT)
+    if (msg_type == NetMsgType::MNGOVERNANCEOBJECT)
     {
         if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
@@ -2875,8 +2875,8 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
             CInv inv(MSG_GOVERNANCE_OBJECT, govobj.GetHash());
             pfrom->AddInventoryKnown(inv);
 
-            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_FUND, strCommand, vRecv);
-            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(strCommand), pfrom->GetId());
+            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_FUND, msg_type, vRecv);
+            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(msg_type), pfrom->GetId());
 
             CNodeState* nodestate = State(pfrom->GetId());
 
@@ -2887,7 +2887,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         }
     }
 
-    if (strCommand == NetMsgType::MNGOVERNANCEOBJECTVOTE)
+    if (msg_type == NetMsgType::MNGOVERNANCEOBJECTVOTE)
     {
         if (fReindex || fImporting || ::ChainstateActive().IsInitialBlockDownload()) return true;
         {
@@ -2899,8 +2899,8 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
             CInv inv(MSG_GOVERNANCE_OBJECT_VOTE, vote.GetHash());
             pfrom->AddInventoryKnown(inv);
 
-            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_FUND, strCommand, vRecv);
-            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(strCommand), pfrom->GetId());
+            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_FUND, msg_type, vRecv);
+            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(msg_type), pfrom->GetId());
 
             CNodeState* nodestate = State(pfrom->GetId());
 
@@ -2911,7 +2911,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         }
     }
 
-    if (strCommand == NetMsgType::CMPCTBLOCK)
+    if (msg_type == NetMsgType::CMPCTBLOCK)
     {
         // Ignore cmpctblock received while importing
         if (fImporting || fReindex) {
@@ -3133,7 +3133,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::BLOCKTXN)
+    if (msg_type == NetMsgType::BLOCKTXN)
     {
         // Ignore blocktxn received while importing
         if (fImporting || fReindex) {
@@ -3215,7 +3215,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::HEADERS)
+    if (msg_type == NetMsgType::HEADERS)
     {
         // Ignore headers received while importing
         if (fImporting || fReindex) {
@@ -3241,7 +3241,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return ProcessHeadersMessage(pfrom, connman, mempool, headers, chainparams, /*via_compact_block=*/false);
     }
 
-    if (strCommand == NetMsgType::BLOCK)
+    if (msg_type == NetMsgType::BLOCK)
     {
         // Ignore block received while importing
         if (fImporting || fReindex) {
@@ -3277,7 +3277,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::GETADDR) {
+    if (msg_type == NetMsgType::GETADDR) {
         // This asymmetric behavior for inbound and outbound connections was introduced
         // to prevent a fingerprinting attack: an attacker can send specific fake addresses
         // to users' AddrMan and later request them by sending getaddr messages.
@@ -3311,7 +3311,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::MEMPOOL) {
+    if (msg_type == NetMsgType::MEMPOOL) {
         if (!(pfrom->GetLocalServices() & NODE_BLOOM) && !pfrom->HasPermission(PF_MEMPOOL))
         {
             if (!pfrom->HasPermission(PF_NOBAN))
@@ -3339,7 +3339,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::PING) {
+    if (msg_type == NetMsgType::PING) {
         if (pfrom->nVersion > BIP0031_VERSION)
         {
             uint64_t nonce = 0;
@@ -3360,7 +3360,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::PONG) {
+    if (msg_type == NetMsgType::PONG) {
         int64_t pingUsecEnd = nTimeReceived;
         uint64_t nonce = 0;
         size_t nAvail = vRecv.in_avail();
@@ -3416,7 +3416,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::FILTERLOAD) {
+    if (msg_type == NetMsgType::FILTERLOAD) {
         CBloomFilter filter;
         vRecv >> filter;
 
@@ -3436,7 +3436,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::FILTERADD) {
+    if (msg_type == NetMsgType::FILTERADD) {
         std::vector<unsigned char> vData;
         vRecv >> vData;
 
@@ -3460,7 +3460,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::FILTERCLEAR) {
+    if (msg_type == NetMsgType::FILTERCLEAR) {
         if (pfrom->m_tx_relay == nullptr) {
             return true;
         }
@@ -3472,7 +3472,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::FEEFILTER) {
+    if (msg_type == NetMsgType::FEEFILTER) {
         CAmount newFeeFilter = 0;
         vRecv >> newFeeFilter;
         if (MoneyRange(newFeeFilter)) {
@@ -3485,7 +3485,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
         return true;
     }
 
-    if (strCommand == NetMsgType::NOTFOUND) {
+    if (msg_type == NetMsgType::NOTFOUND) {
         // Remove the NOTFOUND transactions from the peer
         LOCK(cs_main);
         CNodeState *state = State(pfrom->GetId());
@@ -3512,16 +3512,16 @@ bool ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vR
 
     const std::vector<std::string> &allMessages = getAllNetMessageTypes();
     for (const auto& msg : allMessages) {
-        if(msg == strCommand) {
+        if(msg == msg_type) {
             //probably for one of the modules
-            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_ALL, strCommand, vRecv);
-            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(strCommand), pfrom->GetId());
+            GetMainSignals().ProcessModuleMessage(pfrom, NetMsgDest::MSG_ALL, msg_type, vRecv);
+            LogPrint(BCLog::NET, "Forwarded message \"%s\" from peer=%d to Chaincoin modules\n", SanitizeString(msg_type), pfrom->GetId());
             break;
         }
     }
 
     // Ignore unknown commands for extensibility
-    LogPrint(BCLog::NET, "Unknown command \"%s\" from peer=%d\n", SanitizeString(strCommand), pfrom->GetId());
+    LogPrint(BCLog::NET, "Unknown command \"%s\" from peer=%d\n", SanitizeString(msg_type), pfrom->GetId());
     return true;
 }
 
@@ -3616,7 +3616,7 @@ bool PeerLogicValidation::ProcessMessages(CNode* pfrom, std::atomic<bool>& inter
         LogPrint(BCLog::NET, "PROCESSMESSAGE: ERRORS IN HEADER %s peer=%d\n", SanitizeString(msg.m_command), pfrom->GetId());
         return fMoreWork;
     }
-    const std::string& strCommand = msg.m_command;
+    const std::string& msg_type = msg.m_command;
 
     // Message size
     unsigned int nMessageSize = msg.m_message_size;
@@ -3626,7 +3626,7 @@ bool PeerLogicValidation::ProcessMessages(CNode* pfrom, std::atomic<bool>& inter
     if (!msg.m_valid_checksum)
     {
         LogPrint(BCLog::NET, "%s(%s, %u bytes): CHECKSUM ERROR peer=%d\n", __func__,
-           SanitizeString(strCommand), nMessageSize, pfrom->GetId());
+           SanitizeString(msg_type), nMessageSize, pfrom->GetId());
         return fMoreWork;
     }
 
@@ -3634,19 +3634,19 @@ bool PeerLogicValidation::ProcessMessages(CNode* pfrom, std::atomic<bool>& inter
     bool fRet = false;
     try
     {
-        fRet = ProcessMessage(pfrom, strCommand, vRecv, msg.m_time, chainparams, m_mempool, connman, m_banman, interruptMsgProc);
+        fRet = ProcessMessage(pfrom, msg_type, vRecv, msg.m_time, chainparams, m_mempool, connman, m_banman, interruptMsgProc);
         if (interruptMsgProc)
             return false;
         if (!pfrom->vRecvGetData.empty())
             fMoreWork = true;
     } catch (const std::exception& e) {
-        LogPrint(BCLog::NET, "%s(%s, %u bytes): Exception '%s' (%s) caught\n", __func__, SanitizeString(strCommand), nMessageSize, e.what(), typeid(e).name());
+        LogPrint(BCLog::NET, "%s(%s, %u bytes): Exception '%s' (%s) caught\n", __func__, SanitizeString(msg_type), nMessageSize, e.what(), typeid(e).name());
     } catch (...) {
-        LogPrint(BCLog::NET, "%s(%s, %u bytes): Unknown exception caught\n", __func__, SanitizeString(strCommand), nMessageSize);
+        LogPrint(BCLog::NET, "%s(%s, %u bytes): Unknown exception caught\n", __func__, SanitizeString(msg_type), nMessageSize);
     }
 
     if (!fRet) {
-        LogPrint(BCLog::NET, "%s(%s, %u bytes) FAILED peer=%d\n", __func__, SanitizeString(strCommand), nMessageSize, pfrom->GetId());
+        LogPrint(BCLog::NET, "%s(%s, %u bytes) FAILED peer=%d\n", __func__, SanitizeString(msg_type), nMessageSize, pfrom->GetId());
     }
 
     LOCK(cs_main);
