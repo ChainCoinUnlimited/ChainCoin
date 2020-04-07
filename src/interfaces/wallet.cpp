@@ -523,6 +523,11 @@ public:
         return AutoBackupWallet(pwallet, WalletLocation(), warnings, strBackupError);
     }
 
+    int getWalletBackups() override
+    {
+        return nWalletBackups;
+    }
+
     CAmount getDefaultMaxTxFee() override { return m_wallet->m_default_max_tx_fee; }
 
     void remove() override

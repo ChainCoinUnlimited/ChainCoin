@@ -95,15 +95,8 @@ SendCoinsDialog::SendCoinsDialog(const PlatformStyle *_platformStyle, QWidget *p
         settings.setValue("bCoinJoinLevel", 0);
 
     int nUseCoinJoin = settings.value("bCoinJoinLevel").toInt();
-    if(fLiteMode) {
-        ui->spinCoinJoinLevel->setValue(0);
-        ui->spinCoinJoinLevel->setVisible(false);
-        CoinControlDialog::coinControl()->fUseCoinJoin = false;
-    }
-    else{
-        ui->spinCoinJoinLevel->setValue(nUseCoinJoin);
-        CoinControlDialog::coinControl()->fUseCoinJoin = nUseCoinJoin ? true : false;
-    }
+    ui->spinCoinJoinLevel->setValue(nUseCoinJoin);
+    CoinControlDialog::coinControl()->fUseCoinJoin = nUseCoinJoin ? true : false;
 
     connect(ui->spinCoinJoinLevel, QOverload<const QString &>::of(&QSpinBox::valueChanged), this, &SendCoinsDialog::updateDisplayUnit);
 

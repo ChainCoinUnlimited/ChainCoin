@@ -74,14 +74,6 @@ const int64_t nStartupTime = GetTime();
 //Chaincoin only features
 bool fMasternodeMode = false;
 bool fLiteMode = false;
-/**
-    nWalletBackups:
-        1..10   - number of automatic backups to keep
-        0       - disabled by command-line
-        -1      - disabled because of some error during run-time
-        -2      - disabled because wallet was locked and we were not able to replenish keypool
-*/
-int nWalletBackups = 10;
 
 const char * const CHAINCOIN_CONF_FILENAME = "chaincoin.conf";
 const char * const MASTERNODE_CONF_FILENAME = "masternode.conf";

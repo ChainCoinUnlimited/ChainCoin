@@ -287,6 +287,9 @@ public:
     //! Return result of automatic wallet backup.
     virtual bool DoAutoBackup(std::string walletIn, std::vector<std::string>& warnings, std::string& strBackupError) = 0;
 
+    //! Return number of wallet backups
+    virtual int getWalletBackups() = 0;
+
     //! Get max tx fee.
     virtual CAmount getDefaultMaxTxFee() = 0;
 

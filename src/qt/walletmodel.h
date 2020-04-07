@@ -210,6 +210,7 @@ public:
     void resetPool() { m_wallet->resetPool(); }
     void unlockCoins() { m_wallet->disableAutoBackup(); }
     void toggleMixing(const bool& fOff = false) { m_wallet->toggleMixing(fOff); }
+    int getWalletBackups() { return m_wallet->getWalletBackups(); }
 
     interfaces::Node& node() const { return m_node; }
     interfaces::Wallet& wallet() const { return *m_wallet; }
