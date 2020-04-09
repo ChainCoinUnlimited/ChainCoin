@@ -15,7 +15,7 @@ class CMasternodeBroadcast;
 class CConnman;
 struct NodeContext;
 
-extern NodeContext* g_m_node;
+extern NodeContext* g_module_node;
 
 static const int MASTERNODE_CHECK_SECONDS               =  10;
 static const int MASTERNODE_MIN_MNB_SECONDS             =   5 * 60;
@@ -416,11 +416,7 @@ public:
         return ss.GetHash();
     }
 
-    void Relay() const
-    {
-        CInv inv(MSG_MASTERNODE_VERIFY, GetHash());
-        g_connman->RelayInv(inv);
-    }
+    void Relay() const;
 };
 
 #endif

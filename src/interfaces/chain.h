@@ -5,10 +5,12 @@
 #ifndef BITCOIN_INTERFACES_CHAIN_H
 #define BITCOIN_INTERFACES_CHAIN_H
 
-#include <script/standard.h>           // For CTxDestination
+#include <modules/coinjoin/coinjoin.h>
 #include <optional.h>
 #include <optional.h>               // For Optional and nullopt
 #include <primitives/transaction.h> // For CTransactionRef
+#include <psbt.h>
+#include <script/standard.h>           // For CTxDestination
 
 #include <memory>
 #include <stddef.h>
@@ -274,8 +276,20 @@ public:
     //! removed transactions and already added new transactions.
     virtual void requestMempoolTransactions(Notifications& notifications) = 0;
 
+    //! Process pending CoinJoin! request
+    virtual bool processCJRequest(const CService& addr, std::string sCommand, CAmount denom) = 0;
+
+    //! Send PSBT inputs
+    virtual bool pushCJEntry(masternode_info_t mn, std::string sCommand, CCoinJoinEntry entry) = 0;
+
+    //! Forward PSBT
+    virtual bool pushPSBT(CNode* pnode, std::string sCommand, PartiallySignedTransaction& tx) = 0;
+
     //! Find a Masternode by outpoint
     virtual void askForMN(CNode* pnode, const COutPoint& outpoint) = 0;
+
+    //! Add Masternode connection
+    virtual bool addMasternode(masternode_info_t mn) = 0;
 
     //! Recursively calculate the depth of obscuring a single outpoint.
     virtual int analyzeCoin(const COutPoint& outpoint) = 0;
@@ -311,7 +325,6 @@ public:
 
     //! Return MN mixing state */
     virtual void getMixingMasternodesInfo(std::vector<masternode_info_t>& vecMnInfoRet) = 0;
-
 };
 
 //! Return implementation of Chain interface.

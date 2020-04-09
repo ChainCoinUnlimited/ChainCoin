@@ -124,8 +124,6 @@ private:
     /// As a client, check and sign the final transaction
     bool SignFinalTransaction(PartiallySignedTransaction& finalTransactionNew, CNode* pnode);
 
-    void RelayIn(const CCoinJoinEntry& entry);
-
     void UnlockCoins();
 
 public:
@@ -156,7 +154,7 @@ public:
     /// As a client, submit part of a future mixing transaction to a Masternode to start the process
     bool SendDenominate();
 
-    bool ProcessPendingCJaRequest(CConnman* connman);
+    bool ProcessPendingCJaRequest();
 
     void SetError() { nState = POOL_STATE_ERROR; }
 

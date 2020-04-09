@@ -199,7 +199,7 @@ public:
     /// Check if we have a valid Masternode address
     bool CheckSignature(const CPubKey& pubKeyMasternode) const;
 
-    bool Relay(CConnman* connman);
+    bool Relay();
     bool Push(const CService pto, CConnman* connman);
 
     /// Is this queue expired?

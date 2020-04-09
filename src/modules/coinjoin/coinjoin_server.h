@@ -41,7 +41,7 @@ private:
     void CreateFinalTransaction(CConnman* connman);
     void CommitFinalTransaction(CConnman* connman);
 
-    bool CreateNewSession(const CAmount& nDenom, PoolMessage &nMessageIDRet, CConnman* connman);
+    bool CreateNewSession(const CAmount& nDenom, PoolMessage &nMessageIDRet);
     bool AddUserToExistingSession(const CAmount& nDenom, PoolMessage &nMessageIDRet);
     /// Do we have enough users to take entries?
     bool IsSessionReady() { return vecDenom.size() >= CCoinJoin::GetMinPoolInputs(); }

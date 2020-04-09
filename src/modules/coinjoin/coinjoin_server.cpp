@@ -11,6 +11,7 @@
 #include <modules/masternode/masternode_man.h>
 #include <modules/masternode/masternode_payments.h>
 #include <netmessagemaker.h>
+#include <node/context.h>
 #include <scheduler.h>
 #include <script/interpreter.h>
 #include <shutdown.h>
@@ -67,7 +68,7 @@ void CCoinJoinServer::ProcessModuleMessage(CNode* pfrom, const std::string& strC
 
         PoolMessage nMessageID = MSG_NOERR;
 
-        bool fResult = nSessionID == 0  ? CreateNewSession(nDenom, nMessageID, connman)
+        bool fResult = nSessionID == 0  ? CreateNewSession(nDenom, nMessageID)
                                         : AddUserToExistingSession(nDenom, nMessageID);
         if (fResult) {
             LogPrintf("CJACCEPT -- is compatible, please submit!\n");
@@ -117,7 +118,7 @@ void CCoinJoinServer::ProcessModuleMessage(CNode* pfrom, const std::string& strC
         if (queue.status <= STATUS_OPEN) {
             LogPrint(BCLog::CJOIN, "CJQUEUE -- new CoinJoin queue (%s) from masternode %s\n", queue.ToString(), infoMn.addr.ToString());
             vecCoinJoinQueue.push_back(queue);
-            queue.Relay(connman);
+            queue.Relay();
         }
 
     } else if (strCommand == NetMsgType::CJTXIN) {
@@ -229,14 +230,13 @@ void CCoinJoinServer::UpdateQueue(PoolStatusUpdate update)
     if (activeQueue.IsExpired(nCachedBlockHeight)) return;
     if (activeQueue.status != update) {
         LogPrint(BCLog::CJOIN, "CCoinJoinServer::UpdateQueue -- %s: %s new: %d\n", update == STATUS_CLOSED ? strprintf("closing") : strprintf("updating"), activeQueue.ToString(), update);
-        CConnman* connman = g_connman.get();
         activeQueue.nHeight = nCachedBlockHeight;
         activeQueue.status = update;
         activeQueue.Sign();
         if (update > 1) {
             // status updates should be relayed to mixing participants only
             for (std::vector<std::pair<CService, CAmount> >::iterator it = vecDenom.begin(); it != vecDenom.end(); ++it) {
-                if (!activeQueue.Push(it->first, connman)) {
+                if (!activeQueue.Push(it->first, g_module_node->connman.get())) {
                     // no such node? maybe this client disconnected or our own connection went down
                     LogPrintf("CCoinJoinServer::%s -- client(s) disconnected, removing entry: %s nSessionID: %d  nSessionDenom: %d (%s, size: %d)\n",
                               __func__, it->first.ToStringIPPort(), nSessionID, nSessionDenom, CCoinJoin::GetDenominationsToString(nSessionDenom), vecDenom.size());
@@ -248,7 +248,7 @@ void CCoinJoinServer::UpdateQueue(PoolStatusUpdate update)
                 // do not ban anyone, just reset the pool
                 SetNull();
             }
-        } else activeQueue.Relay(connman);
+        } else activeQueue.Relay();
     }
 }
 
@@ -572,7 +572,7 @@ bool CCoinJoinServer::IsCompatibleTxOut(const CMutableTransaction mtx, CAmount& 
     return true;
 }
 
-bool CCoinJoinServer::CreateNewSession(const CAmount& nDenom, PoolMessage& nMessageIDRet, CConnman* connman)
+bool CCoinJoinServer::CreateNewSession(const CAmount& nDenom, PoolMessage& nMessageIDRet)
 {
     if (!fMasternodeMode || nSessionID != 0) return false;
 
@@ -606,7 +606,7 @@ bool CCoinJoinServer::CreateNewSession(const CAmount& nDenom, PoolMessage& nMess
         activeQueue = queue;
         LOCK(cs_vecqueue);
         vecCoinJoinQueue.push_back(queue);
-        queue.Relay(connman);
+        queue.Relay();
     }
 
     LogPrintf("CCoinJoinServer::CreateNewSession -- new session created, nSessionID: %d  nSessionDenom: %d (%s)  vecDenom.size(): %d\n",
@@ -753,6 +753,6 @@ void CCoinJoinServer::UpdatedBlockTip(const CBlockIndex *pindexNew) {
         return;
 
     if (GetState() == POOL_STATE_QUEUE) CheckForCompleteQueue();
-    if (GetState() == POOL_STATE_ACCEPTING_ENTRIES) CheckPool(g_connman.get());
+    if (GetState() == POOL_STATE_ACCEPTING_ENTRIES) CheckPool(g_module_node->connman.get());
     CheckTimeout(nCachedBlockHeight);
 }

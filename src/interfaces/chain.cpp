@@ -12,6 +12,7 @@
 #include <modules/masternode/masternode_man.h>
 #include <net.h>
 #include <net_processing.h>
+#include <netmessagemaker.h>
 #include <node/coin.h>
 #include <node/context.h>
 #include <node/transaction.h>
@@ -386,9 +387,38 @@ public:
             notifications.TransactionAddedToMempool(entry.GetSharedTx());
         }
     }
+    bool processCJRequest(const CService& addr, std::string sCommand, CAmount denom) override
+    {
+        m_node.connman.get()->ForNode(addr, [&](CNode* pnode) {
+            CNetMsgMaker msgMaker(pnode->GetSendVersion());
+            m_node.connman.get()->PushMessage(pnode, msgMaker.Make(sCommand, denom));
+            return true;
+        });
+        return true;
+    }
+    bool pushCJEntry(masternode_info_t mn, std::string sCommand, CCoinJoinEntry entry) override
+    {
+        m_node.connman.get()->ForNode(mn.addr, [&](CNode* pnode) {
+            CNetMsgMaker msgMaker(pnode->GetSendVersion());
+            m_node.connman.get()->PushMessage(pnode, msgMaker.Make(sCommand, entry));
+            return true;
+        });
+        return true;
+    }
+    bool pushPSBT(CNode *pnode, std::string sCommand, PartiallySignedTransaction &tx) override
+    {
+        CNetMsgMaker msgMaker(pnode->GetSendVersion());
+        m_node.connman.get()->PushMessage(pnode, msgMaker.Make(sCommand, tx));
+        return true;
+    }
     void askForMN(CNode* pnode, const COutPoint& outpoint) override
     {
-        mnodeman.AskForMN(pnode, outpoint, g_connman.get());
+        mnodeman.AskForMN(pnode, outpoint, m_node.connman.get());
+    }
+    bool addMasternode(masternode_info_t mn) override
+    {
+        if (m_node.connman->IsDisconnectRequested(mn.addr)) return false;
+        return m_node.connman.get()->AddPendingMasternode(mn.addr);
     }
     int analyzeCoin(const COutPoint& outpoint) override
     {

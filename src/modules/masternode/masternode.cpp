@@ -25,7 +25,7 @@
 
 #include <string>
 
-NodeContext* g_m_node = nullptr;
+NodeContext* g_module_node = nullptr;
 
 CMasternode::CMasternode() :
     masternode_info_t{ MASTERNODE_ENABLED, PROTOCOL_VERSION, GetAdjustedTime()}
@@ -380,7 +380,7 @@ bool CMasternodeBroadcast::Create(const std::string& strService, const std::stri
         return Log(strprintf("Invalid masternode key %s", strKeyMasternode));
 
     bool foundmnout = false;
-    for (const auto& client : g_m_node->chain_clients) {
+    for (const auto& client : g_module_node->chain_clients) {
         if (client->checkCollateral(outpoint, destNew, pubKeyCollateralAddressNew, keyCollateralAddressNew, strTxHash, strOutputIndex))
             foundmnout = true;
     }
@@ -890,3 +890,10 @@ void CMasternode::FlagGovernanceItemsAsDirty()
         mnodeman.AddDirtyGovernanceObjectHash(vecDirty[i]);
     }
 }
+
+void CMasternodeVerification::Relay() const
+{
+    CInv inv(MSG_MASTERNODE_VERIFY, GetHash());
+    g_module_node->connman->RelayInv(inv);
+}
+

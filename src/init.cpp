@@ -1351,7 +1351,7 @@ bool AppInitMain(NodeContext& node)
         client->registerRpcs();
     }
     g_rpc_node = &node;
-    g_m_node = &node;
+    g_module_node = &node;
 #if ENABLE_ZMQ
     RegisterZMQRPCCommands(tableRPC);
 #endif
@@ -1483,7 +1483,7 @@ bool AppInitMain(NodeContext& node)
     }
 #endif
 
-    pModuleNotificationInterface = new ModuleInterface(g_connman.get());
+    pModuleNotificationInterface = new ModuleInterface(node.connman.get());
 
     if (pModuleNotificationInterface) {
         RegisterValidationInterface(pModuleNotificationInterface);
@@ -1904,10 +1904,10 @@ bool AppInitMain(NodeContext& node)
 
     // ********************************************************* Step 11d: schedule modules
 
-    activeMasternode.Controller(scheduler, g_connman.get());
+    activeMasternode.Controller(scheduler, node.connman.get());
     netfulfilledman.Controller(scheduler);
-    mnodeman.Controller(scheduler, g_connman.get());
-    masternodeSync.Controller(scheduler, g_connman.get());
+    mnodeman.Controller(scheduler, node.connman.get());
+    masternodeSync.Controller(scheduler, node.connman.get());
     mnpayments.Controller(scheduler);
 
     if (ShutdownRequested()) {

@@ -706,7 +706,7 @@ void CMasternodeMan::ProcessMasternodeConnections(CConnman* connman)
     std::vector<CAddress> disconnect;
     std::vector<masternode_info_t> vecMnInfo;
 
-    for (const auto& client : g_m_node->chain_clients) {
+    for (const auto& client : g_module_node->chain_clients) {
         std::vector<masternode_info_t> vecMnInfoClient;
         client->getMixingMasternodesInfo(vecMnInfoClient);
         vecMnInfo.reserve(vecMnInfo.size() + vecMnInfoClient.size());

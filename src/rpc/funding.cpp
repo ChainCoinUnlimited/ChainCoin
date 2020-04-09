@@ -16,6 +16,7 @@
 #include <modules/masternode/masternode_config.h>
 #include <modules/masternode/masternode_man.h>
 #include <messagesigner.h>
+#include <node/context.h>
 #include <rpc/server.h>
 #include <rpc/util.h>
 #include <util/system.h>
@@ -216,9 +217,9 @@ UniValue gobject(const JSONRPCRequest& request)
 
         if(fMissingConfirmations) {
             funding.AddPostponedObject(govobj);
-            govobj.Relay(g_connman.get());
+            govobj.Relay(g_rpc_node->connman.get());
         } else {
-            funding.AddGovernanceObject(govobj, g_connman.get());
+            funding.AddGovernanceObject(govobj, g_rpc_node->connman.get());
         }
 
         return govobj.GetHash().ToString();
@@ -278,7 +279,7 @@ UniValue gobject(const JSONRPCRequest& request)
         }
 
         CGovernanceException exception;
-        if(funding.ProcessVoteAndRelay(vote, exception, g_connman.get())) {
+        if(funding.ProcessVoteAndRelay(vote, exception, g_rpc_node->connman.get())) {
             nSuccessful++;
             statusObj.pushKV("result", "success");
         }
@@ -377,7 +378,7 @@ UniValue gobject(const JSONRPCRequest& request)
             }
 
             CGovernanceException exception;
-            if(funding.ProcessVoteAndRelay(vote, exception, g_connman.get())) {
+            if(funding.ProcessVoteAndRelay(vote, exception, g_rpc_node->connman.get())) {
                 nSuccessful++;
                 statusObj.pushKV("result", "success");
             }
@@ -499,7 +500,7 @@ UniValue gobject(const JSONRPCRequest& request)
             // UPDATE LOCAL DATABASE WITH NEW OBJECT SETTINGS
 
             CGovernanceException exception;
-            if(funding.ProcessVoteAndRelay(vote, exception, g_connman.get())) {
+            if(funding.ProcessVoteAndRelay(vote, exception, g_rpc_node->connman.get())) {
                 nSuccessful++;
                 statusObj.pushKV("result", "success");
             }
@@ -811,7 +812,7 @@ UniValue voteraw(const JSONRPCRequest& request)
     }
 
     CGovernanceException exception;
-    if(funding.ProcessVoteAndRelay(vote, exception, g_connman.get())) {
+    if(funding.ProcessVoteAndRelay(vote, exception, g_rpc_node->connman.get())) {
         return "Voted successfully";
     }
     else {

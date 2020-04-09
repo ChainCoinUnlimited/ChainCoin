@@ -12,6 +12,7 @@
 #include <modules/masternode/masternode_man.h>
 #include <messagesigner.h>
 #include <netmessagemaker.h>
+#include <node/context.h>
 #include <policy/policy.h>
 #include <policy/settings.h>
 #include <reverse_iterator.h>
@@ -68,8 +69,9 @@ bool CCoinJoinQueue::CheckSignature(const CPubKey& pubKeyMasternode) const
     return true;
 }
 
-bool CCoinJoinQueue::Relay(CConnman* connman)
+bool CCoinJoinQueue::Relay()
 {
+    CConnman* connman = g_module_node->connman.get();
     connman->ForEachNode([&connman, this](CNode* pnode) {
         CNetMsgMaker msgMaker(pnode->GetSendVersion());
         if (pnode->nVersion >= MIN_COINJOIN_PEER_PROTO_VERSION)

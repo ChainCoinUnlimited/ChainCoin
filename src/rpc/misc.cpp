@@ -6,6 +6,7 @@
 
 #include <httpserver.h>
 #include <key_io.h>
+#include <node/context.h>
 #include <outputtype.h>
 #include <rpc/blockchain.h>
 #include <rpc/server.h>
@@ -52,14 +53,14 @@ static UniValue mnsync(const JSONRPCRequest& request)
 
     if(strMode == "next")
     {
-        masternodeSync.SwitchToNextAsset(g_connman.get());
+        masternodeSync.SwitchToNextAsset(g_rpc_node->connman.get());
         return "sync updated to " + masternodeSync.GetAssetName();
     }
 
     if(strMode == "reset")
     {
         masternodeSync.Reset();
-        masternodeSync.SwitchToNextAsset(g_connman.get());
+        masternodeSync.SwitchToNextAsset(g_rpc_node->connman.get());
         return "success";
     }
     return "failure";

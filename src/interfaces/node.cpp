@@ -324,11 +324,11 @@ public:
                 }
 
                 int nDoS = 0;
-                if (!g_connman || !::mnodeman.CheckMnbAndUpdateMasternodeList(nullptr, mnb, nDoS, g_connman.get())) {
+                if (!m_context.connman || !::mnodeman.CheckMnbAndUpdateMasternodeList(nullptr, mnb, nDoS, m_context.connman.get())) {
                     strErrorRet = "Failed to verify MNB";
                     return false;
                 }
-                ::mnodeman.NotifyMasternodeUpdates(g_connman.get());
+                ::mnodeman.NotifyMasternodeUpdates(m_context.connman.get());
                 return true;
             }
         }
@@ -354,13 +354,13 @@ public:
             bool fSuccess = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb);
 
             int nDoS = 0;
-            if (fSuccess && (!g_connman || !::mnodeman.CheckMnbAndUpdateMasternodeList(nullptr, mnb, nDoS, g_connman.get()))) {
+            if (fSuccess && (!m_context.connman || !::mnodeman.CheckMnbAndUpdateMasternodeList(nullptr, mnb, nDoS, m_context.connman.get()))) {
                 strError = "Failed to verify MNB";
                 fSuccess = false;
             }
             if(fSuccess) {
                 nCountSuccessful++;
-                ::mnodeman.NotifyMasternodeUpdates(g_connman.get());
+                ::mnodeman.NotifyMasternodeUpdates(m_context.connman.get());
             } else {
                 nCountFailed++;
                 strErrorRet += "\nFailed to start " + mne.getAlias() + ". Error: " + strError;
@@ -470,9 +470,9 @@ public:
 
             if(fMissingConfirmations) {
                 funding.AddPostponedObject(govobj);
-                govobj.Relay(g_connman.get());
+                govobj.Relay(m_context.connman.get());
             } else {
-                funding.AddGovernanceObject(govobj, g_connman.get());
+                funding.AddGovernanceObject(govobj, m_context.connman.get());
             }
         }
         amount = govobj.GetMinCollateralFee();
@@ -480,7 +480,7 @@ public:
     }
     bool sendVoting(const uint256& hash, const std::pair<std::string, std::string>& strVoteSignal, std::pair<int, int>& nResult) override
     {
-        return g_connman ? ::funding.VoteWithAll(hash, strVoteSignal, nResult, g_connman.get()) : false;
+        return m_context.connman ? ::funding.VoteWithAll(hash, strVoteSignal, nResult, m_context.connman.get()) : false;
     }
     int analyzeCoin(const COutPoint& outpoint) override
     {
