@@ -17,6 +17,7 @@
 #include <modules/masternode/masternode_man.h>
 #include <messagesigner.h>
 #include <node/context.h>
+#include <rpc/blockchain.h>
 #include <rpc/server.h>
 #include <rpc/util.h>
 #include <util/system.h>
