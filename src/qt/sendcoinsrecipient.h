@@ -6,7 +6,7 @@
 #define BITCOIN_QT_SENDCOINSRECIPIENT_H
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bitcoin-config.h>
+#include <config/chaincoin-config.h>
 #endif
 
 #include <amount.h>
@@ -30,6 +30,7 @@ public:
     // Todo: This is a hack, should be replaced with a cleaner solution!
     QString address;
     QString label;
+    bool fCoinJoin;
     CAmount amount;
     // If from a payment request, this is used for storing the memo
     QString message;
