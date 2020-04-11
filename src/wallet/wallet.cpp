@@ -2090,7 +2090,7 @@ CAmount CWallet::GetDenominatedBalance(int nDepth) const
         {
             const CWalletTx* wtx = &entry.second;
             if (wtx->IsTrusted(*locked_chain)) {
-                nTotal += wtx->GetDenominatedCredit(*locked_chain, nDepth);
+                nTotal += wtx->GetDenominatedCredit(nDepth);
             }
         }
     }
@@ -2165,7 +2165,7 @@ CAmount CWallet::GetLegacyDenomBalance(std::vector<CAmount>& vecAmounts) const
         // Loop through tx outputs and add incoming payments.
         for (unsigned int i = 0; i < wtx.tx->vout.size(); i++) {
             if (IsMine(wtx.tx->vout[i]) & ISMINE_SPENDABLE) {
-                if (!IsSpent(*locked_chain, wtx.tx->GetHash(), i)) {
+                if (!IsSpent(wtx.tx->GetHash(), i)) {
                     if (CCoinJoin::IsDenominatedAmount(wtx.tx->vout[i].nValue)) {
                         balance += wtx.tx->vout[i].nValue;
                         vecAmounts.push_back(wtx.tx->vout[i].nValue);
