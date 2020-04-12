@@ -29,12 +29,12 @@ void CKeyHolderStorage::AddKey(CScript &script, CWallet* pwalletIn)
         LogPrintf("%s CKeyHolderStorage::%s -- Error: Only SegWit addresses are supported for mixing\n", pwalletIn->GetDisplayName(), __func__);
         return;
     }
-    std::shared_ptr<ReserveDestination> reservedest = std::make_shared<ReserveDestination>(pwalletIn);;
+    std::shared_ptr<ReserveDestination> reservedest = std::make_shared<ReserveDestination>(pwalletIn, output_type);
     CTxDestination dest;
-    if (!reservedest->GetReservedDestination(output_type, dest, true)) {
+    if (!reservedest->GetReservedDestination(dest, true)) {
         LogPrintf("%s CKeyHolderStorage::%s -- Warning: Keypool ran out, trying to top up\n", pwalletIn->GetDisplayName(), __func__);
         pwalletIn->TopUpKeyPool();
-        if (!reservedest->GetReservedDestination(output_type, dest, true)) {
+        if (!reservedest->GetReservedDestination(dest, true)) {
             LogPrintf("%s CKeyHolderStorage::%s -- Error: Failed to obtain key from keypool\n", pwalletIn->GetDisplayName(), __func__);
             return;
         }
