@@ -7,14 +7,15 @@
 #include <hash.h>
 #include <uint256.h>
 #include <util/strencodings.h>
+#include <util/string.h>
 
 #include <assert.h>
 #include <string.h>
 
 #include <limits>
 
-/** All alphanumeric characters except for "0", "I", "O", and "l" */
-static const char* pszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    /** All alphanumeric characters except for "0", "I", "O", and "l" */
+    static const char* pszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 static const int8_t mapBase58[256] = {
     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
@@ -32,7 +33,7 @@ static const int8_t mapBase58[256] = {
     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
-};
+    };
 
 bool DecodeBase58(const char* psz, std::vector<unsigned char>& vch, int max_ret_len)
 {
@@ -130,6 +131,9 @@ std::string EncodeBase58(const std::vector<unsigned char>& vch)
 
 bool DecodeBase58(const std::string& str, std::vector<unsigned char>& vchRet, int max_ret_len)
 {
+    if (!ValidAsCString(str)) {
+        return false;
+    }
     return DecodeBase58(str.c_str(), vchRet, max_ret_len);
 }
 
@@ -161,5 +165,8 @@ bool DecodeBase58Check(const char* psz, std::vector<unsigned char>& vchRet, int 
 
 bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRet, int max_ret)
 {
+    if (!ValidAsCString(str)) {
+        return false;
+    }
     return DecodeBase58Check(str.c_str(), vchRet, max_ret);
 }
