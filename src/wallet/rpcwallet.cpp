@@ -3755,7 +3755,7 @@ UniValue getaddressinfo(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-    const std::string example_address = "\"bc1q09vm5lfy0j5reeulh4x5752q25uqqvz34hufdl\"";
+    const std::string example_address = "\"chc1q09vm5lfy0j5reeulh4x5752q25uqqvz34hufdl\"";
 
             RPCHelpMan{"getaddressinfo",
                 "\nReturn information about the given chaincoin address.\n"
