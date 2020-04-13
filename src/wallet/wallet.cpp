@@ -2797,7 +2797,7 @@ bool CWallet::GetOutpointAndKeysFromOutput(const COutput& out, COutPoint& outpoi
         return false;
     }
 
-    const SigningProvider* provider = this->GetSigningProvider(GetScriptForDestination(destRet));
+    const std::unique_ptr<SigningProvider> provider = this->GetSigningProvider(GetScriptForDestination(destRet));
     auto keyid = GetKeyForDestination(*provider, destRet);
     if (keyid.IsNull()) {
         WalletLogPrintf("CWallet::GetOutpointAndKeysFromOutput -- Address does not refer to a key\n");

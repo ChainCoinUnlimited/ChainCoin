@@ -189,7 +189,7 @@ void CActiveMasternode::ManageStateInitial(CConnman* connman)
                 LogPrintf("CActiveMasternode::ManageStateInitial -- %s: %s\n", GetStateString(), strNotCapableReason);
                 return;
             }
-            connected = ConnectThroughProxy(proxy, service.ToStringIP(), service.GetPort(), hSocket, nConnectTimeout, &proxyConnectionFailed);
+            connected = ConnectThroughProxy(proxy, service.ToStringIP(), service.GetPort(), hSocket, nConnectTimeout, proxyConnectionFailed);
         } else {
             // no proxy needed (none set for target network)
             hSocket = CreateSocket(service);
