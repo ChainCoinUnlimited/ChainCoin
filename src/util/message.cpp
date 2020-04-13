@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-const std::string strMessageMagic = "Bitcoin Signed Message:\n";
+const std::string strMessageMagic = "Darkcoin Signed Message:\n"; // for backwards compatibility
 
 MessageVerificationResult MessageVerify(
     const std::string& address,
