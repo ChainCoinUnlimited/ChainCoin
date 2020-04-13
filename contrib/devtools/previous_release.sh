@@ -98,7 +98,7 @@ pushd "$TARGET" || exit 1
           exit 1
         fi
 
-        git clone https://github.com/bitcoin/bitcoin "$tag"
+        git clone https://github.com/chaincoin/chaincoin "$tag"
         pushd "$tag" || exit 1
         {
           git checkout "$tag"
@@ -120,9 +120,9 @@ pushd "$TARGET" || exit 1
           make
           # Move binaries, so they're in the same place as in the release download:
           mkdir bin
-          mv src/bitcoind src/bitcoin-cli src/bitcoin-tx bin
+          mv src/chaincoind src/chaincoin-cli src/chaincoin-tx bin
           if [ "$FUNCTIONAL_TESTS" -eq "0" ]; then
-            mv src/qt/bitcoin-qt bin
+            mv src/qt/chaincoin-qt bin
           fi
         }
         popd || exit 1
@@ -132,11 +132,11 @@ pushd "$TARGET" || exit 1
         echo "Using cached $tag"
       else
         mkdir "$tag"
-        URL="https://bitcoin.org/bin/bitcoin-core-${tag:1}/bitcoin-${tag:1}-$PLATFORM.tar.gz"
+        URL="https://chaincoin.org/bin/chaincoin-${tag:1}/chaincoin-${tag:1}-$PLATFORM.tar.gz"
         echo "Fetching: $URL"
         curl -O $URL
-        tar -zxf "bitcoin-${tag:1}-$PLATFORM.tar.gz" -C "$tag" --strip-components=1 "bitcoin-${tag:1}"
-        rm "bitcoin-${tag:1}-$PLATFORM.tar.gz"
+        tar -zxf "chaincoin-${tag:1}-$PLATFORM.tar.gz" -C "$tag" --strip-components=1 "chaincoin-${tag:1}"
+        rm "chaincoin-${tag:1}-$PLATFORM.tar.gz"
       fi
     fi
   done
