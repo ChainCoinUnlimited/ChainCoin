@@ -39,8 +39,27 @@ enum class MessageVerificationResult {
     OK
 };
 
+/** Verify a signed hash.
+ * @param[in] address Signer's chaincoin address, it must refer to a public key.
+ * @param[in] signature The signature in base64 format.
+ * @param[in] message The hash that was signed.
+ * @return result code */
+MessageVerificationResult HashVerify(
+    const uint256 &hash,
+    const CPubKey& pubkey,
+    const std::vector<unsigned char> &signature_bytes);
+
+/** Sign a hash.
+ * @param[in] privkey Private key to sign with.
+ * @param[in] hash The hash to sign.
+ * @param[out] signature Signature, base64 encoded, only set if true is returned.
+ * @return true if signing was successful. */
+bool HashSign(const CKey& privkey,
+    const uint256& hash,
+    std::vector<unsigned char>& signature_bytes);
+
 /** Verify a signed message.
- * @param[in] address Signer's bitcoin address, it must refer to a public key.
+ * @param[in] address Signer's chaincoin address, it must refer to a public key.
  * @param[in] signature The signature in base64 format.
  * @param[in] message The message that was signed.
  * @return result code */

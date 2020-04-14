@@ -15,7 +15,6 @@
 #include <modules/masternode/masternode_sync.h>
 #include <modules/masternode/masternode_config.h>
 #include <modules/masternode/masternode_man.h>
-#include <messagesigner.h>
 #include <node/context.h>
 #include <rpc/blockchain.h>
 #include <rpc/server.h>
@@ -180,7 +179,7 @@ UniValue gobject(const JSONRPCRequest& request)
         if(govobj.GetObjectType() == GOVERNANCE_OBJECT_TRIGGER) {
             if(fMnFound) {
                 govobj.SetMasternodeOutpoint(activeMasternode.outpoint);
-                govobj.Sign(activeMasternode.keyMasternode, activeMasternode.pubKeyMasternode);
+                govobj.Sign(activeMasternode.keyMasternode);
             }
             else {
                 LogPrintf("gobject(submit) -- Object submission rejected because node is not a masternode\n");
@@ -269,7 +268,7 @@ UniValue gobject(const JSONRPCRequest& request)
         }
 
         CGovernanceVote vote(mn.outpoint, hash, eVoteSignal, eVoteOutcome);
-        if(!vote.Sign(activeMasternode.keyMasternode, activeMasternode.pubKeyMasternode)) {
+        if(!vote.Sign(activeMasternode.keyMasternode)) {
             nFailed++;
             statusObj.pushKV("result", "failed");
             statusObj.pushKV("errorMessage", "Failure to sign.");
@@ -340,7 +339,7 @@ UniValue gobject(const JSONRPCRequest& request)
 
             UniValue statusObj(UniValue::VOBJ);
 
-            if(!CMessageSigner::GetKeysFromSecret(mne.getPrivKey(), keyMasternode, pubKeyMasternode)){
+            if(!mne.getPrivKey().IsValid()){
                 nFailed++;
                 statusObj.pushKV("result", "failed");
                 statusObj.pushKV("errorMessage", "Masternode signing error, could not set key correctly");
@@ -348,18 +347,8 @@ UniValue gobject(const JSONRPCRequest& request)
                 continue;
             }
 
-            uint256 nTxHash;
-            nTxHash.SetHex(mne.getTxHash());
-
-            int nOutputIndex = 0;
-            if(!ParseInt32(mne.getOutputIndex(), &nOutputIndex)) {
-                continue;
-            }
-
-            COutPoint outpoint(nTxHash, nOutputIndex);
-
             CMasternode mn;
-            bool fMnFound = mnodeman.Get(outpoint, mn);
+            bool fMnFound = mnodeman.Get(mne.getOutPoint(), mn);
 
             if(!fMnFound) {
                 nFailed++;
@@ -370,7 +359,8 @@ UniValue gobject(const JSONRPCRequest& request)
             }
 
             CGovernanceVote vote(mn.outpoint, hash, eVoteSignal, eVoteOutcome);
-            if(!vote.Sign(keyMasternode, pubKeyMasternode)){
+            if(!vote.Sign(keyMasternode))
+            {
                 nFailed++;
                 statusObj.pushKV("result", "failed");
                 statusObj.pushKV("errorMessage", "Failure to sign.");
@@ -456,28 +446,18 @@ UniValue gobject(const JSONRPCRequest& request)
 
             UniValue statusObj(UniValue::VOBJ);
 
-            if(!CMessageSigner::GetKeysFromSecret(mne.getPrivKey(), keyMasternode, pubKeyMasternode)) {
+            if(!mne.getPrivKey().IsValid()) {
                 nFailed++;
                 statusObj.pushKV("result", "failed");
-                statusObj.pushKV("errorMessage", strprintf("Invalid masternode key %s.", mne.getPrivKey()));
+                statusObj.pushKV("errorMessage", strprintf("Invalid masternode key for outpoint %s.", mne.getOutPoint().ToStringShort()));
                 resultsObj.pushKV(mne.getAlias(), statusObj);
                 continue;
             }
 
             // SEARCH FOR THIS MASTERNODE ON THE NETWORK, THE NODE MUST BE ACTIVE TO VOTE
 
-            uint256 nTxHash;
-            nTxHash.SetHex(mne.getTxHash());
-
-            int nOutputIndex = 0;
-            if(!ParseInt32(mne.getOutputIndex(), &nOutputIndex)) {
-                continue;
-            }
-
-            COutPoint outpoint(nTxHash, nOutputIndex);
-
             CMasternode mn;
-            bool fMnFound = mnodeman.Get(outpoint, mn);
+            bool fMnFound = mnodeman.Get(mne.getOutPoint(), mn);
 
             if(!fMnFound) {
                 nFailed++;
@@ -489,8 +469,8 @@ UniValue gobject(const JSONRPCRequest& request)
 
             // CREATE NEW GOVERNANCE OBJECT VOTE WITH OUTCOME/SIGNAL
 
-            CGovernanceVote vote(outpoint, hash, eVoteSignal, eVoteOutcome);
-            if(!vote.Sign(keyMasternode, pubKeyMasternode)) {
+            CGovernanceVote vote(mne.getOutPoint(), hash, eVoteSignal, eVoteOutcome);
+            if(!vote.Sign(keyMasternode)) {
                 nFailed++;
                 statusObj.pushKV("result", "failed");
                 statusObj.pushKV("errorMessage", "Failure to sign.");
@@ -589,7 +569,9 @@ UniValue gobject(const JSONRPCRequest& request)
 
             // REPORT VALIDITY AND CACHING FLAGS FOR VARIOUS SETTINGS
             std::string strError = "";
-            bObj.pushKV("fBlockchainValidity",  pGovObj->IsValidLocally(strError, false));
+            bool fMissingMasternode = false;
+            bool fMissingConfirmations = false;
+            bObj.pushKV("fBlockchainValidity",  pGovObj->IsValidLocally(strError, fMissingMasternode, fMissingConfirmations, false));
             bObj.pushKV("IsValidReason",  strError.c_str());
             bObj.pushKV("fCachedValid",  pGovObj->IsSetCachedValid());
             bObj.pushKV("fCachedFunding",  pGovObj->IsSetCachedFunding());
@@ -669,7 +651,9 @@ UniValue gobject(const JSONRPCRequest& request)
 
         // --
         std::string strError = "";
-        objResult.pushKV("fLocalValidity",  pGovObj->IsValidLocally(strError, false));
+        bool fMissingMasternode = false;
+        bool fMissingConfirmations = false;
+        objResult.pushKV("fLocalValidity",  pGovObj->IsValidLocally(strError, fMissingMasternode, fMissingConfirmations, false));
         objResult.pushKV("IsValidReason",  strError.c_str());
         objResult.pushKV("fCachedValid",  pGovObj->IsSetCachedValid());
         objResult.pushKV("fCachedFunding",  pGovObj->IsSetCachedFunding());

@@ -158,7 +158,6 @@ BITCOIN_CORE_H = \
   logging/timer.h \
   memusage.h \
   merkleblock.h \
-  messagesigner.h \
   miner.h \
   modules/coinjoin/coinjoin.h \
   modules/coinjoin/coinjoin_analyzer.h \
@@ -317,7 +316,6 @@ libchaincoin_server_a_SOURCES = \
   interfaces/node.cpp \
   init.cpp \
   dbwrapper.cpp \
-  messagesigner.cpp \
   miner.cpp \
   modules/coinjoin/coinjoin.cpp \
   modules/coinjoin/coinjoin_analyzer.cpp \

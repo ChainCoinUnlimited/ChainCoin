@@ -53,12 +53,12 @@ bool RemoveWallet(const std::shared_ptr<CWallet>& wallet);
 bool HasWallets();
 
 //! Check MN Collateral
-bool CheckMNCollateral(COutPoint& outpointRet, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash, const std::string& strOutputIndex);
+bool CheckDeposit(const COutPoint& outpointRet, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet);
 
 //! Return MN mixing state
 void GetMixingMasternodesInfo(std::vector<masternode_info_t>& vecMnInfoRet);
 
-std::vector<std::shared_ptr<CWallet>> GetWallets();
+std::vector<std::shared_ptr<CWallet> > GetWallets();
 std::shared_ptr<CWallet> GetWallet(const std::string& name);
 std::shared_ptr<CWallet> LoadWallet(interfaces::Chain& chain, const WalletLocation& location, std::string& error, std::vector<std::string>& warnings);
 std::unique_ptr<interfaces::Handler> HandleLoadWallet(LoadWalletFn load_wallet);
@@ -852,10 +852,8 @@ public:
     // Coin selection
     bool SelectJoinCoins(CAmount nValueMin, CAmount nValueMax, std::vector<std::pair<CTxIn, CTxOut> >& mtxPairRet, int nMinDepth) const;
 
-    /// Get 1000CHC output and keys which can be used for the Masternode
-    bool GetMasternodeOutpointAndKeys(COutPoint& outpointRet, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash = "", const std::string& strOutputIndex = "");
-    /// Extract txin information and keys from output
-    bool GetOutpointAndKeysFromOutput(const COutput& out, COutPoint& outpointRet, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet);
+    /// Get keys which can be used for the Masternode
+    bool GetMasternodeKeys(const COutPoint& outpoint, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet);
 
     bool IsSpent(const uint256& hash, unsigned int n) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 

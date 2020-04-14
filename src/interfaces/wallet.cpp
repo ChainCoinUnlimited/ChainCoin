@@ -609,9 +609,9 @@ public:
     void start(CScheduler& scheduler) override { return StartWallets(scheduler); }
     void flush() override { return FlushWallets(); }
     void stop() override { return StopWallets(); }
-    bool checkCollateral(COutPoint& outpointRet, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash, const std::string& strOutputIndex) override
+    bool checkDeposit(const COutPoint& outpoint, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet) override
     {
-        return CheckMNCollateral(outpointRet, destRet, pubKeyRet, keyRet, strTxHash, strOutputIndex);
+        return CheckDeposit(outpoint, destRet, pubKeyRet, keyRet);
     }
     void getMixingMasternodesInfo(std::vector<masternode_info_t>& vecMnInfoRet) override { return GetMixingMasternodesInfo(vecMnInfoRet); }
     ~WalletClientImpl() override { UnloadWallets(); }

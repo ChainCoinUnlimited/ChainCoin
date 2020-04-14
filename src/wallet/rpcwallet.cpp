@@ -4333,7 +4333,9 @@ static UniValue prepareproposal(const JSONRPCRequest& request)
     LOCK(pwallet->cs_wallet);
 
     std::string strError = "";
-    if(!govobj.IsValidLocally(strError, false))
+    bool fMissingMasternode = false;
+    bool fMissingConfirmations = false;
+    if(!govobj.IsValidLocally(strError, fMissingMasternode, fMissingConfirmations, false))
         throw JSONRPCError(RPC_INTERNAL_ERROR, "Governance object is not valid - " + govobj.GetHash().ToString() + " - " + strError);
 
     if (!pwallet->CanGetAddresses(true)) {

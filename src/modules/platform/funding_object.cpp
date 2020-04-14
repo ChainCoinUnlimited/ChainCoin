@@ -4,13 +4,14 @@
 
 #include <modules/platform/funding_object.h>
 
-#include <messagesigner.h>
 #include <modules/masternode/masternode_man.h>
 #include <modules/masternode/masternode_sync.h>
 #include <modules/platform/funding.h>
 #include <modules/platform/funding_validators.h>
 #include <ui_interface.h>
+#include <util/message.h>
 #include <util/strencodings.h>
+#include <validation.h>
 
 
 CGovernanceObject::CGovernanceObject():
@@ -244,46 +245,33 @@ uint256 CGovernanceObject::GetHash() const
     return ss.GetHash();
 }
 
-uint256 CGovernanceObject::GetSignatureHash() const
-{
-    return SerializeHash(*this);
-}
-
 void CGovernanceObject::SetMasternodeOutpoint(const COutPoint& outpoint)
 {
     masternodeOutpoint = outpoint;
 }
 
-bool CGovernanceObject::Sign(const CKey& keyMasternode, const CPubKey& pubKeyMasternode)
+bool CGovernanceObject::Sign(const CKey& keyMasternode)
 {
     std::string strError;
 
-    uint256 hash = GetSignatureHash();
+    const uint256 hash = SerializeHash(*this);
 
-    if (!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
-        LogPrintf("CGovernanceObject::Sign -- SignHash() failed\n");
+    if (!HashSign(keyMasternode, hash, vchSig)) {
+        LogPrintf("CGovernanceObject::Sign -- HashSign() failed\n");
         return false;
     }
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        LogPrintf("CGovernanceObject::Sign -- VerifyHash() failed, error: %s\n", strError);
-        return false;
-    }
-
-    LogPrint(BCLog::GOV, "CGovernanceObject::Sign -- pubkey id = %s, masternode = %s\n",
-             pubKeyMasternode.GetID().ToString(), masternodeOutpoint.ToStringShort());
-
-    return true;
+    return CheckSignature(keyMasternode.GetPubKey()) ;
 }
 
 bool CGovernanceObject::CheckSignature(const CPubKey& pubKeyMasternode) const
 {
-    std::string strError;
+    const uint256 hash = SerializeHash(*this);
 
-    uint256 hash = GetSignatureHash();
+    const auto result = HashVerify(hash, pubKeyMasternode, vchSig);
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        LogPrintf("CGovernance::CheckSignature -- VerifyMessage() failed, error: %s\n", strError);
+    if (result != MessageVerificationResult::OK) {
+        LogPrintf("CGovernance::CheckSignaturee -- HashVerify() failed!\n");
         return false;
     }
 
@@ -369,19 +357,13 @@ std::string CGovernanceObject::GetDataAsPlainString() const
 
 void CGovernanceObject::UpdateLocalValidity()
 {
-    LOCK(cs_main);
+    LOCK(cs_fobject);
     // THIS DOES NOT CHECK COLLATERAL, THIS IS CHECKED UPON ORIGINAL ARRIVAL
-    fCachedLocalValidity = IsValidLocally(strLocalValidityError, false);
-};
-
-
-bool CGovernanceObject::IsValidLocally(std::string& strError, bool fCheckCollateral) const
-{
     bool fMissingMasternode = false;
     bool fMissingConfirmations = false;
+    fCachedLocalValidity = IsValidLocally(strLocalValidityError, fMissingMasternode, fMissingConfirmations, false /*fCheckCollateral*/);
+};
 
-    return IsValidLocally(strError, fMissingMasternode, fMissingConfirmations, fCheckCollateral);
-}
 
 bool CGovernanceObject::IsValidLocally(std::string& strError, bool& fMissingMasternode, bool& fMissingConfirmations, bool fCheckCollateral) const
 {

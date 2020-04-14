@@ -187,7 +187,6 @@ public:
         }
     }
 
-    uint256 GetSignatureHash() const;
     /** Sign this mixing transaction
      *  \return true if all conditions are met:
      *     1) we have an active Masternode,
@@ -205,6 +204,11 @@ public:
     /// Is this queue expired?
     bool IsExpired(int nHeightIn) const { return nHeightIn - nHeight > COINJOIN_DEFAULT_TIMEOUT; }
     bool IsOpen() const { return status > 0; }
+
+    uint256 GetHash() const
+    {
+        return SerializeHash(*this);
+    }
 
     std::string ToString() const
     {
@@ -279,8 +283,10 @@ public:
         return *this != CCoinJoinBroadcastTx();
     }
 
-    uint256 GetSignatureHash() const;
-
+    uint256 GetHash() const
+    {
+        return SerializeHash(*this);
+    }
     bool Sign();
     bool CheckSignature(const CPubKey& pubKeyMasternode) const;
 };

@@ -138,7 +138,6 @@ public:
     }
 
     uint256 GetHash() const;
-    uint256 GetSignatureHash() const;
 
     bool Sign();
     bool CheckSignature(const CPubKey& pubKeyMasternode, int nValidationHeight, int &nDos) const;

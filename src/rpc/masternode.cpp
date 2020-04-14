@@ -171,7 +171,7 @@ UniValue masternode(const JSONRPCRequest& request)
                 std::string strError;
                 CMasternodeBroadcast mnb;
 
-                bool fResult = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb);
+                bool fResult = CMasternodeBroadcast::Create(mne, strError, mnb);
 
                 int nDoS;
                 if (fResult && !mnodeman.CheckMnbAndUpdateMasternodeList(nullptr, mnb, nDoS, g_rpc_node->connman.get())) {
@@ -211,15 +211,14 @@ UniValue masternode(const JSONRPCRequest& request)
         for (const auto& mne : masternodeConfig.getEntries()) {
             std::string strError;
 
-            COutPoint outpoint = COutPoint(uint256S(mne.getTxHash()), (uint32_t)atoi(mne.getOutputIndex()));
             CMasternode mn;
-            bool fFound = mnodeman.Get(outpoint, mn);
+            bool fFound = mnodeman.Get(mne.getOutPoint(), mn);
             CMasternodeBroadcast mnb;
 
             if(strCommand == "start-missing" && fFound) continue;
             if(strCommand == "start-disabled" && fFound && mn.IsEnabled()) continue;
 
-            bool fResult = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb);
+            bool fResult = CMasternodeBroadcast::Create(mne, strError, mnb);
 
             int nDoS;
             if (fResult && !mnodeman.CheckMnbAndUpdateMasternodeList(nullptr, mnb, nDoS, g_rpc_node->connman.get())) {
@@ -261,17 +260,15 @@ UniValue masternode(const JSONRPCRequest& request)
         UniValue resultObj(UniValue::VOBJ);
 
         for (const auto& mne : masternodeConfig.getEntries()) {
-            COutPoint outpoint = COutPoint(uint256S(mne.getTxHash()), (uint32_t)atoi(mne.getOutputIndex()));
             CMasternode mn;
-            bool fFound = mnodeman.Get(outpoint, mn);
+            bool fFound = mnodeman.Get(mne.getOutPoint(), mn);
 
             std::string strStatus = fFound ? mn.GetStatus() : "MISSING";
 
             UniValue mnObj(UniValue::VOBJ);
             mnObj.pushKV("address", mne.getIp());
-            mnObj.pushKV("privateKey", mne.getPrivKey());
-            mnObj.pushKV("txHash", mne.getTxHash());
-            mnObj.pushKV("outputIndex", mne.getOutputIndex());
+            mnObj.pushKV("privateKey", EncodeSecret(mne.getPrivKey()));
+            mnObj.pushKV("outpoint", mne.getOutPoint().ToStringShort());
             mnObj.pushKV("status", strStatus);
             resultObj.pushKV(mne.getAlias(), mnObj);
         }
@@ -584,7 +581,7 @@ UniValue masternodebroadcast(const JSONRPCRequest& request)
                 std::string strError;
                 CMasternodeBroadcast mnb;
 
-                bool fResult = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb, true);
+                bool fResult = CMasternodeBroadcast::Create(mne, strError, mnb);
 
                 statusObj.pushKV("result", fResult ? "successful" : "failed");
                 if(fResult) {
@@ -624,7 +621,7 @@ UniValue masternodebroadcast(const JSONRPCRequest& request)
             std::string strError;
             CMasternodeBroadcast mnb;
 
-            bool fResult = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb, true);
+            bool fResult = CMasternodeBroadcast::Create(mne, strError, mnb);
 
             UniValue statusObj(UniValue::VOBJ);
             statusObj.pushKV("alias", mne.getAlias());

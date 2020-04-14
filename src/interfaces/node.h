@@ -6,7 +6,7 @@
 #define BITCOIN_INTERFACES_NODE_H
 
 #include <amount.h>                                 // For CAmount
-#include <modules/masternode/masternode_config.h>   // For CMasternodeConfig::CMasternodeEntry
+#include <modules/masternode/masternode_config.h>   // For MasternodeEntry
 #include <net.h>                                    // For CConnman::NumConnections
 #include <netaddress.h>                             // For Network
 #include <primitives/transaction.h>
@@ -207,7 +207,7 @@ public:
     virtual bool isMasternodelistSynced() = 0;
     virtual bool isModuleDataSynced() = 0;
     virtual int getMasternodeConfigCount() = 0;
-    virtual std::vector<CMasternodeConfig::CMasternodeEntry>& MNgetEntries() = 0;
+    virtual std::vector<MasternodeEntry>& MNgetEntries() = 0;
     virtual bool startMasternodeAlias(const std::string& strAlias, std::string& strErrorRet) = 0;
     virtual bool startAllMasternodes(const std::string& strCommand, std::string&  strErrorRet, int& nCountSuccessful, int& nCountFailed) = 0;
 

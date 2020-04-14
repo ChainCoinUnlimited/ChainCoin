@@ -21,6 +21,35 @@
  */
 const std::string MESSAGE_MAGIC = "Darkcoin Signed Message:\n"; // for backwards compatibility
 
+MessageVerificationResult HashVerify(
+    const uint256& hash,
+    const CPubKey& pubkey,
+    const std::vector<unsigned char>& signature_bytes)
+{
+    CPubKey pubkeyFromSig;
+    if (!pubkeyFromSig.RecoverCompact(hash, signature_bytes)) {
+        return MessageVerificationResult::ERR_PUBKEY_NOT_RECOVERED;
+    }
+
+    if (!(pubkey == pubkeyFromSig)) {
+        return MessageVerificationResult::ERR_NOT_SIGNED;
+    }
+
+    return MessageVerificationResult::OK;
+}
+
+bool HashSign(
+    const CKey& privkey,
+    const uint256& hash,
+    std::vector<unsigned char>& signature_bytes)
+{
+    if (!privkey.SignCompact(hash, signature_bytes)) {
+        return false;
+    }
+
+    return true;
+}
+
 MessageVerificationResult MessageVerify(
     const std::string& address,
     const std::string& signature,

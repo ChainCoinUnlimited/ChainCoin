@@ -12,14 +12,15 @@
 #include <interfaces/chain.h>
 #include <netbase.h>
 #include <modules/masternode/activemasternode.h>
+#include <modules/masternode/masternode_config.h>
 #include <modules/masternode/masternode_payments.h>
 #include <modules/masternode/masternode_sync.h>
 #include <modules/masternode/masternode_man.h>
-#include <messagesigner.h>
 #include <node/context.h>
 #include <script/standard.h>
 #include <shutdown.h>
 #include <ui_interface.h>
+#include <util/message.h>
 #include <util/system.h>
 #include <walletinitinterface.h>
 
@@ -355,60 +356,12 @@ void CMasternode::UpdateLastPaid(const CBlockIndex *pindex, int nMaxBlocksToScan
     // LogPrint(BCLog::MNODEPAY, "CMasternode::UpdateLastPaidBlock -- searching for block with payment to %s -- keeping old %d\n", outpoint.ToStringShort(), nBlockLastPaid);
 }
 
-bool CMasternodeBroadcast::Create(const std::string& strService, const std::string& strKeyMasternode, const std::string& strTxHash, const std::string& strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast &mnbRet, bool fOffline)
-{
-    COutPoint outpoint;
-    CPubKey pubKeyCollateralAddressNew;
-    CKey keyCollateralAddressNew;
-    CPubKey pubKeyMasternodeNew;
-    CKey keyMasternodeNew;
-    CTxDestination destNew;
-    const auto defaultChainParams = CreateChainParams(CBaseChainParams::MAIN);
-
-    auto Log = [&strErrorRet](std::string sErr)->bool
-    {
-        strErrorRet = sErr;
-        LogPrintf("CMasternodeBroadcast::Create -- %s\n", strErrorRet);
-        return false;
-    };
-
-    // Wait for sync to finish because mnb simply won't be relayed otherwise
-    if (!fOffline && !masternodeSync.IsSynced())
-        return Log("Sync in progress. Must wait until sync is complete to start Masternode");
-
-    if (!CMessageSigner::GetKeysFromSecret(strKeyMasternode, keyMasternodeNew, pubKeyMasternodeNew))
-        return Log(strprintf("Invalid masternode key %s", strKeyMasternode));
-
-    bool foundmnout = false;
-    for (const auto& client : g_module_node->chain_clients) {
-        if (client->checkCollateral(outpoint, destNew, pubKeyCollateralAddressNew, keyCollateralAddressNew, strTxHash, strOutputIndex))
-            foundmnout = true;
-    }
-
-    if (!foundmnout)
-        return Log(strprintf("Could not allocate outpoint %s:%s for masternode %s", strTxHash, strOutputIndex, strService));
-
-    CService service;
-    if (!Lookup(strService.c_str(), service, 0, false))
-        return Log(strprintf("Invalid address %s for masternode.", strService));
-    int mainnetDefaultPort = defaultChainParams->GetDefaultPort();
-    if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
-        if (service.GetPort() != mainnetDefaultPort)
-            return Log(strprintf("Invalid port %u for masternode %s, only %d is supported on mainnet.", service.GetPort(), strService, mainnetDefaultPort));
-    } else if (service.GetPort() == mainnetDefaultPort)
-        return Log(strprintf("Invalid port %u for masternode %s, %d is the only supported on mainnet.", service.GetPort(), strService, mainnetDefaultPort));
-
-    return Create(outpoint, service, keyCollateralAddressNew, pubKeyCollateralAddressNew, destNew, keyMasternodeNew, pubKeyMasternodeNew, strErrorRet, mnbRet);
-}
-
-bool CMasternodeBroadcast::Create(const COutPoint& outpoint, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CTxDestination destNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string &strErrorRet, CMasternodeBroadcast &mnbRet)
+bool CMasternodeBroadcast::Create(const MasternodeEntry& entry, std::string& strErrorRet, CMasternodeBroadcast &mnbRet)
 {
     // wait for reindex and/or import to finish
     if (fImporting || fReindex) return false;
 
-    LogPrint(BCLog::MNODE, "CMasternodeBroadcast::Create -- pubKeyCollateralAddressNew = %s, pubKeyMasternodeNew.GetID() = %s\n",
-             EncodeDestination(destNew),
-             pubKeyMasternodeNew.GetID().ToString());
+    const auto defaultChainParams = CreateChainParams(CBaseChainParams::MAIN);
 
     auto Log = [&strErrorRet,&mnbRet](std::string sErr)->bool
     {
@@ -418,18 +371,50 @@ bool CMasternodeBroadcast::Create(const COutPoint& outpoint, const CService& ser
         return false;
     };
 
-    CMasternodePing mnp(outpoint);
-    if (!mnp.Sign(keyMasternodeNew, pubKeyMasternodeNew))
-        return Log(strprintf("Failed to sign ping, masternode=%s", outpoint.ToStringShort()));
+    // Wait for sync to finish because mnb simply won't be relayed otherwise
+    if (!masternodeSync.IsSynced())
+        return Log("Sync in progress. Must wait until sync is complete to start Masternode");
 
-    mnbRet = CMasternodeBroadcast(service, outpoint, pubKeyCollateralAddressNew, destNew, pubKeyMasternodeNew, PROTOCOL_VERSION);
+    if (!entry.getPrivKey().IsValid())
+        return Log(strprintf("Invalid masternode key."));
+
+    bool foundmnout = false;
+    CTxDestination dest;
+    CPubKey pubKeyCollateralAddress;
+    CKey keyCollateralAddress;
+    for (const auto& client : g_module_node->chain_clients) {
+        if (client->checkDeposit(entry.getOutPoint(), dest, pubKeyCollateralAddress, keyCollateralAddress))
+            foundmnout = true;
+    }
+
+    if (!foundmnout)
+        return Log(strprintf("Could not allocate deposit for masternode."));
+
+    CService service;
+    if (!Lookup(entry.getIp().c_str(), service, 0, false))
+        return Log(strprintf("Invalid address %s for masternode.", service.ToStringIPPort()));
+    int mainnetDefaultPort = defaultChainParams->GetDefaultPort();
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
+        if (service.GetPort() != mainnetDefaultPort)
+            return Log(strprintf("Invalid port %u for masternode %s, only %d is supported on mainnet.", service.GetPort(), service.ToStringIPPort(), mainnetDefaultPort));
+    } else if (service.GetPort() == mainnetDefaultPort)
+        return Log(strprintf("Invalid port %u for masternode %s, %d is the only supported on mainnet.", service.GetPort(), service.ToStringIPPort(), mainnetDefaultPort));
+
+    LogPrint(BCLog::MNODE, "CMasternodeBroadcast::Create -- pubKeyCollateralAddress = %s\n",
+             EncodeDestination(dest));
+
+    CMasternodePing mnp(entry.getOutPoint());
+    if (!mnp.Sign(entry.getPrivKey()))
+        return Log(strprintf("Failed to sign ping, masternode=%s", entry.getOutPoint().ToStringShort()));
+
+    mnbRet = CMasternodeBroadcast(service, entry.getOutPoint(), keyCollateralAddress.GetPubKey(), dest, entry.getPrivKey().GetPubKey(), PROTOCOL_VERSION);
 
     if (!service.IsRoutable() || !IsReachable(service.GetNetwork()))
-        return Log(strprintf("Invalid IP address, masternode=%s", outpoint.ToStringShort()));
+        return Log(strprintf("Invalid IP address, masternode=%s", entry.getOutPoint().ToStringShort()));
 
     mnbRet.lastPing = mnp;
-    if (!mnbRet.Sign(keyCollateralAddressNew))
-        return Log(strprintf("Failed to sign broadcast, masternode=%s", outpoint.ToStringShort()));
+    if (!mnbRet.Sign(keyCollateralAddress))
+        return Log(strprintf("Failed to sign broadcast, masternode=%s", entry.getOutPoint().ToStringShort()));
 
     return true;
 }
@@ -615,41 +600,32 @@ uint256 CMasternodeBroadcast::GetHash() const
     return ss.GetHash();
 }
 
-uint256 CMasternodeBroadcast::GetSignatureHash() const
-{
-    return SerializeHash(*this);
-}
-
 bool CMasternodeBroadcast::Sign(const CKey& keyCollateralAddress)
 {
-    std::string strError;
-
     sigTime = GetAdjustedTime();
 
-    uint256 hash = GetSignatureHash();
+    const uint256 hash = SerializeHash(*this);
 
-    if (!CHashSigner::SignHash(hash, keyCollateralAddress, vchSig)) {
-        LogPrintf("CMasternodeBroadcast::Sign -- SignHash() failed\n");
+    if (!HashSign(keyCollateralAddress, hash, vchSig)) {
+        LogPrintf("CMasternodeBroadcast::Sign -- HashSign() failed\n");
         return false;
     }
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyCollateralAddress, vchSig, strError)) {
-        LogPrintf("CMasternodeBroadcast::Sign -- VerifyMessage() failed, error: %s\n", strError);
-        return false;
-    }
+    int nDos = 0;
 
-    return true;
+    return CheckSignature(nDos);
 }
 
 bool CMasternodeBroadcast::CheckSignature(int& nDos) const
 {
-    std::string strError = "";
     nDos = 0;
 
-    uint256 hash = GetSignatureHash();
+    const uint256 hash = SerializeHash(*this);
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyCollateralAddress, vchSig, strError)) {
-        LogPrintf("CMasternodeBroadcast::CheckSignature -- Got bad Masternode announce signature, error: %s\n", strError);
+    const auto result = HashVerify(hash, pubKeyCollateralAddress, vchSig);
+
+    if (result != MessageVerificationResult::OK) {
+        LogPrintf("CMasternodeBroadcast::CheckSignature -- HashVerify() failed!\n");
         nDos = 100;
         return false;
     }
@@ -669,16 +645,6 @@ void CMasternodeBroadcast::Relay(CConnman* connman) const
     connman->RelayInv(inv);
 }
 
-uint256 CMasternodePing::GetHash() const
-{
-    return SerializeHash(*this);
-}
-
-uint256 CMasternodePing::GetSignatureHash() const
-{
-    return GetHash();
-}
-
 CMasternodePing::CMasternodePing(const COutPoint& outpoint)
 {
     LOCK(cs_main);
@@ -690,43 +656,33 @@ CMasternodePing::CMasternodePing(const COutPoint& outpoint)
     nDaemonVersion = CLIENT_VERSION;
 }
 
-bool CMasternodePing::Sign(const CKey& keyMasternode, const CPubKey& pubKeyMasternode)
+bool CMasternodePing::Sign(const CKey& keyMasternode)
 {
-    std::string strError;
-
     sigTime = GetAdjustedTime();
 
-    uint256 hash = GetSignatureHash();
+    const uint256 hash = SerializeHash(*this);
 
-    if (!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
-        LogPrintf("CMasternodePing::Sign -- SignHash() failed\n");
+    if (!HashSign(keyMasternode, hash, vchSig)) {
+        LogPrintf("CMasternodePing::Sign -- HashSign() failed\n");
         return false;
     }
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        LogPrintf("CMasternodePing::Sign -- VerifyHash() failed, error: %s\n", strError);
-        return false;
-    }
-
-    return true;
+    int nDos = 0;
+    return CheckSignature(keyMasternode.GetPubKey(), nDos);
 }
 
 bool CMasternodePing::CheckSignature(const CPubKey& pubKeyMasternode, int &nDos) const
 {
-    std::string strError = "";
     nDos = 0;
 
-    uint256 hash = GetSignatureHash();
+    const uint256 hash = SerializeHash(*this);
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        std::string strMessage = CTxIn(masternodeOutpoint).ToString() + blockHash.ToString() +
-                    std::to_string(sigTime);
+    const auto result = HashVerify(hash, pubKeyMasternode, vchSig);
 
-        if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
-            LogPrintf("CMasternodePing::CheckSignature -- Got bad Masternode ping signature, masternode=%s, error: %s\n", masternodeOutpoint.ToStringShort(), strError);
-            nDos = 33;
-            return false;
-        }
+    if (result != MessageVerificationResult::OK) {
+        LogPrintf("CMasternodePing::CheckSignature -- Got bad Masternode ping signature, masternode=%s\n", masternodeOutpoint.ToStringShort());
+        nDos = 33;
+        return false;
     }
 
     return true;

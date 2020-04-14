@@ -63,7 +63,7 @@ Masternode MakeMasternode(const CMasternode& masternode)
     result.alias = "";
     for (const auto& mne : ::masternodeConfig.getEntries())
     {
-        if ((COutPoint(uint256S(mne.getTxHash()), atoi(mne.getOutputIndex()))) == masternode.outpoint)
+        if (mne.getOutPoint() == masternode.outpoint)
         {
             result.alias = mne.getAlias();
             break;
@@ -311,14 +311,14 @@ public:
     bool isMasternodelistSynced() override { return ::masternodeSync.IsMasternodeListSynced(); }
     bool isModuleDataSynced() override { return ::masternodeSync.IsSynced(); }
     int getMasternodeConfigCount() override { return ::masternodeConfig.getCount(); }
-    std::vector<CMasternodeConfig::CMasternodeEntry>& MNgetEntries() override { return ::masternodeConfig.getEntries(); }
+    std::vector<MasternodeEntry>& MNgetEntries() override { return ::masternodeConfig.getEntries(); }
 
     bool startMasternodeAlias(const std::string& strAlias, std::string& strErrorRet) override
     {
         for (const auto& mne : ::masternodeConfig.getEntries()) {
             if(mne.getAlias() == strAlias) {
                 CMasternodeBroadcast mnb;
-                if (!CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strErrorRet, mnb)) {
+                if (!CMasternodeBroadcast::Create(mne, strErrorRet, mnb)) {
                     return false;
                 }
 
@@ -341,16 +341,9 @@ public:
             std::string strError;
             CMasternodeBroadcast mnb;
 
-            int32_t nOutputIndex = 0;
-            if(!ParseInt32(mne.getOutputIndex(), &nOutputIndex)) {
-                continue;
-            }
+            if(strCommand == "start-missing" && !::mnodeman.Has(mne.getOutPoint())) continue;
 
-            COutPoint outpoint = COutPoint(uint256S(mne.getTxHash()), nOutputIndex);
-
-            if(strCommand == "start-missing" && !::mnodeman.Has(outpoint)) continue;
-
-            bool fSuccess = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb);
+            bool fSuccess = CMasternodeBroadcast::Create(mne, strError, mnb);
 
             int nDoS = 0;
             if (fSuccess && (!m_context.connman || !::mnodeman.CheckMnbAndUpdateMasternodeList(nullptr, mnb, nDoS, m_context.connman.get()))) {
@@ -391,7 +384,7 @@ public:
         for (const auto& mne : ::masternodeConfig.getEntries())
         {
             if (alias == mne.getAlias())
-                return mne.getPrivKey();
+                return EncodeSecret(mne.getPrivKey());
         }
         return {};
     }
@@ -410,7 +403,7 @@ public:
             for (const auto& mnpair : mapMasternodes)
             {
                 CMasternode masternode = mnpair.second;
-                if (masternode.outpoint == COutPoint(uint256S(mne.getTxHash()), atoi(mne.getOutputIndex())))
+                if (masternode.outpoint == mne.getOutPoint())
                 {
                     fFound = true;
                     break;
@@ -419,7 +412,7 @@ public:
             if (!fFound)
             {
                 Masternode mineMissing;
-                mineMissing.outpoint = COutPoint(uint256S(mne.getTxHash()), atoi(mne.getOutputIndex()));
+                mineMissing.outpoint = mne.getOutPoint();
                 mineMissing.alias = mne.getAlias();
                 mineMissing.address = mne.getIp();
                 result.emplace_back(mineMissing);
@@ -459,11 +452,12 @@ public:
 
         CGovernanceObject govobj(uint256(), nRevision, GetTime(), hash, dataHexStr);
 
+        bool fMissingMasternode = false;
+        bool fMissingConfirmations = false;
+
         if(hash == uint256()) {
-            if (!govobj.IsValidLocally(error, false)) return uint256();
+            if (!govobj.IsValidLocally(error, fMissingMasternode, fMissingConfirmations, false)) return uint256();
         }  else {
-            bool fMissingMasternode;
-            bool fMissingConfirmations;
             LOCK(::cs_main);
             if(!govobj.IsValidLocally(error, fMissingMasternode, fMissingConfirmations, true) && !fMissingConfirmations) return uint256();
 

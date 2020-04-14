@@ -5,14 +5,15 @@
 #ifndef BITCOIN_MODULES_MASTERNODE_MASTERNODE_H
 #define BITCOIN_MODULES_MASTERNODE_MASTERNODE_H
 
-#include <key.h>
+#include <chain.h>
 #include <key_io.h>
 #include <net.h>
-#include <validation.h>
 
 class CMasternode;
 class CMasternodeBroadcast;
 class CConnman;
+
+struct MasternodeEntry;
 struct NodeContext;
 
 extern NodeContext* g_module_node;
@@ -63,12 +64,13 @@ public:
         READWRITE(nDaemonVersion);
     }
 
-    uint256 GetHash() const;
-    uint256 GetSignatureHash() const;
-
     bool IsExpired() const { return GetAdjustedTime() - sigTime > MASTERNODE_NEW_START_REQUIRED_SECONDS; }
 
-    bool Sign(const CKey& keyMasternode, const CPubKey& pubKeyMasternode);
+    uint256 GetHash() const
+    {
+        return SerializeHash(*this);
+    }
+    bool Sign(const CKey& keyMasternode);
     bool CheckSignature(const CPubKey& pubKeyMasternode, int &nDos) const;
     bool SimpleCheck(int& nDos);
     bool CheckAndUpdate(CMasternode* pmn, bool fFromNewBroadcast, int& nDos, CConnman* connman);
@@ -112,11 +114,11 @@ struct masternode_info_t
     int nProtocolVersion = 0;
     int64_t sigTime = 0; //mnb message time
 
-    COutPoint outpoint{};
-    CService addr{};
-    CTxDestination collDest{};
-    CPubKey pubKeyCollateralAddress{};
-    CPubKey pubKeyMasternode{};
+    COutPoint outpoint;
+    CService addr;
+    CTxDestination collDest;
+    CPubKey pubKeyCollateralAddress;
+    CPubKey pubKeyMasternode;
 
     int64_t nLastCJq = 0; //the dsq count from the last dsq broadcast of this node
     int64_t nTimeLastChecked = 0;
@@ -331,11 +333,9 @@ public:
     }
 
     uint256 GetHash() const;
-    uint256 GetSignatureHash() const;
 
     /// Create Masternode broadcast, needs to be relayed manually after that
-    static bool Create(const COutPoint& outpoint, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CTxDestination collateralNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string &strErrorRet, CMasternodeBroadcast &mnbRet);
-    static bool Create(const std::string& strService, const std::string& strKey, const std::string& strTxHash, const std::string& strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast &mnbRet, bool fOffline = false);
+    static bool Create(const MasternodeEntry& mne, std::string& strErrorRet, CMasternodeBroadcast &mnbRet);
 
     bool SimpleCheck(int& nDos);
     bool Update(CMasternode* pmn, int& nDos, CConnman* connman);

@@ -312,7 +312,7 @@ public:
     virtual void stop() = 0;
 
     //! Check MN Collateral */
-    virtual bool checkCollateral(COutPoint& outpointRet, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash, const std::string& strOutputIndex) = 0;
+    virtual bool checkDeposit(const COutPoint& outpoint, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet) = 0;
 
     //! Return MN mixing state */
     virtual void getMixingMasternodesInfo(std::vector<masternode_info_t>& vecMnInfoRet) = 0;

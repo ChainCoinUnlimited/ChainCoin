@@ -5,7 +5,6 @@
 #include <modules/platform/funding.h>
 
 #include <consensus/validation.h>
-#include <messagesigner.h>
 #include <modules/masternode/masternode.h>
 #include <modules/masternode/masternode_config.h>
 #include <modules/masternode/masternode_sync.h>
@@ -286,7 +285,10 @@ void CGovernanceManager::AddGovernanceObject(CGovernanceObject& govobj, CConnman
 
     // MAKE SURE THIS OBJECT IS OK
 
-    if(!govobj.IsValidLocally(strError, true)) {
+    bool fMissingMasternode = false;
+    bool fMissingConfirmations = false;
+
+    if(!govobj.IsValidLocally(strError, fMissingMasternode, fMissingConfirmations, true)) {
         LogPrintf("CGovernanceManager::AddGovernanceObject -- invalid funding object - %s - (nCachedBlockHeight %d) \n", strError, nCachedBlockHeight);
         return;
     }
@@ -910,10 +912,11 @@ void CGovernanceManager::CheckPostponedObjects(CConnman* connman)
         assert(govobj.GetObjectType() != GOVERNANCE_OBJECT_TRIGGER);
 
         std::string strError;
-        bool fMissingConfirmations;
+        bool fMissingMasternode = false;
+        bool fMissingConfirmations = false;
         if (govobj.IsCollateralValid(strError, fMissingConfirmations))
         {
-            if(govobj.IsValidLocally(strError, false) && !fMissingConfirmations)
+            if(govobj.IsValidLocally(strError, fMissingMasternode, fMissingConfirmations, false) && !fMissingConfirmations)
                 AddGovernanceObject(govobj, connman);
             else
                 LogPrintf("CGovernanceManager::CheckPostponedObjects -- %s invalid\n", nHash.ToString());
@@ -1111,23 +1114,13 @@ bool CGovernanceManager::VoteWithAll(const uint256& hash, const std::pair<std::s
         CPubKey pubKeyMasternode;
         CKey keyMasternode;
 
-        if(!CMessageSigner::GetKeysFromSecret(mne.getPrivKey(), keyMasternode, pubKeyMasternode)){
+        if(!mne.getPrivKey().IsValid()){
             nResult.first++;
             continue;
          }
 
-        uint256 nTxHash;
-        nTxHash.SetHex(mne.getTxHash());
-
-        uint32_t nOutputIndex = 0;
-        if(!ParseUInt32(mne.getOutputIndex(), &nOutputIndex)) {
-            continue;
-        }
-
-        COutPoint outpoint(nTxHash, nOutputIndex);
-
         CMasternode mn;
-        bool fMnFound = mnodeman.Get(outpoint, mn);
+        bool fMnFound = mnodeman.Get(mne.getOutPoint(), mn);
 
         if(!fMnFound) {
             nResult.first++;
@@ -1135,7 +1128,7 @@ bool CGovernanceManager::VoteWithAll(const uint256& hash, const std::pair<std::s
         }
 
         CGovernanceVote vote(mn.outpoint, hash, eVoteSignal, eVoteOutcome);
-        if(!vote.Sign(keyMasternode, pubKeyMasternode)){
+        if(!vote.Sign(keyMasternode)){
             nResult.first++;
             continue;
         }

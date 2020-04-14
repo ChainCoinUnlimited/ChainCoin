@@ -10,12 +10,12 @@
 #include <modules/masternode/masternode_payments.h>
 #include <modules/masternode/masternode_sync.h>
 #include <modules/masternode/masternode_man.h>
-#include <messagesigner.h>
 #include <netmessagemaker.h>
 #include <node/context.h>
 #include <policy/policy.h>
 #include <policy/settings.h>
 #include <reverse_iterator.h>
+#include <util/message.h>
 #include <util/moneystr.h>
 #include <util/system.h>
 #include <util/translation.h>
@@ -28,41 +28,24 @@ constexpr CAmount HIGH_TX_FEE_PER_KB{COIN / 500};
 //! -maxtxfee will warn if called with a higher fee than this amount (in satoshis)
 constexpr CAmount HIGH_MAX_TX_FEE{100 * HIGH_TX_FEE_PER_KB};
 
-uint256 CCoinJoinQueue::GetSignatureHash() const
-{
-    return SerializeHash(*this);
-}
-
 bool CCoinJoinQueue::Sign()
 {
     if(!fMasternodeMode) return false;
 
-    std::string strError = "";
-
-    uint256 hash = GetSignatureHash();
-
-    if (!CHashSigner::SignHash(hash, activeMasternode.keyMasternode, vchSig)) {
-        LogPrintf("CCoinJoinQueue::Sign -- SignHash() failed\n");
+    if (!HashSign(activeMasternode.keyMasternode, GetHash(), vchSig)) {
+        LogPrintf("CCoinJoinQueue::Sign -- HashSign() failed\n");
         return false;
     }
 
-    if (!CHashSigner::VerifyHash(hash, activeMasternode.pubKeyMasternode, vchSig, strError)) {
-        LogPrintf("CCoinJoinQueue::Sign -- VerifyHash() failed, error: %s\n", strError);
-        return false;
-    }
-
-    return true;
+    return CheckSignature(activeMasternode.pubKeyMasternode);
 }
 
 bool CCoinJoinQueue::CheckSignature(const CPubKey& pubKeyMasternode) const
 {
-    std::string strError = "";
+    const auto result = HashVerify(GetHash(), pubKeyMasternode, vchSig);
 
-    uint256 hash = GetSignatureHash();
-
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        // we don't care about queues with old signature format
-        LogPrintf("CCoinJoinQueue::CheckSignature -- VerifyHash() failed, error: %s\n", strError);
+    if (result != MessageVerificationResult::OK) {
+        LogPrintf("CCoinJoinQueue::CheckSignature -- HashVerify() failed!\n");
         return false;
     }
 
@@ -91,41 +74,24 @@ bool CCoinJoinQueue::Push(const CService pto, CConnman* connman)
     return fOK;
 }
 
-uint256 CCoinJoinBroadcastTx::GetSignatureHash() const
-{
-    return SerializeHash(*this);
-}
-
 bool CCoinJoinBroadcastTx::Sign()
 {
     if(!fMasternodeMode) return false;
 
-    std::string strError = "";
-
-    uint256 hash = GetSignatureHash();
-
-    if (!CHashSigner::SignHash(hash, activeMasternode.keyMasternode, vchSig)) {
-        LogPrintf("CCoinJoinBroadcastTx::Sign -- SignHash() failed\n");
+    if (!HashSign(activeMasternode.keyMasternode, GetHash(), vchSig)) {
+        LogPrintf("CCoinJoinBroadcastTx::Sign -- HashSign() failed\n");
         return false;
     }
 
-    if (!CHashSigner::VerifyHash(hash, activeMasternode.pubKeyMasternode, vchSig, strError)) {
-        LogPrintf("CCoinJoinBroadcastTx::Sign -- VerifyHash() failed, error: %s\n", strError);
-        return false;
-    }
-
-    return true;
+    return CheckSignature(activeMasternode.pubKeyMasternode);
 }
 
 bool CCoinJoinBroadcastTx::CheckSignature(const CPubKey& pubKeyMasternode) const
 {
-    std::string strError = "";
+    const auto result = HashVerify(GetHash(), pubKeyMasternode, vchSig);
 
-    uint256 hash = GetSignatureHash();
-
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        // we don't care about dstxes with old signature format
-        LogPrintf("CCoinJoinBroadcastTx::CheckSignature -- VerifyHash() failed, error: %s\n", strError);
+    if (result != MessageVerificationResult::OK) {
+        LogPrintf("CCoinJoinBroadcastTx::CheckSignature -- HashVerify() failed!\n");
         return false;
     }
 

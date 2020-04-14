@@ -2752,74 +2752,56 @@ bool CWallet::SelectJoinCoins(CAmount nValueMin, CAmount nValueMax, std::vector<
     return nValueRet >= nValueMin;
 }
 
-bool CWallet::GetMasternodeOutpointAndKeys(COutPoint& outpointRet, CTxDestination& destRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash, const std::string& strOutputIndex)
+bool CWallet::GetMasternodeKeys(const COutPoint& outpoint, CTxDestination& destRet, CPubKey& pubKeyRet, CKey& keyRet)
 {
-    // wait for reindex and/or import to finish
-    if (fImporting || fReindex) return false;
-
     auto locked_chain = chain().lock();
     LOCK(cs_wallet);
     // Find possible candidates
     std::vector<COutput> vPossibleCoins;
     AvailableCoins(*locked_chain, vPossibleCoins, true, nullptr, ONLY_1000);
     if(vPossibleCoins.empty()) {
-        WalletLogPrintf("CWallet::GetMasternodeOutpointAndKeys -- Could not locate any valid masternode vin\n");
+        WalletLogPrintf("CWallet::GetMasternodeKeys -- Could not locate any valid masternode vin\n");
         return false;
     }
-
-    if(strTxHash.empty()) // No output specified, select the first one
-        return GetOutpointAndKeysFromOutput(vPossibleCoins[0], outpointRet, destRet, pubKeyRet, keyRet);
 
     // Find specific outpoint
-    uint256 txHash = uint256S(strTxHash);
-    int nOutputIndex = atoi(strOutputIndex);
-
     for (const auto& out : vPossibleCoins)
-        if(out.tx->GetHash() == txHash && out.i == nOutputIndex) // found it!
-            return GetOutpointAndKeysFromOutput(out, outpointRet, destRet, pubKeyRet, keyRet);
+        if(out.tx->GetHash() == outpoint.hash && (uint32_t)out.i == outpoint.n) { // found it!
+            auto locked_chain = chain().lock();
+            AssertLockHeld(cs_wallet);
 
-    WalletLogPrintf("CWallet::GetMasternodeOutpointAndKeys -- Could not locate specified masternode vin\n");
+            CScript pubScript;
+
+            pubScript = out.tx->tx->vout[out.i].scriptPubKey; // the inputs PubKey
+
+            if (!ExtractDestination(pubScript, destRet)) {
+                WalletLogPrintf("CWallet::GetMasternodeKeys -- invalid Script\n");
+                return false;
+            }
+
+            if (!IsValidDestination(destRet)) {
+                WalletLogPrintf("CWallet::GetMasternodeKeys -- invalid Address\n");
+                return false;
+            }
+
+            const std::unique_ptr<SigningProvider> provider = this->GetSigningProvider(GetScriptForDestination(destRet));
+            auto keyid = GetKeyForDestination(*provider, destRet);
+            if (keyid.IsNull()) {
+                WalletLogPrintf("CWallet::GetMasternodeKeys -- Address does not refer to a key\n");
+                return false;
+            }
+
+            if (!provider->GetKey(keyid, keyRet)) {
+                WalletLogPrintf ("CWallet::GetMasternodeKeys -- Private key for address is not known\n");
+                return false;
+            }
+
+            pubKeyRet = keyRet.GetPubKey();
+
+            return true;
+        }
+    WalletLogPrintf("CWallet::GetMasternodeKeys -- Could not locate specified masternode vin\n");
     return false;
-}
-
-bool CWallet::GetOutpointAndKeysFromOutput(const COutput& out, COutPoint& outpointRet, CTxDestination& destRet, CPubKey& pubKeyRet, CKey& keyRet)
-{
-    // wait for reindex and/or import to finish
-    if (fImporting || fReindex) return false;
-
-    auto locked_chain = chain().lock();
-    LOCK(cs_wallet);
-
-    CScript pubScript;
-
-    outpointRet = COutPoint(out.tx->GetHash(), out.i);
-    pubScript = out.tx->tx->vout[out.i].scriptPubKey; // the inputs PubKey
-
-    if (!ExtractDestination(pubScript, destRet)) {
-        WalletLogPrintf("CWallet::GetOutpointAndKeysFromOutput -- invalid Script\n");
-        return false;
-    }
-
-    if (!IsValidDestination(destRet)) {
-        WalletLogPrintf("CWallet::GetOutpointAndKeysFromOutput -- invalid Address\n");
-        return false;
-    }
-
-    const std::unique_ptr<SigningProvider> provider = this->GetSigningProvider(GetScriptForDestination(destRet));
-    auto keyid = GetKeyForDestination(*provider, destRet);
-    if (keyid.IsNull()) {
-        WalletLogPrintf("CWallet::GetOutpointAndKeysFromOutput -- Address does not refer to a key\n");
-        return false;
-    }
-
-    if (!provider->GetKey(keyid, keyRet)) {
-        WalletLogPrintf ("CWallet::GetOutpointAndKeysFromOutput -- Private key for address is not known\n");
-        return false;
-    }
-
-    pubKeyRet = keyRet.GetPubKey();
-
-    return true;
 }
 
 bool CWallet::GetBudgetSystemCollateralTX(interfaces::Chain::Lock& locked_chain, CTransactionRef& tx, uint256 hash, CAmount amount)
@@ -4397,19 +4379,14 @@ void CWallet::postInitProcess()
 
     if((gArgs.GetBoolArg("-mnconflock", true)) && (masternodeConfig.getCount() > 0)) {
         WalletLogPrintf("Locking Masternodes:\n");
-        uint256 mnTxHash;
-        uint32_t outputIndex;
         for (const auto& mne : masternodeConfig.getEntries()) {
-            mnTxHash.SetHex(mne.getTxHash());
-            outputIndex = (uint32_t)atoi(mne.getOutputIndex());
-            COutPoint outpoint = COutPoint(mnTxHash, outputIndex);
             // don't lock non-spendable outpoint (i.e. it's already spent or it's not from this wallet at all)
-            if(IsMine(CTxIn(outpoint)) != ISMINE_SPENDABLE) {
-                WalletLogPrintf("  %s %s - IS NOT SPENDABLE, was not locked\n", mne.getTxHash(), mne.getOutputIndex());
+            if(IsMine(CTxIn(mne.getOutPoint())) != ISMINE_SPENDABLE) {
+                WalletLogPrintf(" %s - IS NOT SPENDABLE, was not locked\n", mne.getOutPoint().ToStringShort());
                 continue;
             }
-            LockCoin(outpoint);
-            WalletLogPrintf("  %s %s - locked successfully\n", mne.getTxHash(), mne.getOutputIndex());
+            LockCoin(mne.getOutPoint());
+            WalletLogPrintf("%s - locked successfully\n", mne.getOutPoint().ToString());
         }
     }
 }

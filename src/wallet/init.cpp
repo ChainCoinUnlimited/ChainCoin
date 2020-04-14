@@ -155,10 +155,10 @@ void WalletInit::Construct(NodeContext& node) const
     gArgs.SoftSetArg("-wallet", "");
     node.chain_clients.emplace_back(interfaces::MakeWalletClient(*node.chain, gArgs.GetArgs("-wallet")));
 }
-bool CheckMNCollateral(COutPoint& outpointRet, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash, const std::string& strOutputIndex)
+bool CheckDeposit(const COutPoint& outpoint, CTxDestination &destRet, CPubKey& pubKeyRet, CKey& keyRet)
 {
     for (const std::shared_ptr<CWallet>& pwallet : GetWallets()) {
-        if (pwallet->GetMasternodeOutpointAndKeys(outpointRet, destRet, pubKeyRet, keyRet, strTxHash, strOutputIndex))
+        if (pwallet->GetMasternodeKeys(outpoint, destRet, pubKeyRet, keyRet))
             return true;
     }
     return false;

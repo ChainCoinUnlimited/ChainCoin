@@ -64,7 +64,6 @@
 #include <validationinterface.h>
 #include <walletinitinterface.h>
 
-#include <messagesigner.h>
 #include <netfulfilledman.h>
 
 #include <modules/coinjoin/coinjoin_analyzer.h>
@@ -1858,7 +1857,8 @@ bool AppInitMain(NodeContext& node)
 
         std::string strMasterNodePrivKey = gArgs.GetArg("-masternodeprivkey", "");
         if(!strMasterNodePrivKey.empty()) {
-            if(!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, activeMasternode.keyMasternode, activeMasternode.pubKeyMasternode))
+            CKey key = DecodeSecret(strMasterNodePrivKey);
+            if(!key.IsValid())
                 return InitError(_("Invalid masternodeprivkey. Please see documenation.").translated);
         } else {
             return InitError(_("You must specify a masternodeprivkey in the configuration. Please see documentation for help.").translated);
@@ -1926,11 +1926,11 @@ bool AppInitMain(NodeContext& node)
 
     // ********************************************************* Step 11d: schedule modules
 
-    activeMasternode.Controller(scheduler, node.connman.get());
-    netfulfilledman.Controller(scheduler);
-    mnodeman.Controller(scheduler, node.connman.get());
-    masternodeSync.Controller(scheduler, node.connman.get());
-    mnpayments.Controller(scheduler);
+    activeMasternode.Controller(*node.scheduler, node.connman.get());
+    netfulfilledman.Controller(*node.scheduler);
+    mnodeman.Controller(*node.scheduler, node.connman.get());
+    masternodeSync.Controller(*node.scheduler, node.connman.get());
+    mnpayments.Controller(*node.scheduler);
 
     if (ShutdownRequested()) {
         return false;
@@ -2045,7 +2045,7 @@ bool AppInitMain(NodeContext& node)
         banman->DumpBanlist();
     }, DUMP_BANS_INTERVAL * 1000);
 
-    scheduler.scheduleEvery([]{
+    node.scheduler->scheduleEvery([]{
         g_analyzer->Flush();
     }, CJ_CLEAN_INTERVAL * 1000);
 
