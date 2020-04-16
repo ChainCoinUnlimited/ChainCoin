@@ -2921,7 +2921,7 @@ bool CWallet::GetMasternodeKeys(const COutPoint& outpoint, CTxDestination& destR
                 return false;
             }
 
-            const std::unique_ptr<SigningProvider> provider = this->GetSigningProvider(GetScriptForDestination(destRet));
+            const std::unique_ptr<SigningProvider> provider = this->GetSolvingProvider(GetScriptForDestination(destRet));
             auto keyid = GetKeyForDestination(*provider, destRet);
             if (keyid.IsNull()) {
                 WalletLogPrintf("CWallet::GetMasternodeKeys -- Address does not refer to a key\n");
