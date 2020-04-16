@@ -305,7 +305,10 @@ void CCoinJoinClientManager::UnlockCoins()
 {
     while(m_wallet) {
         TRY_LOCK(m_wallet->cs_wallet, lockWallet);
-        if (!lockWallet) {MilliSleep(50); continue;}
+        if (!lockWallet) {
+            UninterruptibleSleep(std::chrono::milliseconds{50});
+            continue;
+        }
         for (const auto& outpoint : vecOutPointLocked)
             m_wallet->UnlockCoin(outpoint);
         break;
@@ -318,7 +321,10 @@ void CCoinJoinClientSession::UnlockCoins()
 {
     while(m_wallet_session) {
         TRY_LOCK(m_wallet_session->cs_wallet, lockWallet);
-        if (!lockWallet) {MilliSleep(50); continue;}
+        if (!lockWallet) {
+            UninterruptibleSleep(std::chrono::milliseconds{50});
+            continue;
+        }
         for (const auto& outpoint : vecOutPointLocked)
             m_wallet_session->UnlockCoin(outpoint);
         break;
