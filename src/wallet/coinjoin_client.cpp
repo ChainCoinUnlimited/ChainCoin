@@ -16,8 +16,8 @@
 #include <util/translation.h>
 #include <wallet/coincontrol.h>
 #include <wallet/fees.h>
-#include <wallet/psbtwallet.h>
 #include <wallet/scriptpubkeyman.h>
+#include <wallet/wallet.h>
 
 #include <numeric>
 #include <memory>
@@ -529,7 +529,7 @@ bool CCoinJoinClientSession::SendDenominate()
     }
 
     bool complete = false;
-    const TransactionError err = FillPSBT(m_wallet_session, psbtx, complete, 1, false, false);
+    const TransactionError err = m_wallet_session->FillPSBT(psbtx, complete, 1, false, false);
     LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::SendDenominate -- FillPSBT completed: %b\n", m_wallet_session->GetDisplayName(), complete);
 
     if (err != TransactionError::OK) {
@@ -623,7 +623,7 @@ bool CCoinJoinClientSession::SignFinalTransaction(PartiallySignedTransaction& fi
         return false;
     }
 
-    const TransactionError err = FillPSBT(m_wallet_session, finalTransactionNew, complete);
+    const TransactionError err = m_wallet_session->FillPSBT(finalTransactionNew, complete);
 
     if (err != TransactionError::OK) {
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientSession::SignFinalTransaction -- ERROR: finalTransactionNew=%s, error=%s\n",
@@ -1549,7 +1549,7 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
 
         bool complete = true;
         bool sign = true;
-        const TransactionError err = FillPSBT(m_wallet, ptx, complete, 1, sign, false);
+        const TransactionError err = m_wallet->FillPSBT(ptx, complete, 1, sign, false);
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CreateDenominated -- FillPSBT completed: %b\n", m_wallet->GetDisplayName(), complete);
 
         if (err != TransactionError::OK) {
