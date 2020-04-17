@@ -4201,7 +4201,7 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
             if (pto->m_tx_relay != nullptr) {
                 // Send non-tx/non-block inventory items
                 LOCK(pto->m_tx_relay->cs_tx_inventory);
-                for (const auto& inv : pto->vInventoryOtherToSend) {
+                for (const auto& inv : pto->m_tx_relay->vInventoryOtherToSend) {
                     if (pto->m_tx_relay->filterInventoryKnown.contains(inv.hash)) {
                         continue;
                     }
@@ -4212,7 +4212,7 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
                         vInv.clear();
                     }
                 }
-                pto->vInventoryOtherToSend.clear();
+                pto->m_tx_relay->vInventoryOtherToSend.clear();
             }
         }
         if (!vInv.empty())
