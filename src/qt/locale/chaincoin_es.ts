@@ -454,8 +454,8 @@
         <translation>&amp;Recibir</translation>
     </message>
     <message>
-        <source>&amp;About Chaincoin Core</source>
-        <translation>&amp;Acerca de Chaincoin Core</translation>
+        <source>&amp;About Chaincoin</source>
+        <translation>&amp;Acerca de Chaincoin</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -534,8 +534,8 @@
         <translation>Abrir identificador URI chaincoin o petición de pago</translation>
     </message>
     <message>
-        <source>Show the Chaincoin Core help message to get a list with possible Chaincoin Core command-line options</source>
-        <translation>Muestre el mensaje de ayuda de Chaincoin Core para obtener una lista con las posibles opciones de línea de comandos de Chaincoin Core</translation>
+        <source>Show the Chaincoin help message to get a list with possible Chaincoin command-line options</source>
+        <translation>Muestre el mensaje de ayuda de Chaincoin para obtener una lista con las posibles opciones de línea de comandos de Chaincoin</translation>
     </message>
     <message>
         <source>&amp;PrivateSend information</source>
@@ -586,8 +586,8 @@
         <translation>Sincronizando datos adicionales: %p%</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>Date: %1
@@ -978,16 +978,16 @@
         <translation>versión</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Chaincoin Core</source>
-        <translation>Acerca de Chaincoin Core</translation>
+        <source>About Chaincoin</source>
+        <translation>Acerca de Chaincoin</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1405,8 +1405,8 @@
         <translation>Cantidad de Chaincoin a mantener anonimizada</translation>
     </message>
     <message>
-        <source>Automatically open the Chaincoin Core client port on the router. This only works when your router  UPnP and it is enabled.</source>
-        <translation>Abrir automáticamente el puerto del cliente Chaincoin Core en el router. Esta opción solo funciona si el router admite UPnP y está activado.</translation>
+        <source>Automatically open the Chaincoin client port on the router. This only works when your router  UPnP and it is enabled.</source>
+        <translation>Abrir automáticamente el puerto del cliente Chaincoin en el router. Esta opción solo funciona si el router admite UPnP y está activado.</translation>
     </message>
     <message>
         <source>Connect to the Chaincoin network through a SOCKS5 proxy.</source>
@@ -1465,12 +1465,12 @@
         <translation>&amp;Red</translation>
     </message>
     <message>
-        <source>Automatically start Chaincoin Core after logging in to the system.</source>
-        <translation>Iniciar automáticamente  Chaincoin Core después de iniciar sesión en el sistema.</translation>
+        <source>Automatically start Chaincoin after logging in to the system.</source>
+        <translation>Iniciar automáticamente  Chaincoin después de iniciar sesión en el sistema.</translation>
     </message>
     <message>
-        <source>&amp;Start Chaincoin Core on system login</source>
-        <translation>&amp;Iniciar Chaincoin Core en el inicio de sesión del sistema</translation>
+        <source>&amp;Start Chaincoin on system login</source>
+        <translation>&amp;Iniciar Chaincoin en el inicio de sesión del sistema</translation>
     </message>
     <message>
         <source>(0 = auto, &lt;0 = leave that many cores free)</source>
@@ -1573,8 +1573,8 @@
         <translation>Mostrar o no funcionalidad de Coin Control</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin Core.</source>
-        <translation>El idioma de la interfaz de usuario puede establecerse aquí. Esta configuración tendrá efecto tras reiniciar Chaincoin Core.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin.</source>
+        <translation>El idioma de la interfaz de usuario puede establecerse aquí. Esta configuración tendrá efecto tras reiniciar Chaincoin.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
@@ -2466,8 +2466,8 @@ https://www.transifex.com/projects/p/chaincoin/</translation>
         <translation>Uso de memoria</translation>
     </message>
     <message>
-        <source>Open the Chaincoin Core debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Abra el archivo de registro de depuración de Chaincoin Core del directorio de datos actual. Esto puede tomar unos segundos para archivos de registro grandes.</translation>
+        <source>Open the Chaincoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Abra el archivo de registro de depuración de Chaincoin del directorio de datos actual. Esto puede tomar unos segundos para archivos de registro grandes.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -3259,8 +3259,8 @@ https://www.transifex.com/projects/p/chaincoin/</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Chaincoin Core is shutting down...</source>
-        <translation>Chaincoin Core se esta cerrando...</translation>
+        <source>Chaincoin is shutting down...</source>
+        <translation>Chaincoin se esta cerrando...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -3425,8 +3425,8 @@ https://www.transifex.com/projects/p/chaincoin/</translation>
         <translation>Los desarrolladores de Dash Core</translation>
     </message>
     <message>
-        <source>The Chaincoin Core developers</source>
-        <translation>Los desarrolladores de Chaincoin Core</translation>
+        <source>The Chaincoin developers</source>
+        <translation>Los desarrolladores de Chaincoin</translation>
     </message>
 </context>
 <context>

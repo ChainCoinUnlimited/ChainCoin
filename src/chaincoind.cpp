@@ -10,9 +10,9 @@
 #include <chainparams.h>
 #include <clientversion.h>
 #include <compat.h>
-#include <fs.h>
 #include <init.h>
 #include <interfaces/chain.h>
+#include <node/context.h>
 #include <noui.h>
 #include <shutdown.h>
 #include <modules/masternode/masternode_config.h>
@@ -26,13 +26,13 @@
 
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
-static void WaitForShutdown()
+static void WaitForShutdown(NodeContext& node)
 {
     while (!ShutdownRequested())
     {
-        MilliSleep(200);
+        UninterruptibleSleep(std::chrono::milliseconds{200});
     }
-    Interrupt();
+    Interrupt(node);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -41,8 +41,8 @@ static void WaitForShutdown()
 //
 static bool AppInit(int argc, char* argv[])
 {
-    InitInterfaces interfaces;
-    interfaces.chain = interfaces::MakeChain();
+    NodeContext node;
+    node.chain = interfaces::MakeChain(node);
 
     bool fRet = false;
 
@@ -72,7 +72,7 @@ static bool AppInit(int argc, char* argv[])
             strUsage += "\n" + gArgs.GetHelpMessage();
         }
 
-        tfm::format(std::cout, "%s", strUsage.c_str());
+        tfm::format(std::cout, "%s", strUsage);
         return true;
     }
 
@@ -151,7 +151,7 @@ static bool AppInit(int argc, char* argv[])
             // If locking the data directory failed, exit immediately
             return false;
         }
-        fRet = AppInitMain(interfaces);
+        fRet = AppInitMain(node);
     }
     catch (const std::exception& e) {
         PrintExceptionContinue(&e, "AppInit()");
@@ -161,11 +161,11 @@ static bool AppInit(int argc, char* argv[])
 
     if (!fRet)
     {
-        Interrupt();
+        Interrupt(node);
     } else {
-        WaitForShutdown();
+        WaitForShutdown(node);
     }
-    Shutdown(interfaces);
+    Shutdown(node);
 
     return fRet;
 }

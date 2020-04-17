@@ -1814,7 +1814,7 @@
     </message>
     <message>
         <location line="+45"/>
-        <source>Automatically open the Chaincoin Core client port on the router. This only works when your router  UPnP and it is enabled.</source>
+        <source>Automatically open the Chaincoin client port on the router. This only works when your router  UPnP and it is enabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1887,12 +1887,12 @@
     </message>
     <message>
         <location line="-315"/>
-        <source>Automatically start Chaincoin Core after logging in to the system.</source>
+        <source>Automatically start Chaincoin after logging in to the system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>&amp;Start Chaincoin Core on system login</source>
+        <source>&amp;Start Chaincoin on system login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2060,7 +2060,7 @@
     </message>
     <message>
         <location line="+525"/>
-        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin Core.</source>
+        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

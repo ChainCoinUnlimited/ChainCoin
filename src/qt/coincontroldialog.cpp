@@ -1,5 +1,4 @@
-// Copyright (c) 2011-2018 The Bitcoin Core developers
-// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2011-2019 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -20,7 +19,6 @@
 #include <wallet/coincontrol.h>
 #include <interfaces/node.h>
 #include <key_io.h>
-#include <policy/fees.h>
 #include <policy/policy.h>
 #include <wallet/wallet.h>
 
@@ -514,7 +512,7 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
         {
             CPubKey pubkey;
             PKHash *pkhash = boost::get<PKHash>(&address);
-            if (pkhash && model->wallet().getPubKey(CKeyID(*pkhash), pubkey))
+            if (pkhash && model->wallet().getPubKey(out.txout.scriptPubKey, CKeyID(*pkhash), pubkey))
             {
                 nBytesInputs += (pubkey.IsCompressed() ? 148 : 180);
             }

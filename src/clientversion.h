@@ -22,7 +22,7 @@
 #define DO_STRINGIZE(X) #X
 
 //! Copyright string used in Windows .rc files
-#define COPYRIGHT_STR "2009-" STRINGIZE(COPYRIGHT_YEAR) " The Bitcoin Core Developers, Dash Core Decelopers, 2014-" STRINGIZE(COPYRIGHT_YEAR) " The Chaincoin Core Developers"
+#define COPYRIGHT_STR "2009-" STRINGIZE(COPYRIGHT_YEAR) " The Bitcoin Core Developers, Dash Core Decelopers, 2014-" STRINGIZE(COPYRIGHT_YEAR) " The Chaincoin Developers"
 
 /**
  * chaincoind-res.rc includes this file, but it cannot cope with real c++ code.

@@ -1,14 +1,16 @@
 *.tar.gz
 
 *.exe
+*.pdb
 src/chaincoin
 src/chaincoind
 src/chaincoin-cli
 src/chaincoin-tx
+src/chaincoin-wallet
+src/test/fuzz
+!src/test/fuzz/*.*
 src/test/test_chaincoin
-src/test/test_chaincoin_fuzzy
 src/qt/test/test_chaincoin-qt
-*.pdb
 
 # autoreconf
 Makefile.in
@@ -87,7 +89,7 @@ src/qt/chaincoin-qt.includes
 *.qm
 Makefile
 !depends/Makefile
-chaincoin-qt
+src/qt/chaincoin-qt
 Chaincoin-Qt.app
 background.tiff*
 
@@ -104,6 +106,9 @@ qrc_*.cpp
 # Mac specific
 .DS_Store
 build
+
+# Previous releases
+releases
 
 #lcov
 *.gcno
@@ -129,10 +134,6 @@ contrib/devtools/split-debug.sh
 
 # Output from running db4 installation
 db4/
-chaincoin-wallet
-Chaincoin.cflags
-Chaincoin.creator.user.4.8-pre1
-Chaincoin.cxxflags
 
 # clang-check
 *.plist

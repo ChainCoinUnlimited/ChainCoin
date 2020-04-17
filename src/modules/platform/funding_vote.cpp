@@ -4,10 +4,10 @@
 
 #include <modules/platform/funding_vote.h>
 
-#include <messagesigner.h>
 #include <modules/platform/funding_object.h>
 #include <modules/masternode/masternode_man.h>
 #include <modules/masternode/masternode_sync.h>
+#include <util/message.h>
 #include <util/system.h>
 
 std::string CGovernanceVoting::ConvertOutcomeToString(vote_outcome_enum_t nOutcome)
@@ -147,40 +147,28 @@ uint256 CGovernanceVote::GetHash() const
     return hash;
 }
 
-uint256 CGovernanceVote::GetSignatureHash() const
-{
-    return SerializeHash(*this);
-}
-
-bool CGovernanceVote::Sign(const CKey& keyMasternode, const CPubKey& pubKeyMasternode)
+bool CGovernanceVote::Sign(const CKey& keyMasternode)
 {
     std::string strError;
 
-    uint256 hash = GetSignatureHash();
+    const uint256 hash = SerializeHash(*this);
 
-    if(!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
-        LogPrintf("CGovernanceVote::Sign -- SignHash() failed\n");
+    if (!HashSign(keyMasternode, hash, vchSig)) {
+        LogPrintf("CGovernanceVote::Sign -- HashSign() failed\n");
         return false;
     }
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-        LogPrintf("CGovernanceVote::Sign -- VerifyHash() failed, error: %s\n", strError);
-        return false;
-    }
-
-    return true;
+    return CheckSignature(keyMasternode.GetPubKey());
 }
 
 bool CGovernanceVote::CheckSignature(const CPubKey& pubKeyMasternode) const
 {
-    std::string strError;
+    const auto result = HashVerify(GetHash(), pubKeyMasternode, vchSig);
 
-        uint256 hash = GetSignatureHash();
-
-        if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
-            LogPrintf("CGovernanceVote::Sign -- SignHash() failed\n");
-            return false;
-        }
+    if (result != MessageVerificationResult::OK) {
+        LogPrintf("CGovernanceVote::CheckSignature -- HashVerify() failed!\n");
+        return false;
+    }
 
     return true;
 }

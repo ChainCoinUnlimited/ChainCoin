@@ -17,7 +17,7 @@
 CMasternodeConfig masternodeConfig;
 
 void CMasternodeConfig::add(const std::string& alias, const std::string& ip, const std::string& privKey, const std::string& txHash, const std::string& outputIndex) {
-    CMasternodeEntry cme(alias, ip, privKey, txHash, outputIndex);
+    MasternodeEntry cme(alias, ip, DecodeSecret(privKey), COutPoint(uint256S(txHash), std::atoi(outputIndex.c_str())));
     entries.push_back(cme);
 }
 

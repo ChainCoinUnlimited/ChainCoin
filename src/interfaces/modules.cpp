@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2020 PM-Tech
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,10 +11,10 @@
 #include <modules/coinjoin/coinjoin.h>
 #include <modules/coinjoin/coinjoin_server.h>
 
-void ModuleInterface::InitializeCurrentBlockTip()
+void ModuleInterface::InitializeCurrentBlockTip(const CBlockIndex *pindexNew, bool fInitialDownload)
 {
     LOCK(cs_main);
-    UpdatedBlockTip(::ChainActive().Tip(), nullptr, ::ChainstateActive().IsInitialBlockDownload());
+    UpdatedBlockTip(pindexNew, nullptr, fInitialDownload);
 }
 
 void ModuleInterface::ProcessModuleMessage(CNode* pfrom, const NetMsgDest& dest, const std::string& strCommand, CDataStream& vRecv)

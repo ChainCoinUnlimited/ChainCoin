@@ -14,19 +14,9 @@ Release Process
 * Update [bips.md](bips.md) to account for changes since the last release (don't forget to bump the version number on the first line).
 * Update version in `configure.ac` (don't forget to set `CLIENT_VERSION_RC` to `0`).
 * Write release notes (see "Write the release notes" below).
-* Update `src/chainparams.cpp` nMinimumChainWork with information from the getblockchaininfo rpc.
-* Update `src/chainparams.cpp` defaultAssumeValid with information from the getblockhash rpc.
-  - The selected value must not be orphaned so it may be useful to set the value two blocks back from the tip.
-  - Testnet should be set some tens of thousands back from the tip due to reorgs there.
-  - This update should be reviewed with a reindex-chainstate with assumevalid=0 to catch any defect
-     that causes rejection of blocks in the past history.
 
 ### Before every major release
 
-* Update hardcoded [seeds](/contrib/seeds/README.md), see [this pull request](https://github.com/bitcoin/bitcoin/pull/7415) for an example.
-* Update [`src/chainparams.cpp`](/src/chainparams.cpp) m_assumed_blockchain_size and m_assumed_chain_state_size with the current size plus some overhead (see [this](#how-to-calculate-m_assumed_blockchain_size-and-m_assumed_chain_state_size) for information on how to calculate them).
-* Update `src/chainparams.cpp` chainTxData with statistics about the transaction count and rate. Use the output of the RPC `getchaintxstats`, see
-  [this pull request](https://github.com/bitcoin/bitcoin/pull/12270) for an example. Reviewers can verify the results by running `getchaintxstats <window_block_count> <window_last_block_hash>` with the `window_block_count` and `window_last_block_hash` from your output.
 * On both the master branch and the new release branch:
   - update `CLIENT_VERSION_MINOR` in [`configure.ac`](../configure.ac)
   - update `CLIENT_VERSION_MINOR`, `PACKAGE_VERSION`, and `PACKAGE_STRING` in [`build_msvc/chaincoincoin_config.h`](/build_msvc/chaincoin_config.h)
@@ -36,6 +26,16 @@ Release Process
 
 #### Before branch-off
 
+* Update hardcoded [seeds](/contrib/seeds/README.md), see [this pull request](https://github.com/bitcoin/bitcoin/pull/7415) for an example.
+* Update [`src/chainparams.cpp`](/src/chainparams.cpp) m_assumed_blockchain_size and m_assumed_chain_state_size with the current size plus some overhead (see [this](#how-to-calculate-m_assumed_blockchain_size-and-m_assumed_chain_state_size) for information on how to calculate them).
+* Update `src/chainparams.cpp` chainTxData with statistics about the transaction count and rate. Use the output of the RPC `getchaintxstats`, see
+  [this pull request](https://github.com/bitcoin/bitcoin/pull/17002) for an example. Reviewers can verify the results by running `getchaintxstats <window_block_count> <window_last_block_hash>` with the `window_block_count` and `window_last_block_hash` from your output.
+* Update `src/chainparams.cpp` nMinimumChainWork with information from the getblockchaininfo rpc.
+* Update `src/chainparams.cpp` defaultAssumeValid with information from the getblockhash rpc.
+  - The selected value must not be orphaned so it may be useful to set the value two blocks back from the tip.
+  - Testnet should be set some tens of thousands back from the tip due to reorgs there.
+  - This update should be reviewed with a reindex-chainstate with assumevalid=0 to catch any defect
+     that causes rejection of blocks in the past history.
 - Clear the release notes and move them to the wiki (see "Write the release notes" below).
 
 #### After branch-off (on master)
@@ -45,8 +45,8 @@ Release Process
 
 #### After branch-off (on the major release branch)
 
-- Update the versions and the link to the release notes draft in `doc/release-notes.md`.
-- Delete `SECURITY.md`.
+- Update the versions.
+- Create a pinned meta-issue for testing the release candidate (see [this issue](https://github.com/bitcoin/bitcoin/issues/17079) for an example) and provide a link to it in the release announcements where useful.
 
 #### Before final release
 
@@ -111,13 +111,11 @@ Ensure gitian-builder is up-to-date:
 
     pushd ./gitian-builder
     mkdir -p inputs
-    wget -P inputs https://bitcoincore.org/cfields/osslsigncode-Backports-to-1.7.1.patch
-    echo 'a8c4e9cafba922f89de0df1f2152e7be286aba73f78505169bc351a7938dd911 inputs/osslsigncode-Backports-to-1.7.1.patch' | sha256sum -c
-    wget -P inputs https://downloads.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz
-    echo 'f9a8cdb38b9c309326764ebc937cba1523a3a751a7ab05df3ecc99d18ae466c9 inputs/osslsigncode-1.7.1.tar.gz' | sha256sum -c
+    wget -O inputs/osslsigncode-2.0.tar.gz https://github.com/mtrojnar/osslsigncode/archive/2.0.tar.gz
+    echo '5a60e0a4b3e0b4d655317b2f12a810211c50242138322b16e7e01c6fbb89d92f inputs/osslsigncode-2.0.tar.gz' | sha256sum -c
     popd
 
-Create the macOS SDK tarball, see the [macOS build instructions](build-osx.md#deterministic-macos-dmg-notes) for details, and copy it into the inputs directory.
+Create the macOS SDK tarball, see the [macdeploy instructions](/contrib/macdeploy/README.md#deterministic-macos-dmg-notes) for details, and copy it into the inputs directory.
 
 ### Optional: Seed the Gitian sources cache and offline git repositories
 
@@ -215,7 +213,7 @@ Codesigner only: Commit the detached codesign payloads:
     rm -rf *
     tar xf signature-osx.tar.gz
     tar xf signature-win.tar.gz
-    git add -a
+    git add -A
     git commit -m "point to ${VERSION}"
     git tag -s v${VERSION} HEAD
     git push the current branch and new tag
@@ -264,7 +262,6 @@ The list of files should be:
 ```
 chaincoin-${VERSION}-aarch64-linux-gnu.tar.gz
 chaincoin-${VERSION}-arm-linux-gnueabihf.tar.gz
-chaincoin-${VERSION}-i686-pc-linux-gnu.tar.gz
 chaincoin-${VERSION}-riscv64-linux-gnu.tar.gz
 chaincoin-${VERSION}-x86_64-linux-gnu.tar.gz
 chaincoin-${VERSION}-osx64.tar.gz
@@ -287,6 +284,12 @@ rm SHA256SUMS
 (the digest algorithm is forced to sha256 to avoid confusion of the `Hash:` header that GPG adds with the SHA256 used for the files)
 Note: check that SHA256SUMS itself doesn't end up in SHA256SUMS, which is a spurious/nonsensical entry.
 
+
+  - This repo
+
+      - Archive the release notes for the new version to `doc/release-notes/` (branch `master` and branch of the release)
+
+      - Create a [new GitHub release](https://github.com/chaincoin/chaincoin/releases/new) with a link to the archived release notes
 
 - Announce the release:
 

@@ -23,12 +23,12 @@ static const int MNPAYMENTS_SIGNATURES_TOTAL            = 10;
 //  vote for masternode and be elected as a payment winner
 static const int MIN_MASTERNODE_PAYMENT_PROTO_VERSION = 70015;
 
-extern CCriticalSection cs_vecPayees;
-extern CCriticalSection cs_mapMasternodeBlocks;
+extern RecursiveMutex cs_vecPayees;
+extern RecursiveMutex cs_mapMasternodeBlocks;
 
 extern CMasternodePayments mnpayments;
 
-/// TODO: all 4 functions do not belong here really, they should be refactored/moved somewhere (main.cpp ?)
+CAmount GetMasternodePayment(const int& nHeight, CAmount blockValue);
 bool IsBlockValueValid(const CBlock& block, int nBlockHeight, CAmount blockReward, std::string& strErrorRet);
 bool IsBlockPayeeValid(const CTransactionRef& txNew, int nBlockHeight, CAmount blockReward);
 void FillBlockPayments(CMutableTransaction& txNew, int nBlockHeight, CAmount blockReward, CTxOut& txoutMasternodeRet, std::vector<CTxOut>& voutSuperblockRet);
@@ -138,7 +138,6 @@ public:
     }
 
     uint256 GetHash() const;
-    uint256 GetSignatureHash() const;
 
     bool Sign();
     bool CheckSignature(const CPubKey& pubKeyMasternode, int nValidationHeight, int &nDos) const;

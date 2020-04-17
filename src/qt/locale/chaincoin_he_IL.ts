@@ -359,7 +359,7 @@
     </message>
     <message>
         <source>Open &amp;Masternode Configuration File</source>
-        <translation>פתח קובץ תצורה Masternode </translation>
+        <translation>פתח קובץ תצורה Masternode </translation>
     </message>
     <message>
         <source>Open Masternode configuration file</source>
@@ -426,7 +426,7 @@
         <translation>קבל</translation>
     </message>
     <message>
-        <source>&amp;About Chaincoin Core</source>
+        <source>&amp;About Chaincoin</source>
         <translation>אודות CoreCoin Core</translation>
     </message>
     <message>
@@ -494,8 +494,8 @@
         <translation>פתח Chaincoin URI או בקשת תשלום</translation>
     </message>
     <message>
-        <source>Show the Chaincoin Core help message to get a list with possible Chaincoin Core command-line options</source>
-        <translation>הצג את הודעת העזרה של Chaincoin Core לקבלת רשימה עם אפשרויות שורת פקודה של Chaincoin Core</translation>
+        <source>Show the Chaincoin help message to get a list with possible Chaincoin command-line options</source>
+        <translation>הצג את הודעת העזרה של Chaincoin לקבלת רשימה עם אפשרויות שורת פקודה של Chaincoin</translation>
     </message>
     <message>
         <source>&amp;PrivateSend information</source>
@@ -534,8 +534,8 @@
         <translation>מעדכן</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>Date: %1
@@ -919,15 +919,15 @@
         <translation>version</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Chaincoin Core</source>
+        <source>About Chaincoin</source>
         <translation>אודות CoreCoin Core</translation>
     </message>
     <message>
@@ -1334,8 +1334,8 @@
         <translation>כמות Chaincoin לשמור אנונימי</translation>
     </message>
     <message>
-        <source>Automatically open the Chaincoin Core client port on the router. This only works when your router  UPnP and it is enabled.</source>
-        <translation>פתח באופן אוטומטי את יציאת הלקוח של Chaincoin Core בנתב. זה עובד רק כאשר UPnP הנתב שלך הוא מופעל.</translation>
+        <source>Automatically open the Chaincoin client port on the router. This only works when your router  UPnP and it is enabled.</source>
+        <translation>פתח באופן אוטומטי את יציאת הלקוח של Chaincoin בנתב. זה עובד רק כאשר UPnP הנתב שלך הוא מופעל.</translation>
     </message>
     <message>
         <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
@@ -1390,12 +1390,12 @@
         <translation>&amp;רֶשֶׁת</translation>
     </message>
     <message>
-        <source>Automatically start Chaincoin Core after logging in to the system.</source>
-        <translation>הפעל באופן אוטומטי את Chaincoin Core לאחר כניסה למערכת.</translation>
+        <source>Automatically start Chaincoin after logging in to the system.</source>
+        <translation>הפעל באופן אוטומטי את Chaincoin לאחר כניסה למערכת.</translation>
     </message>
     <message>
-        <source>&amp;Start Chaincoin Core on system login</source>
-        <translation>&amp;התחל Chaincoin Core על כניסה למערכת</translation>
+        <source>&amp;Start Chaincoin on system login</source>
+        <translation>&amp;התחל Chaincoin על כניסה למערכת</translation>
     </message>
     <message>
         <source>W&amp;allet</source>
@@ -1494,8 +1494,8 @@
         <translation>אם להציג תכונות שליטה מטבע או לא.</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin Core.</source>
-        <translation>ניתן להגדיר את שפת ממשק המשתמש כאן. הגדרה זו תיכנס לתוקף לאחר הפעלה מחדש של Chaincoin Core.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin.</source>
+        <translation>ניתן להגדיר את שפת ממשק המשתמש כאן. הגדרה זו תיכנס לתוקף לאחר הפעלה מחדש של Chaincoin.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
@@ -2350,8 +2350,8 @@ https://www.transifex.com/projects/p/chaincoin/</source>
         <translation>שימוש בזיכרון</translation>
     </message>
     <message>
-        <source>Open the Chaincoin Core debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>פתח את קובץ יומן האיתחול של Chaincoin Core מספריית הנתונים הנוכחית. פעולה זו עשויה להימשך מספר שניות עבור קובצי יומן גדולים.</translation>
+        <source>Open the Chaincoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>פתח את קובץ יומן האיתחול של Chaincoin מספריית הנתונים הנוכחית. פעולה זו עשויה להימשך מספר שניות עבור קובצי יומן גדולים.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -3131,8 +3131,8 @@ https://www.transifex.com/projects/p/chaincoin/</source>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Chaincoin Core is shutting down...</source>
-        <translation>Chaincoin Core כבה...</translation>
+        <source>Chaincoin is shutting down...</source>
+        <translation>Chaincoin כבה...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -3297,7 +3297,7 @@ https://www.transifex.com/projects/p/chaincoin/</source>
         <translation>מפתחי Dash Core</translation>
     </message>
     <message>
-        <source>The Chaincoin Core developers</source>
+        <source>The Chaincoin developers</source>
         <translation>מפתחי CoreCoin Core</translation>
     </message>
 </context>
@@ -3948,7 +3948,7 @@ https://www.transifex.com/projects/p/chaincoin/</source>
     </message>
     <message>
         <source>Disable all Chaincoin specific functionality (Masternodes, PrivateSend, Governance) (0-1, default: %u)</source>
-        <translation>השבת את כל הפונקציונליות הספציפית של Chaincoin  ו  (Masternodes, PrivateSend, Governance) ו (0-1, default: %u)</translation>
+        <translation>השבת את כל הפונקציונליות הספציפית של Chaincoin  ו  (Masternodes, PrivateSend, Governance) ו (0-1, default: %u)</translation>
     </message>
     <message>
         <source>Discover own IP addresses (default: 1 when listening and no -externalip or -proxy)</source>

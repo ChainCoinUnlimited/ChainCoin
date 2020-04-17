@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2013-2018 The Bitcoin Core developers
+# Copyright (c) 2013-2019 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #
@@ -19,7 +19,9 @@ MIN_BLOCKS = 337600
 
 # These are hosts that have been observed to be behaving strangely (e.g.
 # aggressively connecting to every node).
-SUSPICIOUS_HOSTS = {}
+with open("suspicious_hosts.txt", mode="r", encoding="utf-8") as f:
+    SUSPICIOUS_HOSTS = {s.strip() for s in f if s.strip()}
+
 
 PATTERN_IPV4 = re.compile(r"^((\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})):(\d+)$")
 PATTERN_IPV6 = re.compile(r"^\[([0-9a-z:]+)\]:(\d+)$")
@@ -117,7 +119,7 @@ def filtermultiport(ips):
 
 def lookup_asn(net, ip):
     '''
-    Look up the asn for an IP (4 or 6) address by querying cymry.com, or None
+    Look up the asn for an IP (4 or 6) address by querying cymru.com, or None
     if it could not be found.
     '''
     try:
@@ -181,7 +183,7 @@ def main():
     # Skip entries with invalid address.
     ips = [ip for ip in ips if ip is not None]
     print('%s Skip entries with invalid address' % (ip_stats(ips)), file=sys.stderr)
-    # Skip duplicattes (in case multiple seeds files were concatenated)
+    # Skip duplicates (in case multiple seeds files were concatenated)
     ips = dedup(ips)
     print('%s After removing duplicates' % (ip_stats(ips)), file=sys.stderr)
     # Skip entries from suspicious hosts.

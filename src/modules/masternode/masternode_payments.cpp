@@ -8,17 +8,36 @@
 #include <modules/masternode/masternode_sync.h>
 #include <modules/masternode/masternode_man.h>
 #include <modules/platform/funding_classes.h>
-#include <messagesigner.h>
 #include <netmessagemaker.h>
 #include <netfulfilledman.h>
+#include <util/message.h>
 #include <util/system.h>
+#include <validation.h>
 
 /** Object for who's going to get paid on which blocks */
 CMasternodePayments mnpayments;
 
-CCriticalSection cs_vecPayees;
-CCriticalSection cs_mapMasternodeBlocks;
-CCriticalSection cs_mapMasternodePaymentVotes;
+RecursiveMutex cs_vecPayees;
+RecursiveMutex cs_mapMasternodeBlocks;
+RecursiveMutex cs_mapMasternodePaymentVotes;
+
+CAmount GetMasternodePayment(const int& nHeight, CAmount blockValue)
+{
+    CAmount ret = blockValue/5; // start at 20%
+
+    int nMNPIBlock = Params().GetConsensus().nMasternodePaymentsIncreaseBlock;
+    int nMNPIPeriod = Params().GetConsensus().nMasternodePaymentsIncreasePeriod;
+
+    // mainnet:
+    if(nHeight > nMNPIBlock)                  ret += blockValue / 40; // 22.5%
+    if(nHeight > nMNPIBlock+(nMNPIPeriod* 1)) ret += blockValue / 40; // 25,0%
+    if(nHeight > nMNPIBlock+(nMNPIPeriod* 2)) ret += blockValue / 40; // 27.5%
+    if(nHeight > nMNPIBlock+(nMNPIPeriod* 3)) ret += blockValue / 40; // 30.0%
+    if(nHeight > nMNPIBlock+(nMNPIPeriod* 4)) ret += blockValue / 40; // 32.5%
+    if(nHeight > nMNPIBlock+(nMNPIPeriod* 5)) ret += blockValue / 40; // 35.0%
+
+    return ret;
+}
 
 /**
 * IsBlockValueValid
@@ -374,24 +393,21 @@ uint256 CMasternodePaymentVote::GetHash() const
     return ss.GetHash();
 }
 
-uint256 CMasternodePaymentVote::GetSignatureHash() const
-{
-    return SerializeHash(*this);
-}
-
 bool CMasternodePaymentVote::Sign()
 {
     std::string strError;
 
-    uint256 hash = GetSignatureHash();
+    const uint256 hash = SerializeHash(*this);
 
-    if (!CHashSigner::SignHash(hash, activeMasternode.keyMasternode, vchSig)) {
-        LogPrintf("CMasternodePaymentVote::Sign -- SignHash() failed\n");
+    if (!HashSign(activeMasternode.keyMasternode, hash, vchSig)) {
+        LogPrintf("CMasternodePaymentVote::Sign -- HashSign() failed\n");
         return false;
     }
 
-    if (!CHashSigner::VerifyHash(hash, activeMasternode.pubKeyMasternode, vchSig, strError)) {
-        LogPrintf("CMasternodePaymentVote::Sign -- VerifyHash() failed, error: %s\n", strError);
+    const auto result = HashVerify(hash, activeMasternode.pubKeyMasternode, vchSig);
+
+    if (result != MessageVerificationResult::OK) {
+        LogPrintf("CMasternodePaymentVote::Sign -- HashVerify() failed!\n");
         return false;
     }
     return true;
@@ -809,19 +825,19 @@ bool CMasternodePaymentVote::CheckSignature(const CPubKey& pubKeyMasternode, int
 {
     // do not ban by default
     nDos = 0;
-    std::string strError = "";
+    const uint256 hash = SerializeHash(*this);
 
-    uint256 hash = GetSignatureHash();
+    const auto result = HashVerify(hash, pubKeyMasternode, vchSig);
 
-    if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
+    if (result != MessageVerificationResult::OK) {
         // Only ban for future block vote when we are already synced.
         // Otherwise it could be the case when MN which signed this vote is using another key now
         // and we have no idea about the old one.
         if (masternodeSync.IsMasternodeListSynced() && nBlockHeight > nValidationHeight) {
             nDos = 20;
         }
-        return error("CMasternodePaymentVote::CheckSignature -- Got bad Masternode payment signature, masternode=%s, error: %s",
-                    masternodeOutpoint.ToStringShort(), strError);
+        return error("CMasternodePaymentVote::CheckSignature -- Got bad Masternode payment signature, masternode=%s\n",
+                    masternodeOutpoint.ToStringShort());
     }
 
     return true;
@@ -973,7 +989,7 @@ void CMasternodePayments::UpdatedBlockTip(const CBlockIndex *pindexNew, bool fIn
 void CMasternodePayments::Controller(CScheduler& scheduler)
 {
     if (!fLiteMode) {
-        scheduler.scheduleEvery(std::bind(&CMasternodePayments::CheckAndRemove, this), 60000);
+        scheduler.scheduleEvery(std::bind(&CMasternodePayments::CheckAndRemove, this), std::chrono::seconds{60});
     }
 }
 

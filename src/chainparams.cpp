@@ -1,7 +1,7 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Copyright (c) 2009-2019 The Bitcoin Core developers
 // Copyright (c) 2014-2017 The Dash Core developers
-// Copyright (c) 2018 PM-Tech
+// Copyright (c) 2018-2019 PM-Tech
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -64,7 +64,7 @@ static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits
 class CMainParams : public CChainParams {
 public:
     CMainParams() {
-        strNetworkID = "main";
+        strNetworkID = CBaseChainParams::MAIN;
         consensus.nSubsidyHalvingInterval = 700800; // PM-Tech: ChainCoin // 2 years
         consensus.nMasternodePaymentsStartBlock = 1572480; // PM-Tech: SegWit activation block
         consensus.nMasternodePaymentsIncreaseBlock = 2250000; // PM-Tech: estimation
@@ -150,6 +150,7 @@ public:
         fRequireStandard = true;
         fAllowMultiplePorts = false;
         m_is_test_chain = false;
+        m_is_mockable_chain = false;
 
         nPoolMinInputs = 3;
         nPoolMaxInputs = 8;
@@ -187,7 +188,7 @@ public:
 class CTestNetParams : public CChainParams {
 public:
     CTestNetParams() {
-        strNetworkID = "test";
+        strNetworkID = CBaseChainParams::TESTNET;
         consensus.nSubsidyHalvingInterval = 56600;
         consensus.nMasternodePaymentsStartBlock = 48384; // PM-Tech: SegWit activation block
         consensus.nMasternodePaymentsIncreaseBlock = 4030;
@@ -262,6 +263,7 @@ public:
         fRequireStandard = false;
         fAllowMultiplePorts = true;
         m_is_test_chain = true;
+        m_is_mockable_chain = false;
 
         nPoolMinInputs = 3;
         nPoolMaxInputs = 8;
@@ -290,7 +292,7 @@ public:
 class CRegTestParams : public CChainParams {
 public:
     explicit CRegTestParams(const ArgsManager& args) {
-        strNetworkID = "regtest";
+        strNetworkID =  CBaseChainParams::REGTEST;
         consensus.nSubsidyHalvingInterval = 150;
         consensus.nMasternodePaymentsStartBlock = 240;
         consensus.nMasternodePaymentsIncreaseBlock = 350;
@@ -353,6 +355,7 @@ public:
         fRequireStandard = false;
         fAllowMultiplePorts = true;
         m_is_test_chain = true;
+        m_is_mockable_chain = true;
 
         nPoolMinInputs = 3;
         nPoolMaxInputs = 8;

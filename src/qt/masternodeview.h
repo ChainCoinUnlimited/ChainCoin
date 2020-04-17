@@ -64,7 +64,7 @@ private:
     QAction *startAliasAction; // to be able to explicitly disable it
 
     // Protects tableView
-    CCriticalSection cs_mnlist;
+    RecursiveMutex cs_mnlist;
 
 private Q_SLOTS:
     /** QR code button clicked */

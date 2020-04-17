@@ -442,8 +442,8 @@
         <translation>&amp;Nhận</translation>
     </message>
     <message>
-        <source>&amp;About Chaincoin Core</source>
-        <translation>&amp;Tài liệu về Chaincoin Core</translation>
+        <source>&amp;About Chaincoin</source>
+        <translation>&amp;Tài liệu về Chaincoin</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -522,7 +522,7 @@
         <translation>Mở một Chaincoin: URI hoặc yêu cầu thanh toán</translation>
     </message>
     <message>
-        <source>Show the Chaincoin Core help message to get a list with possible Chaincoin Core command-line options</source>
+        <source>Show the Chaincoin help message to get a list with possible Chaincoin command-line options</source>
         <translation>Hiển thị tin nhắn hỗ trợ của Chaincoin để nhận được danh sách lệnh của Chaincoin.</translation>
     </message>
     <message>
@@ -574,7 +574,7 @@
         <translation>Đồng bộ hóa dữ liệu bổ sung: %p%</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
+        <source>Chaincoin</source>
         <translation>Chaincoin</translation>
     </message>
     <message>
@@ -956,7 +956,7 @@ Tùy chọn này khá nhanh và tốn khoảng 0,05 CHC để ẩn danh 1000 CHC
         <translation>phiên bản</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
+        <source>Chaincoin</source>
         <translation>Chaincoin</translation>
     </message>
     <message>
@@ -964,8 +964,8 @@ Tùy chọn này khá nhanh và tốn khoảng 0,05 CHC để ẩn danh 1000 CHC
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Chaincoin Core</source>
-        <translation>Tài liệu về Chaincoin Core</translation>
+        <source>About Chaincoin</source>
+        <translation>Tài liệu về Chaincoin</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1379,8 +1379,8 @@ Tùy chọn này khá nhanh và tốn khoảng 0,05 CHC để ẩn danh 1000 CHC
         <translation>Số lượng của Chaincoin để giữ vô danh</translation>
     </message>
     <message>
-        <source>Automatically open the Chaincoin Core client port on the router. This only works when your router  UPnP and it is enabled.</source>
-        <translation>Tự động mở cổng khách hàng của Chaincoin Core trên router. Điều này chỉ hoạt động khi router UPnP của bạn và nó được kích hoạt.</translation>
+        <source>Automatically open the Chaincoin client port on the router. This only works when your router  UPnP and it is enabled.</source>
+        <translation>Tự động mở cổng khách hàng của Chaincoin trên router. Điều này chỉ hoạt động khi router UPnP của bạn và nó được kích hoạt.</translation>
     </message>
     <message>
         <source>Connect to the Chaincoin network through a SOCKS5 proxy.</source>
@@ -1439,12 +1439,12 @@ Tùy chọn này khá nhanh và tốn khoảng 0,05 CHC để ẩn danh 1000 CHC
         <translation>&amp;Network</translation>
     </message>
     <message>
-        <source>Automatically start Chaincoin Core after logging in to the system.</source>
-        <translation>Tự động khởi động Chaincoin Core sau khi đăng nhập vào hệ thống.</translation>
+        <source>Automatically start Chaincoin after logging in to the system.</source>
+        <translation>Tự động khởi động Chaincoin sau khi đăng nhập vào hệ thống.</translation>
     </message>
     <message>
-        <source>&amp;Start Chaincoin Core on system login</source>
-        <translation>&amp;Bắt đầu Chaincoin Core về đăng nhập hệ thống</translation>
+        <source>&amp;Start Chaincoin on system login</source>
+        <translation>&amp;Bắt đầu Chaincoin về đăng nhập hệ thống</translation>
     </message>
     <message>
         <source>(0 = auto, &lt;0 = leave that many cores free)</source>
@@ -1547,8 +1547,8 @@ Tùy chọn này khá nhanh và tốn khoảng 0,05 CHC để ẩn danh 1000 CHC
         <translation>Cho hiển thị tính năng coin control hoặc không.</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin Core.</source>
-        <translation>Giao diện ngôn ngữ người dùng có thể được thiết lập tại đây. Tùy chọn này sẽ có hiệu lực sau khi khởi động lại Chaincoin Core.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin.</source>
+        <translation>Giao diện ngôn ngữ người dùng có thể được thiết lập tại đây. Tùy chọn này sẽ có hiệu lực sau khi khởi động lại Chaincoin.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
@@ -2252,7 +2252,7 @@ https://www.transifex.com/projects/p/chaincoin/</translation>
         <translation>Bộ nhớ usage</translation>
     </message>
     <message>
-        <source>Open the Chaincoin Core debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <source>Open the Chaincoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
         <translation>Mở tệp nhật ký gỡ lỗi Corecoin Core từ thư mục dữ liệu hiện tại. Quá trình này có thể mất vài giây cho các tệp nhật ký lớn.</translation>
     </message>
     <message>
@@ -3033,8 +3033,8 @@ https://www.transifex.com/projects/p/chaincoin/</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Chaincoin Core is shutting down...</source>
-        <translation>Chaincoin Core đang tắt ...</translation>
+        <source>Chaincoin is shutting down...</source>
+        <translation>Chaincoin đang tắt ...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -3199,8 +3199,8 @@ https://www.transifex.com/projects/p/chaincoin/</translation>
         <translation>Các nhà phát triển Dash Core</translation>
     </message>
     <message>
-        <source>The Chaincoin Core developers</source>
-        <translation>Các nhà phát triển Chaincoin Core</translation>
+        <source>The Chaincoin developers</source>
+        <translation>Các nhà phát triển Chaincoin</translation>
     </message>
 </context>
 <context>

@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2017 The Dash Core developers
-// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Copyright (c) 2011-2019 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,8 +9,6 @@
 #include <qt/clientmodel.h>
 #include <qt/guiconstants.h>
 #include <qt/guiutil.h>
-#include <init.h>
-#include <interfaces/node.h>
 #include <qt/optionsmodel.h>
 #include <qt/platformstyle.h>
 #include <qt/transactionfilterproxy.h>
@@ -22,9 +19,9 @@
 #include <qt/coinjoinconfig.h>
 
 #include <QAbstractItemDelegate>
+#include <QDebug>
 #include <QPainter>
 #include <QSettings>
-#include <QTimer>
 
 #define ICON_OFFSET 16
 #define DECORATION_SIZE 54
@@ -157,11 +154,8 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     // we'll setup and make it visible in updateAdvancedPSUI() later if we are not in litemode
     ui->frameCoinJoin->setVisible(false);
 
-    // that's it for litemode
-    if(fLiteMode) return;
-
     // Disable any PS UI when autobackup is disabled or failed for whatever reason
-    if(nWalletBackups <= 0){
+    if(walletModel->getWalletBackups() <= 0){
         DisableCoinJoinCompletely();
         ui->labelCoinJoinEnabled->setToolTip(tr("Automatic backups are disabled, no mixing available!"));
     } else {
@@ -193,7 +187,7 @@ void OverviewPage::setBalance(const interfaces::WalletBalances& balances)
 {
     int unit = walletModel->getOptionsModel()->getDisplayUnit();
     m_balances = balances;
-    if (walletModel->privateKeysDisabled()) {
+    if (walletModel->wallet().privateKeysDisabled()) {
         ui->labelBalance->setText(BitcoinUnits::formatWithUnit(unit, balances.watch_only_balance, false, BitcoinUnits::separatorAlways));
         ui->labelUnconfirmed->setText(BitcoinUnits::formatWithUnit(unit, balances.unconfirmed_watch_only_balance, false, BitcoinUnits::separatorAlways));
         ui->labelImmature->setText(BitcoinUnits::formatWithUnit(unit, balances.immature_watch_only_balance, false, BitcoinUnits::separatorAlways));
@@ -217,7 +211,7 @@ void OverviewPage::setBalance(const interfaces::WalletBalances& balances)
     // for symmetry reasons also show immature label when the watch-only one is shown
     ui->labelImmature->setVisible(showImmature || showWatchOnlyImmature);
     ui->labelImmatureText->setVisible(showImmature || showWatchOnlyImmature);
-    ui->labelWatchImmature->setVisible(!walletModel->privateKeysDisabled() && showWatchOnlyImmature); // show watch-only immature balance
+    ui->labelWatchImmature->setVisible(!walletModel->wallet().privateKeysDisabled() && showWatchOnlyImmature); // show watch-only immature balance
 }
 
 // show/hide watch-only labels
@@ -266,16 +260,14 @@ void OverviewPage::setWalletModel(WalletModel *model)
 
         connect(model->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &OverviewPage::updateDisplayUnit);
 
-        updateWatchOnlyLabels(wallet.haveWatchOnly() && !model->privateKeysDisabled());
+        updateWatchOnlyLabels(wallet.haveWatchOnly() && !model->wallet().privateKeysDisabled());
         connect(model, &WalletModel::notifyWatchonlyChanged, [this](bool showWatchOnly) {
-            updateWatchOnlyLabels(showWatchOnly && !walletModel->privateKeysDisabled());
+            updateWatchOnlyLabels(showWatchOnly && !walletModel->wallet().privateKeysDisabled());
         });
 
         // explicitly update PS frame and transaction list to reflect actual settings
         updateAdvancedPSUI(model->getOptionsModel()->getShowAdvancedPSUI());
 
-        // that's it for litemode
-        if(fLiteMode) return;
         interfaces::CoinJoinStatus status = wallet.getCoinJoinStatus();
         coinJoinStatus(status);
         connect(model, &WalletModel::coinJoinChanged, this, &OverviewPage::coinJoinStatus);
@@ -384,10 +376,8 @@ void OverviewPage::updateCoinJoinProgress()
 
 void OverviewPage::updateAdvancedPSUI(bool _fShowAdvancedPSUI) {
     this->fShowAdvancedPSUI = _fShowAdvancedPSUI;
-    int nNumItems = (fLiteMode || !_fShowAdvancedPSUI) ? NUM_ITEMS : NUM_ITEMS_ADV;
+    int nNumItems = (!_fShowAdvancedPSUI) ? NUM_ITEMS : NUM_ITEMS_ADV;
     SetupTransactionList(nNumItems);
-
-    if (fLiteMode) return;
 
     ui->frameCoinJoin->setVisible(true);
     ui->labelCompletitionText->setVisible(_fShowAdvancedPSUI);
@@ -406,13 +396,11 @@ void OverviewPage::coinJoinStatus(const interfaces::CoinJoinStatus& status)
 
     m_coinjoinstatus = status;
 
-    static int64_t nLastDSProgressBlockTime = 0;
-
-    int nBestHeight = clientModel->cachedBestHeaderHeight;
+    static QDateTime nLastCJProgressBlockTime = QDateTime();
 
     // We are processing more then 1 block per second, we'll just leave
-    if(((nBestHeight - m_coinjoinstatus.cachednumblocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
-    nLastDSProgressBlockTime = GetTimeMillis();
+    if(((clientModel->getHeaderTipHeight() - m_coinjoinstatus.cachednumblocks) / (nLastCJProgressBlockTime.msecsTo(QDateTime::currentDateTime()) + 1000) > 1)) return;
+    nLastCJProgressBlockTime = QDateTime::currentDateTime();
 
     QString strKeysLeftText(tr("keys left: %1").arg(m_coinjoinstatus.keysleft));
     if(m_coinjoinstatus.keysleft < walletModel->m_privsendconfig.keyswarning) {
@@ -421,8 +409,8 @@ void OverviewPage::coinJoinStatus(const interfaces::CoinJoinStatus& status)
     ui->labelCoinJoinEnabled->setToolTip(strKeysLeftText);
 
     if (!m_coinjoinstatus.enabled) {
-        if (nBestHeight != m_coinjoinstatus.cachednumblocks) {
-            walletModel->setNumBlocks(nBestHeight);
+        if (clientModel->getHeaderTipHeight() != m_coinjoinstatus.cachednumblocks) {
+            walletModel->setNumBlocks(clientModel->getHeaderTipHeight());
         }
         updateCoinJoinProgress();
 
@@ -441,7 +429,7 @@ void OverviewPage::coinJoinStatus(const interfaces::CoinJoinStatus& status)
 
     // Warn user that wallet is running out of keys
     // NOTE: we do NOT warn user and do NOT create autobackups if mixing is not running
-    if (nWalletBackups > 0 && m_coinjoinstatus.keysleft < walletModel->m_privsendconfig.keyswarning) {
+    if (walletModel->getWalletBackups() > 0 && m_coinjoinstatus.keysleft < walletModel->m_privsendconfig.keyswarning) {
         QSettings settings;
         if(settings.value("fLowKeysWarning").toBool()) {
             QString strWarn =   tr("Very low number of keys left since last automatic backup!") + "<br><br>" +
@@ -450,27 +438,27 @@ void OverviewPage::coinJoinStatus(const interfaces::CoinJoinStatus& status)
                                    "saved in some safe place</span>!") + "<br><br>" +
                                 tr("Note: You can turn this message off in options.");
             ui->labelCoinJoinEnabled->setToolTip(strWarn);
-            LogPrintf("OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, warning user and trying to create new backup...\n");
+            qDebug() << "OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, warning user and trying to create new backup...";
             QMessageBox::warning(this, tr("CoinJoin"), strWarn, QMessageBox::Ok, QMessageBox::Ok);
         } else {
-            LogPrintf("OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, skipping warning and trying to create new backup...\n");
+            qDebug() << "OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, skipping warning and trying to create new backup...";
         }
 
-        std::string strBackupWarning;
+        std::vector<std::string> warnings;
         std::string strBackupError;
         const std::string name = walletModel->getWalletName().toStdString();
-        if(!walletModel->wallet().DoAutoBackup(name, strBackupWarning, strBackupError)) {
-            if (!strBackupWarning.empty()) {
+        if(!walletModel->wallet().DoAutoBackup(name, warnings, strBackupError)) {
+            if (!warnings.empty()) {
                 // It's still more or less safe to continue but warn user anyway
-                LogPrintf("OverviewPage::coinJoinStatus -- WARNING! Something went wrong on automatic backup: %s\n", strBackupWarning);
+                qDebug() << "OverviewPage::coinJoinStatus -- WARNING! Something went wrong on automatic backup: " + QString::fromStdString(warnings.back());
 
                 QMessageBox::warning(this, tr("CoinJoin"),
-                    tr("WARNING! Something went wrong on automatic backup") + ":<br><br>" + strBackupWarning.c_str(),
+                    tr("WARNING! Something went wrong on automatic backup") + ":<br><br>" + QString::fromStdString(warnings.back()),
                     QMessageBox::Ok, QMessageBox::Ok);
             }
             if (!strBackupError.empty()) {
                 // Things are really broken, warn user and stop mixing immediately
-                LogPrintf("OverviewPage::coinJoinStatus -- ERROR! Failed to create automatic backup: %s\n", strBackupError);
+                qDebug() << "OverviewPage::coinJoinStatus -- ERROR! Failed to create automatic backup: " + QString::fromStdString(strBackupError);
 
                 QMessageBox::warning(this, tr("CoinJoin"),
                     tr("ERROR! Failed to create automatic backup") + ":<br><br>" + strBackupError.c_str() + "<br>" +
@@ -485,7 +473,7 @@ void OverviewPage::coinJoinStatus(const interfaces::CoinJoinStatus& status)
     if(fShowAdvancedPSUI) strEnabled += ", " + strKeysLeftText;
     ui->labelCoinJoinEnabled->setText(strEnabled);
 
-    if(nWalletBackups == -1) {
+    if(walletModel->getWalletBackups() == -1) {
         // Automatic backup failed, nothing else we can do until user fixes the issue manually
         DisableCoinJoinCompletely();
 
@@ -495,16 +483,16 @@ void OverviewPage::coinJoinStatus(const interfaces::CoinJoinStatus& status)
         ui->labelCoinJoinEnabled->setToolTip(strError);
 
         return;
-    } else if(nWalletBackups == -2) {
+    } else if(walletModel->getWalletBackups() == -2) {
         // We were able to create automatic backup but keypool was not replenished because wallet is locked.
         QString strWarning = tr("WARNING! Failed to replenish keypool, please unlock your wallet to do so.");
         ui->labelCoinJoinEnabled->setToolTip(strWarning);
     }
 
     // check darksend status and unlock if needed
-    if(nBestHeight != m_coinjoinstatus.cachednumblocks) {
+    if(clientModel->getHeaderTipHeight() != m_coinjoinstatus.cachednumblocks) {
         // Balance and number of transactions might have changed
-        walletModel->setNumBlocks(nBestHeight);
+        walletModel->setNumBlocks(clientModel->getHeaderTipHeight());
         updateCoinJoinProgress();
     }
 
@@ -513,7 +501,7 @@ void OverviewPage::coinJoinStatus(const interfaces::CoinJoinStatus& status)
     QString s = tr("CoinJoin status:\n") + strStatus;
 
     if(s != ui->labelCoinJoinLastMessage->text())
-        LogPrintf("OverviewPage::coinJoinStatus -- CoinJoin status: %s\n", strStatus.toStdString());
+        qDebug() << "OverviewPage::coinJoinStatus -- CoinJoin status: " + strStatus;
 
     ui->labelCoinJoinLastMessage->setText(s);
 
@@ -568,7 +556,7 @@ void OverviewPage::toggleCoinJoin(){
                 QMessageBox::warning(this, tr("CoinJoin"),
                     tr("Wallet is locked and user declined to unlock. Disabling CoinJoin."),
                     QMessageBox::Ok, QMessageBox::Ok);
-                LogPrint(BCLog::CJOIN, "OverviewPage::toggleCoinJoin -- Wallet is locked and user declined to unlock. Disabling CoinJoin.\n");
+                qDebug() << "OverviewPage::toggleCoinJoin -- Wallet is locked and user declined to unlock. Disabling CoinJoin.";
                 return;
             }
         }
@@ -601,7 +589,7 @@ void OverviewPage::DisableCoinJoinCompletely() {
     ui->toggleCoinJoin->setText("(" + tr("Disabled") + ")");
     ui->coinJoinReset->setText("(" + tr("Disabled") + ")");
     ui->frameCoinJoin->setEnabled(false);
-    if (nWalletBackups <= 0) {
+    if (walletModel->getWalletBackups() <= 0) {
         ui->labelCoinJoinEnabled->setText("<span style='color:red;'>(" + tr("Disabled") + ")</span>");
     }
     walletModel->toggleMixing(true);

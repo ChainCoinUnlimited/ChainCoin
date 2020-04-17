@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2020 PM-Tech
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -41,7 +41,7 @@ private:
     void CreateFinalTransaction(CConnman* connman);
     void CommitFinalTransaction(CConnman* connman);
 
-    bool CreateNewSession(const CAmount& nDenom, PoolMessage &nMessageIDRet, CConnman* connman);
+    bool CreateNewSession(const CAmount& nDenom, PoolMessage &nMessageIDRet);
     bool AddUserToExistingSession(const CAmount& nDenom, PoolMessage &nMessageIDRet);
     /// Do we have enough users to take entries?
     bool IsSessionReady() { return vecDenom.size() >= CCoinJoin::GetMinPoolInputs(); }

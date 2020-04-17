@@ -5,24 +5,27 @@
 #ifndef BITCOIN_MODULES_MASTERNODE_MASTERNODE_H
 #define BITCOIN_MODULES_MASTERNODE_MASTERNODE_H
 
-#include <key.h>
+#include <chain.h>
 #include <key_io.h>
 #include <net.h>
-#include <validation.h>
+
+#include <chrono>
 
 class CMasternode;
 class CMasternodeBroadcast;
 class CConnman;
-struct InitInterfaces;
 
-extern InitInterfaces* g_mn_interfaces;
+struct MasternodeEntry;
+struct NodeContext;
 
-static const int MASTERNODE_CHECK_SECONDS               =  10;
-static const int MASTERNODE_MIN_MNB_SECONDS             =   5 * 60;
-static const int MASTERNODE_MIN_MNP_SECONDS             =  10 * 60;
-static const int MASTERNODE_SENTINEL_PING_MAX_SECONDS   =  60 * 60;
-static const int MASTERNODE_EXPIRATION_SECONDS          = 120 * 60;
-static const int MASTERNODE_NEW_START_REQUIRED_SECONDS  = 180 * 60;
+extern NodeContext* g_module_node;
+
+static constexpr int64_t MASTERNODE_CHECK_SECONDS               =       10;
+static constexpr int64_t MASTERNODE_MIN_MNB_SECONDS             =   5 * 60;
+static constexpr int64_t MASTERNODE_MIN_MNP_SECONDS             =  10 * 60;
+static constexpr int64_t MASTERNODE_SENTINEL_PING_MAX_SECONDS   =  60 * 60;
+static constexpr int64_t MASTERNODE_EXPIRATION_SECONDS          = 120 * 60;
+static constexpr int64_t MASTERNODE_NEW_START_REQUIRED_SECONDS  = 180 * 60;
 
 static const int MASTERNODE_MAX_MNP_BLOCKS              = 60;
 static const int MASTERNODE_POSE_BAN_MAX_SCORE          =  5;
@@ -63,12 +66,13 @@ public:
         READWRITE(nDaemonVersion);
     }
 
-    uint256 GetHash() const;
-    uint256 GetSignatureHash() const;
-
     bool IsExpired() const { return GetAdjustedTime() - sigTime > MASTERNODE_NEW_START_REQUIRED_SECONDS; }
 
-    bool Sign(const CKey& keyMasternode, const CPubKey& pubKeyMasternode);
+    uint256 GetHash() const
+    {
+        return SerializeHash(*this);
+    }
+    bool Sign(const CKey& keyMasternode);
     bool CheckSignature(const CPubKey& pubKeyMasternode, int &nDos) const;
     bool SimpleCheck(int& nDos);
     bool CheckAndUpdate(CMasternode* pmn, bool fFromNewBroadcast, int& nDos, CConnman* connman);
@@ -112,11 +116,11 @@ struct masternode_info_t
     int nProtocolVersion = 0;
     int64_t sigTime = 0; //mnb message time
 
-    COutPoint outpoint{};
-    CService addr{};
-    CTxDestination collDest{};
-    CPubKey pubKeyCollateralAddress{};
-    CPubKey pubKeyMasternode{};
+    COutPoint outpoint;
+    CService addr;
+    CTxDestination collDest;
+    CPubKey pubKeyCollateralAddress;
+    CPubKey pubKeyMasternode;
 
     int64_t nLastCJq = 0; //the dsq count from the last dsq broadcast of this node
     int64_t nTimeLastChecked = 0;
@@ -133,7 +137,7 @@ class CMasternode : public masternode_info_t
 {
 private:
     // critical section to protect the inner data structures
-    mutable CCriticalSection cs;
+    mutable RecursiveMutex cs;
 
 public:
     enum state {
@@ -331,11 +335,9 @@ public:
     }
 
     uint256 GetHash() const;
-    uint256 GetSignatureHash() const;
 
     /// Create Masternode broadcast, needs to be relayed manually after that
-    static bool Create(const COutPoint& outpoint, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CTxDestination collateralNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string &strErrorRet, CMasternodeBroadcast &mnbRet);
-    static bool Create(const std::string& strService, const std::string& strKey, const std::string& strTxHash, const std::string& strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast &mnbRet, bool fOffline = false);
+    static bool Create(const MasternodeEntry& mne, std::string& strErrorRet, CMasternodeBroadcast &mnbRet);
 
     bool SimpleCheck(int& nDos);
     bool Update(CMasternode* pmn, int& nDos, CConnman* connman);
@@ -416,11 +418,7 @@ public:
         return ss.GetHash();
     }
 
-    void Relay() const
-    {
-        CInv inv(MSG_MASTERNODE_VERIFY, GetHash());
-        g_connman->RelayInv(inv);
-    }
+    void Relay() const;
 };
 
 #endif

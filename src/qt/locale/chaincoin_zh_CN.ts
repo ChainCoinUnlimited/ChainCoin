@@ -454,7 +454,7 @@
         <translation>接收(&amp;R)</translation>
     </message>
     <message>
-        <source>&amp;About Chaincoin Core</source>
+        <source>&amp;About Chaincoin</source>
         <translation>＆关于链币核心</translation>
     </message>
     <message>
@@ -534,7 +534,7 @@
         <translation>打开一个链币: URI 或支付请求</translation>
     </message>
     <message>
-        <source>Show the Chaincoin Core help message to get a list with possible Chaincoin Core command-line options</source>
+        <source>Show the Chaincoin help message to get a list with possible Chaincoin command-line options</source>
         <translation>显示链币核心帮助信息来得到链币核心的命令行选项列表</translation>
     </message>
     <message>
@@ -582,8 +582,8 @@
         <translation>更新中...</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
-        <translation>Chaincoin Core</translation>
+        <source>Chaincoin</source>
+        <translation>Chaincoin</translation>
     </message>
     <message>
         <source>Date: %1
@@ -974,7 +974,7 @@
         <translation>版本</translation>
     </message>
     <message>
-        <source>Chaincoin Core</source>
+        <source>Chaincoin</source>
         <translation>链币核心</translation>
     </message>
     <message>
@@ -982,7 +982,7 @@
         <translation>(%1 位)</translation>
     </message>
     <message>
-        <source>About Chaincoin Core</source>
+        <source>About Chaincoin</source>
         <translation>关于链币核心</translation>
     </message>
     <message>
@@ -1397,7 +1397,7 @@
         <translation>链币数量要保持匿名</translation>
     </message>
     <message>
-        <source>Automatically open the Chaincoin Core client port on the router. This only works when your router  UPnP and it is enabled.</source>
+        <source>Automatically open the Chaincoin client port on the router. This only works when your router  UPnP and it is enabled.</source>
         <translation>自动打开路由器上的链币中心客户端端口。</translation>
     </message>
     <message>
@@ -1457,11 +1457,11 @@
         <translation>网络(&amp;N)</translation>
     </message>
     <message>
-        <source>Automatically start Chaincoin Core after logging in to the system.</source>
+        <source>Automatically start Chaincoin after logging in to the system.</source>
         <translation>登录到系统后自动启动链币核心</translation>
     </message>
     <message>
-        <source>&amp;Start Chaincoin Core on system login</source>
+        <source>&amp;Start Chaincoin on system login</source>
         <translation>&amp;在系统登录时启动链币核心</translation>
     </message>
     <message>
@@ -1565,7 +1565,7 @@
         <translation>是否需要交易源地址控制功能。</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin Core.</source>
+        <source>The user interface language can be set here. This setting will take effect after restarting Chaincoin.</source>
         <translation>用户界面语言可以在这里设置。 设置将在重新启动链币核心后生效</translation>
     </message>
     <message>
@@ -2429,7 +2429,7 @@ https://www.transifex.com/projects/p/chaincoin/</source>
         <translation>内存使用</translation>
     </message>
     <message>
-        <source>Open the Chaincoin Core debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <source>Open the Chaincoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
         <translation>从当前数据目录打开链币调试日志文件。 对于大型日志文件，这可能需要几秒钟。</translation>
     </message>
     <message>
@@ -3210,7 +3210,7 @@ https://www.transifex.com/projects/p/chaincoin/</source>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Chaincoin Core is shutting down...</source>
+        <source>Chaincoin is shutting down...</source>
         <translation>链币正在关闭......</translation>
     </message>
     <message>
@@ -3372,7 +3372,7 @@ https://www.transifex.com/projects/p/chaincoin/</source>
         <translation>Dash 核心开发人员</translation>
     </message>
     <message>
-        <source>The Chaincoin Core developers</source>
+        <source>The Chaincoin developers</source>
         <translation>链币核心开发人员</translation>
     </message>
 </context>

@@ -9,14 +9,15 @@
 #include <modules/masternode/masternode_payments.h>
 #include <modules/masternode/masternode_sync.h>
 #include <modules/masternode/masternode_man.h>
-#include <netmessagemaker.h>
 #include <script/sign.h>
 #include <shutdown.h>
 #include <util/moneystr.h>
+#include <util/string.h>
 #include <util/translation.h>
 #include <wallet/coincontrol.h>
 #include <wallet/fees.h>
-#include <wallet/psbtwallet.h>
+#include <wallet/scriptpubkeyman.h>
+#include <wallet/wallet.h>
 
 #include <numeric>
 #include <memory>
@@ -28,12 +29,12 @@ void CKeyHolderStorage::AddKey(CScript &script, CWallet* pwalletIn)
         LogPrintf("%s CKeyHolderStorage::%s -- Error: Only SegWit addresses are supported for mixing\n", pwalletIn->GetDisplayName(), __func__);
         return;
     }
-    std::shared_ptr<ReserveDestination> reservedest = std::make_shared<ReserveDestination>(pwalletIn);;
+    std::shared_ptr<ReserveDestination> reservedest = std::make_shared<ReserveDestination>(pwalletIn, output_type);
     CTxDestination dest;
-    if (!reservedest->GetReservedDestination(output_type, dest, true)) {
+    if (!reservedest->GetReservedDestination(dest, true)) {
         LogPrintf("%s CKeyHolderStorage::%s -- Warning: Keypool ran out, trying to top up\n", pwalletIn->GetDisplayName(), __func__);
         pwalletIn->TopUpKeyPool();
-        if (!reservedest->GetReservedDestination(output_type, dest, true)) {
+        if (!reservedest->GetReservedDestination(dest, true)) {
             LogPrintf("%s CKeyHolderStorage::%s -- Error: Failed to obtain key from keypool\n", pwalletIn->GetDisplayName(), __func__);
             return;
         }
@@ -145,7 +146,7 @@ void CCoinJoinClientManager::ProcessMessage(CNode* pfrom, const std::string& str
         {
             LOCK(cs_vecqueue);
             vecCoinJoinQueue.emplace_back(queue);
-            queue.Relay(g_connman.get());
+            queue.Relay();
             LogPrint(BCLog::CJOIN, "%s CJQUEUE -- %s CoinJoin queue (%s) from masternode %s, vecCoinJoinQueue size: %d from %s\n",
                      m_wallet->GetDisplayName(), queue.status == STATUS_CLOSED ? strprintf("closed") : strprintf("new"), queue.ToString(),
                      infoMn.addr.ToString(), GetQueueSize(), pfrom->addr.ToStringIPPort());
@@ -304,7 +305,10 @@ void CCoinJoinClientManager::UnlockCoins()
 {
     while(m_wallet) {
         TRY_LOCK(m_wallet->cs_wallet, lockWallet);
-        if (!lockWallet) {MilliSleep(50); continue;}
+        if (!lockWallet) {
+            UninterruptibleSleep(std::chrono::milliseconds{50});
+            continue;
+        }
         for (const auto& outpoint : vecOutPointLocked)
             m_wallet->UnlockCoin(outpoint);
         break;
@@ -317,7 +321,10 @@ void CCoinJoinClientSession::UnlockCoins()
 {
     while(m_wallet_session) {
         TRY_LOCK(m_wallet_session->cs_wallet, lockWallet);
-        if (!lockWallet) {MilliSleep(50); continue;}
+        if (!lockWallet) {
+            UninterruptibleSleep(std::chrono::milliseconds{50});
+            continue;
+        }
         for (const auto& outpoint : vecOutPointLocked)
             m_wallet_session->UnlockCoin(outpoint);
         break;
@@ -499,6 +506,9 @@ bool CCoinJoinClientSession::SendDenominate()
         return false;
     }
 
+    if (!infoMixingMasternode.fInfoValid)
+        return false;
+
     SetState(POOL_STATE_ACCEPTING_ENTRIES);
     strLastMessage = "";
 
@@ -519,7 +529,7 @@ bool CCoinJoinClientSession::SendDenominate()
     }
 
     bool complete = false;
-    const TransactionError err = FillPSBT(m_wallet_session, psbtx, complete, 1, false, false);
+    const TransactionError err = m_wallet_session->FillPSBT(psbtx, complete, 1, false, false);
     LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::SendDenominate -- FillPSBT completed: %b\n", m_wallet_session->GetDisplayName(), complete);
 
     if (err != TransactionError::OK) {
@@ -533,8 +543,10 @@ bool CCoinJoinClientSession::SendDenominate()
 
     // store our entry for later use
     CCoinJoinEntry entry(nSessionID, psbtx);
-    RelayIn(entry);
-
+    if (!m_wallet_session->chain().pushCJEntry(infoMixingMasternode, NetMsgType::CJTXIN, entry)) {
+        LogPrintf("%s CCoinJoinClientSession::SendDenominate -- Failed to submit psbt %s\n", m_wallet_session->GetDisplayName(), mtxSession.GetHash().ToString());
+        return false;
+    }
     return true;
 }
 
@@ -611,7 +623,7 @@ bool CCoinJoinClientSession::SignFinalTransaction(PartiallySignedTransaction& fi
         return false;
     }
 
-    const TransactionError err = FillPSBT(m_wallet_session, finalTransactionNew, complete);
+    const TransactionError err = m_wallet_session->FillPSBT(finalTransactionNew, complete);
 
     if (err != TransactionError::OK) {
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientSession::SignFinalTransaction -- ERROR: finalTransactionNew=%s, error=%s\n",
@@ -623,8 +635,10 @@ bool CCoinJoinClientSession::SignFinalTransaction(PartiallySignedTransaction& fi
 
     // push all of our signatures to the Masternode
     LogPrintf("%s CCoinJoinClientSession::SignFinalTransaction -- pushing sigs to the masternode, finalMutableTransaction=%s\n", m_wallet_session->GetDisplayName(), mtx.GetHash().ToString());
-    CNetMsgMaker msgMaker(pnode->GetSendVersion());
-    g_connman.get()->PushMessage(pnode, msgMaker.Make(NetMsgType::CJSIGNFINALTX, finalTransactionNew));
+    if (!m_wallet_session->chain().pushPSBT(pnode, NetMsgType::CJSIGNFINALTX, finalTransactionNew)) {
+        LogPrintf("%s CCoinJoinClientSession::SignFinalTransaction -- failed to push sigs to the masternode, masternode=%s\n", m_wallet_session->GetDisplayName(), pnode->addr.ToString());
+        return false;
+    }
     SetState(POOL_STATE_SIGNING);
     nTimeStart = GetTime();
 
@@ -797,14 +811,14 @@ bool CCoinJoinClientManager::CheckAutomaticBackup()
 
         if (fCreateAutoBackups) {
             LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CheckAutomaticBackup -- Trying to create new backup.\n", m_wallet->GetDisplayName());
-            std::string warningString;
+            std::vector<std::string> warnings;
             std::string errorString;
             std::shared_ptr<CWallet> const pwallet = GetWallet(m_wallet->GetName());
 
-            if (!AutoBackupWallet(pwallet, WalletLocation(), warningString, errorString)) {
-                if (!warningString.empty()) {
+            if (!AutoBackupWallet(pwallet, WalletLocation(), warnings, errorString)) {
+                if (!warnings.empty()) {
                     // There were some issues saving backup but yet more or less safe to continue
-                    LogPrintf("%s CCoinJoinClientManager::CheckAutomaticBackup -- WARNING! Something went wrong on automatic backup: %s\n", m_wallet->GetDisplayName(), warningString);
+                    LogPrintf("%s CCoinJoinClientManager::CheckAutomaticBackup -- WARNING! Something went wrong on automatic backup: %s\n", m_wallet->GetDisplayName(), Join(warnings, "\n"));
                 }
                 if (!errorString.empty()) {
                     // Things are really broken
@@ -994,7 +1008,7 @@ bool CCoinJoinClientSession::AddFeesAndLocktime(std::vector<CAmount>& vecAmounts
         }
         // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
         // because we must be at the maximum allowed fee.
-        if (nFeeNeeded < ::minRelayTxFee.GetFee(nBytes))
+        if (nFeeNeeded < m_wallet_session->chain().relayMinFee().GetFee(nBytes))
         {
             LogPrintf("%s CCoinJoinClientSession::AddFeesAndLocktime --- ERROR: Transaction too large for fee policy!\n", m_wallet_session->GetDisplayName());
             return false;
@@ -1347,7 +1361,7 @@ bool CCoinJoinClientSession::JoinExistingQueue()
 
         m_wallet_session->coinjoinClient->AddUsedMasternode(queue.masternodeOutpoint);
 
-        if (g_connman.get()->IsDisconnectRequested(infoMn.addr)) {
+        if (!m_wallet_session->chain().addMasternode(infoMn)) {
             LogPrintf("%s CCoinJoinClientSession::JoinExistingQueue -- skipping connection, addr=%s\n", m_wallet_session->GetDisplayName(), infoMn.addr.ToString());
             continue;
         }
@@ -1355,7 +1369,7 @@ bool CCoinJoinClientSession::JoinExistingQueue()
         SetState(POOL_STATE_CONNECTING);
         infoMixingMasternode = infoMn;
         pendingCJaRequest = CPendingCJaRequest(infoMn.addr, nSessionDenom);
-        g_connman.get()->AddPendingMasternode(infoMn.addr);
+
         LogPrintf("%s CCoinJoinClientSession::JoinExistingQueue -- pending connection (from queue): nSessionDenom: %d (%s), addr=%s\n",
                 m_wallet_session->GetDisplayName(),
                 nSessionDenom, CCoinJoin::GetDenominationsToString(nSessionDenom), infoMn.addr.ToString());
@@ -1391,17 +1405,15 @@ bool CCoinJoinClientSession::StartNewQueue()
             continue;
         }
 
-        // this should never happen
-        if (g_connman.get()->IsDisconnectRequested(infoMn.addr)) {
+        LogPrintf("%s CCoinJoinClientSession::StartNewQueue -- attempt %d connection to Masternode %s\n", m_wallet_session->GetDisplayName(), nTries, infoMn.addr.ToString());
+
+        if (!m_wallet_session->chain().addMasternode(infoMn)) {
             LogPrintf("%s CCoinJoinClientSession::StartNewQueue -- skipping connection, addr=%s\n", m_wallet_session->GetDisplayName(), infoMn.addr.ToString());
             continue;
         }
 
-        LogPrintf("%s CCoinJoinClientSession::StartNewQueue -- attempt %d connection to Masternode %s\n", m_wallet_session->GetDisplayName(), nTries, infoMn.addr.ToString());
-
         SetState(POOL_STATE_CONNECTING);
         infoMixingMasternode = infoMn;
-        g_connman.get()->AddPendingMasternode(infoMn.addr);
         pendingCJaRequest = CPendingCJaRequest(infoMn.addr, nSessionDenom);
         LogPrintf("%s CCoinJoinClientSession::StartNewQueue -- pending connection, nSessionDenom: %d (%s), addr=%s\n",
                   m_wallet_session->GetDisplayName(),
@@ -1416,33 +1428,28 @@ bool CCoinJoinClientSession::StartNewQueue()
     return false;
 }
 
-bool CCoinJoinClientSession::ProcessPendingCJaRequest(CConnman* connman)
+bool CCoinJoinClientSession::ProcessPendingCJaRequest()
 {
     if (!pendingCJaRequest) return false;
 
-    bool fDone = connman->ForNode(pendingCJaRequest.GetAddr(), [&](CNode* pnode) {
-            LogPrint(BCLog::CJOIN, "%s CCoinJoinClientSession::ProcessPendingDsaRequest -- processing cja queue for addr=%s\n", m_wallet_session->GetDisplayName(), pnode->addr.ToString());
-            CNetMsgMaker msgMaker(pnode->GetSendVersion());
-            connman->PushMessage(pnode, msgMaker.Make(NetMsgType::CJACCEPT, pendingCJaRequest.GetDenom()));
-            return true;
-        });
+    LogPrint(BCLog::CJOIN, "%s CCoinJoinClientSession::ProcessPendingDsaRequest -- processing cja queue for addr=%s\n", m_wallet_session->GetDisplayName(), pendingCJaRequest.GetAddr().ToString());
 
-    if (fDone) {
+    if (m_wallet_session->chain().processCJRequest(pendingCJaRequest.GetAddr(), NetMsgType::CJACCEPT, pendingCJaRequest.GetDenom())) {
         SetState(POOL_STATE_QUEUE);
         pendingCJaRequest = CPendingCJaRequest();
+        return true;
     } else if (pendingCJaRequest.IsExpired()) {
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientSession::ProcessPendingDsaRequest -- failed to connect to %s\n", m_wallet_session->GetDisplayName(), pendingCJaRequest.GetAddr().ToString());
         SetNull();
     }
-
-    return fDone;
+    return false;
 }
 
 void CCoinJoinClientManager::ProcessPendingCJaRequest()
 {
     LOCK(cs_deqsessions);
     for (auto& session : deqSessions) {
-        if (session.ProcessPendingCJaRequest(g_connman.get())) {
+        if (session.ProcessPendingCJaRequest()) {
             strAutoCoinJoinResult = _("Mixing in progress...").translated;
         }
     }
@@ -1542,7 +1549,7 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
 
         bool complete = true;
         bool sign = true;
-        const TransactionError err = FillPSBT(m_wallet, ptx, complete, 1, sign, false);
+        const TransactionError err = m_wallet->FillPSBT(ptx, complete, 1, sign, false);
         LogPrint(BCLog::CJOIN, "%s CCoinJoinClientManager::CreateDenominated -- FillPSBT completed: %b\n", m_wallet->GetDisplayName(), complete);
 
         if (err != TransactionError::OK) {
@@ -1560,12 +1567,8 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
         CTransactionRef tx(MakeTransactionRef(std::move(mtx)));
         CWalletTx wtx(m_wallet, tx);
 
-        CValidationState state;
-        if (!m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */, state)) {
-            LogPrintf("%s CCoinJoinClientManager::CreateDenominated -- CommitTransaction failed! Reason given: %s\n", m_wallet->GetDisplayName(), state.GetRejectReason());
-            keyHolderStorageDenom.ReturnAll();
-            return false;
-        }
+        // Broadcast transaction
+        m_wallet->CommitTransaction(tx, std::move(wtx.mapValue), {} /* orderForm */);
 
         keyHolderStorageDenom.KeepAll();
 
@@ -1574,18 +1577,6 @@ bool CCoinJoinClientManager::CreateDenominated(const CAmount& nValue, std::vecto
     }
 
     return true;
-}
-
-void CCoinJoinClientSession::RelayIn(const CCoinJoinEntry& entry)
-{
-    if (!infoMixingMasternode.fInfoValid) return;
-
-    g_connman.get()->ForNode(infoMixingMasternode.addr, [&entry](CNode* pnode) {
-        LogPrintf("CCoinJoinClientSession::RelayIn -- found master, relaying message to %s\n", pnode->addr.ToString());
-        CNetMsgMaker msgMaker(pnode->GetSendVersion());
-        g_connman.get()->PushMessage(pnode, msgMaker.Make(NetMsgType::CJTXIN, entry));
-        return true;
-    });
 }
 
 void CCoinJoinClientSession::SetState(PoolState nStateNew)

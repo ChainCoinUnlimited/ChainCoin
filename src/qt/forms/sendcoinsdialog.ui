@@ -588,7 +588,7 @@
         <x>0</x>
         <y>0</y>
         <width>824</width>
-        <height>131</height>
+        <height>127</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
@@ -791,7 +791,7 @@
           <item>
            <widget class="QPushButton" name="buttonMinimizeFee">
             <property name="toolTip">
-             <string>collapse fee-settings</string>
+             <string>Hide transaction fee settings</string>
             </property>
             <property name="text">
              <string>Hide</string>
@@ -1230,7 +1230,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="labelBalanceName">
          <property name="text">
           <string>Balance:</string>
          </property>
@@ -1263,15 +1263,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QValidatedLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qt/qvalidatedlineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>BitcoinAmountField</class>
    <extends>QLineEdit</extends>
    <header>qt/bitcoinamountfield.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QValidatedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qt/qvalidatedlineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

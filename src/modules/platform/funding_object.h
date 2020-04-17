@@ -119,7 +119,7 @@ public: // Types
 
 private:
     /// critical section to protect the inner data structures
-    mutable CCriticalSection cs_fobject;
+    mutable RecursiveMutex cs_fobject;
 
     /// Object typecode
     int nObjectType;
@@ -242,15 +242,12 @@ public:
     // Signature related functions
 
     void SetMasternodeOutpoint(const COutPoint& outpoint);
-    bool Sign(const CKey& keyMasternode, const CPubKey& pubKeyMasternode);
+    bool Sign(const CKey& keyMasternode);
     bool CheckSignature(const CPubKey& pubKeyMasternode) const;
 
     std::string GetSignatureMessage() const;
-    uint256 GetSignatureHash() const;
 
     // CORE OBJECT FUNCTIONS
-
-    bool IsValidLocally(std::string& strError, bool fCheckCollateral) const;
 
     bool IsValidLocally(std::string& strError, bool& fMissingMasternode, bool& fMissingConfirmations, bool fCheckCollateral) const;
 

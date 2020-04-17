@@ -101,7 +101,7 @@ bool CActiveMasternode::SendMasternodePing(CConnman* connman)
     mnp.nSentinelVersion = nSentinelVersion;
     mnp.fSentinelIsCurrent =
             (std::abs(GetAdjustedTime() - nSentinelPingTime) < MASTERNODE_SENTINEL_PING_MAX_SECONDS);
-    if (!mnp.Sign(keyMasternode, pubKeyMasternode)) {
+    if (!mnp.Sign(keyMasternode)) {
         LogPrintf("CActiveMasternode::SendMasternodePing -- ERROR: Couldn't sign Masternode Ping\n");
         return false;
     }
@@ -189,7 +189,7 @@ void CActiveMasternode::ManageStateInitial(CConnman* connman)
                 LogPrintf("CActiveMasternode::ManageStateInitial -- %s: %s\n", GetStateString(), strNotCapableReason);
                 return;
             }
-            connected = ConnectThroughProxy(proxy, service.ToStringIP(), service.GetPort(), hSocket, nConnectTimeout, &proxyConnectionFailed);
+            connected = ConnectThroughProxy(proxy, service.ToStringIP(), service.GetPort(), hSocket, nConnectTimeout, proxyConnectionFailed);
         } else {
             // no proxy needed (none set for target network)
             hSocket = CreateSocket(service);
@@ -261,6 +261,6 @@ void CActiveMasternode::ManageStateRemote()
 void CActiveMasternode::Controller(CScheduler& scheduler, CConnman* connman)
 {
     if (!fLiteMode) {
-        scheduler.scheduleEvery(std::bind(&CActiveMasternode::ManageState, this, connman), MASTERNODE_MIN_MNP_SECONDS*1000);
+        scheduler.scheduleEvery(std::bind(&CActiveMasternode::ManageState, this, connman), std::chrono::seconds{MASTERNODE_MIN_MNP_SECONDS});
     }
 }

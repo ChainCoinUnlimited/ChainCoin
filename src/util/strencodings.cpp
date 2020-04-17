@@ -1,9 +1,10 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Copyright (c) 2009-2019 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <util/strencodings.h>
+#include <util/string.h>
 
 #include <tinyformat.h>
 
@@ -16,11 +17,11 @@
 static const std::string CHARS_ALPHA_NUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 static const std::string SAFE_CHARS[] =
-{
-    CHARS_ALPHA_NUM + " .,;-_/:?@()", // SAFE_CHARS_DEFAULT
-    CHARS_ALPHA_NUM + " .,;-_?@", // SAFE_CHARS_UA_COMMENT
-    CHARS_ALPHA_NUM + ".-_", // SAFE_CHARS_FILENAME
-    CHARS_ALPHA_NUM + "!*'();:@&=+$,/?#[]-_.~%", // SAFE_CHARS_URI
+    {
+        CHARS_ALPHA_NUM + " .,;-_/:?@()", // SAFE_CHARS_DEFAULT
+        CHARS_ALPHA_NUM + " .,;-_?@", // SAFE_CHARS_UA_COMMENT
+        CHARS_ALPHA_NUM + ".-_", // SAFE_CHARS_FILENAME
+        CHARS_ALPHA_NUM + "!*'();:@&=+$,/?#[]-_.~%", // SAFE_CHARS_URI
 };
 
 std::string SanitizeString(const std::string& str, int rule)
@@ -35,22 +36,22 @@ std::string SanitizeString(const std::string& str, int rule)
 }
 
 const signed char p_util_hexdigit[256] =
-{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  0,1,2,3,4,5,6,7,8,9,-1,-1,-1,-1,-1,-1,
-  -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, };
+    { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        0,1,2,3,4,5,6,7,8,9,-1,-1,-1,-1,-1,-1,
+        -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, };
 
 signed char HexDigit(char c)
 {
@@ -138,27 +139,27 @@ std::string EncodeBase64(const unsigned char* pch, size_t len)
 
 std::string EncodeBase64(const std::string& str)
 {
-    return EncodeBase64((const unsigned char*)str.c_str(), str.size());
+    return EncodeBase64((const unsigned char*)str.data(), str.size());
 }
 
 std::vector<unsigned char> DecodeBase64(const char* p, bool* pf_invalid)
 {
     static const int decode64_table[256] =
-    {
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, 62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1,
-        -1, -1, -1, -1, -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
-        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 26, 27, 28,
-        29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
-        49, 50, 51, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-    };
+        {
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, 62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1,
+            -1, -1, -1, -1, -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+            15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 26, 27, 28,
+            29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+            49, 50, 51, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+        };
 
     const char* e = p;
     std::vector<uint8_t> val;
@@ -190,6 +191,12 @@ std::vector<unsigned char> DecodeBase64(const char* p, bool* pf_invalid)
 
 std::string DecodeBase64(const std::string& str, bool* pf_invalid)
 {
+    if (!ValidAsCString(str)) {
+        if (pf_invalid) {
+            *pf_invalid = true;
+        }
+        return {};
+    }
     std::vector<unsigned char> vchRet = DecodeBase64(str.c_str(), pf_invalid);
     return std::string((const char*)vchRet.data(), vchRet.size());
 }
@@ -207,27 +214,27 @@ std::string EncodeBase32(const unsigned char* pch, size_t len)
 
 std::string EncodeBase32(const std::string& str)
 {
-    return EncodeBase32((const unsigned char*)str.c_str(), str.size());
+    return EncodeBase32((const unsigned char*)str.data(), str.size());
 }
 
 std::vector<unsigned char> DecodeBase32(const char* p, bool* pf_invalid)
 {
     static const int decode32_table[256] =
-    {
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
-        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1,  0,  1,  2,
-         3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-        23, 24, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-    };
+        {
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+            15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1,  0,  1,  2,
+            3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+            23, 24, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+        };
 
     const char* e = p;
     std::vector<uint8_t> val;
@@ -259,6 +266,12 @@ std::vector<unsigned char> DecodeBase32(const char* p, bool* pf_invalid)
 
 std::string DecodeBase32(const std::string& str, bool* pf_invalid)
 {
+    if (!ValidAsCString(str)) {
+        if (pf_invalid) {
+            *pf_invalid = true;
+        }
+        return {};
+    }
     std::vector<unsigned char> vchRet = DecodeBase32(str.c_str(), pf_invalid);
     return std::string((const char*)vchRet.data(), vchRet.size());
 }
@@ -269,7 +282,7 @@ NODISCARD static bool ParsePrechecks(const std::string& str)
         return false;
     if (str.size() >= 1 && (IsSpace(str[0]) || IsSpace(str[str.size()-1]))) // No padding allowed
         return false;
-    if (str.size() != strlen(str.c_str())) // No embedded NUL characters allowed
+    if (!ValidAsCString(str)) // No embedded NUL characters allowed
         return false;
     return true;
 }
@@ -286,8 +299,8 @@ bool ParseInt32(const std::string& str, int32_t *out)
     // we still have to check that the returned value is within the range of an *int32_t*. On 64-bit
     // platforms the size of these types may be different.
     return endp && *endp == 0 && !errno &&
-        n >= std::numeric_limits<int32_t>::min() &&
-        n <= std::numeric_limits<int32_t>::max();
+           n >= std::numeric_limits<int32_t>::min() &&
+           n <= std::numeric_limits<int32_t>::max();
 }
 
 bool ParseInt64(const std::string& str, int64_t *out)
@@ -301,8 +314,8 @@ bool ParseInt64(const std::string& str, int64_t *out)
     // Note that strtoll returns a *long long int*, so even if strtol doesn't report an over/underflow
     // we still have to check that the returned value is within the range of an *int64_t*.
     return endp && *endp == 0 && !errno &&
-        n >= std::numeric_limits<int64_t>::min() &&
-        n <= std::numeric_limits<int64_t>::max();
+           n >= std::numeric_limits<int64_t>::min() &&
+           n <= std::numeric_limits<int64_t>::max();
 }
 
 bool ParseUInt32(const std::string& str, uint32_t *out)
@@ -319,7 +332,7 @@ bool ParseUInt32(const std::string& str, uint32_t *out)
     // we still have to check that the returned value is within the range of an *uint32_t*. On 64-bit
     // platforms the size of these types may be different.
     return endp && *endp == 0 && !errno &&
-        n <= std::numeric_limits<uint32_t>::max();
+           n <= std::numeric_limits<uint32_t>::max();
 }
 
 bool ParseUInt64(const std::string& str, uint64_t *out)
@@ -335,7 +348,7 @@ bool ParseUInt64(const std::string& str, uint64_t *out)
     // Note that strtoull returns a *unsigned long long int*, so even if it doesn't report an over/underflow
     // we still have to check that the returned value is within the range of an *uint64_t*.
     return endp && *endp == 0 && !errno &&
-        n <= std::numeric_limits<uint64_t>::max();
+           n <= std::numeric_limits<uint64_t>::max();
 }
 
 
@@ -392,16 +405,6 @@ std::string FormatParagraph(const std::string& in, size_t width, size_t indent)
         }
     }
     return out.str();
-}
-
-std::string i64tostr(int64_t n)
-{
-    return strprintf("%d", n);
-}
-
-std::string itostr(int n)
-{
-    return strprintf("%d", n);
 }
 
 int64_t atoi64(const char* psz)

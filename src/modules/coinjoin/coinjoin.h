@@ -14,9 +14,14 @@
 #include <timedata.h>
 #include <tinyformat.h>
 
+#include <chrono>
+
 class CCoinJoin;
 class CConnman;
 class CNode;
+
+// How often to clean up the CoinJoin! cache
+static constexpr std::chrono::minutes CJ_CLEAN_INTERVAL{60};
 
 // denominations
 static const unsigned char COINJOIN_MAX_SHIFT = 0x0b;
@@ -26,11 +31,11 @@ static const CAmount COINJOIN_HIGH_DENOM = COINJOIN_BASE_DENOM << COINJOIN_MAX_S
 static const CAmount COINJOIN_LOW_DENOM = COINJOIN_BASE_DENOM >> COINJOIN_MAX_SHIFT;
 
 // time for all participants to sign
-static const int COINJOIN_SIGNING_TIMEOUT        = 30;
+static constexpr int64_t COINJOIN_SIGNING_TIMEOUT        = 30;
 // timeout for nodes to submit their tx
-static const int COINJOIN_ACCEPT_TIMEOUT         = 60;
+static constexpr int64_t COINJOIN_ACCEPT_TIMEOUT         = 60;
 // timeout for queues in blocks
-static const int COINJOIN_DEFAULT_TIMEOUT        = 4;
+static constexpr int64_t COINJOIN_DEFAULT_TIMEOUT        = 4;
 
 //! minimum peer version accepted by mixing pool
 static const int MIN_COINJOIN_PEER_PROTO_VERSION            = 70017;
@@ -187,7 +192,6 @@ public:
         }
     }
 
-    uint256 GetSignatureHash() const;
     /** Sign this mixing transaction
      *  \return true if all conditions are met:
      *     1) we have an active Masternode,
@@ -199,12 +203,17 @@ public:
     /// Check if we have a valid Masternode address
     bool CheckSignature(const CPubKey& pubKeyMasternode) const;
 
-    bool Relay(CConnman* connman);
+    bool Relay();
     bool Push(const CService pto, CConnman* connman);
 
     /// Is this queue expired?
     bool IsExpired(int nHeightIn) const { return nHeightIn - nHeight > COINJOIN_DEFAULT_TIMEOUT; }
     bool IsOpen() const { return status > 0; }
+
+    uint256 GetHash() const
+    {
+        return SerializeHash(*this);
+    }
 
     std::string ToString() const
     {
@@ -279,8 +288,10 @@ public:
         return *this != CCoinJoinBroadcastTx();
     }
 
-    uint256 GetSignatureHash() const;
-
+    uint256 GetHash() const
+    {
+        return SerializeHash(*this);
+    }
     bool Sign();
     bool CheckSignature(const CPubKey& pubKeyMasternode) const;
 };
@@ -289,7 +300,7 @@ public:
 class CCoinJoinBaseSession
 {
 protected:
-    mutable CCriticalSection cs_coinjoin;
+    mutable RecursiveMutex cs_coinjoin;
 
     std::vector<CCoinJoinEntry> vecEntries; // Masternode/clients entries
 
@@ -327,7 +338,7 @@ public:
 class CCoinJoinBaseManager
 {
 protected:
-    mutable CCriticalSection cs_vecqueue;
+    mutable RecursiveMutex cs_vecqueue;
 
     // The current mixing sessions in progress on the network
     std::vector<CCoinJoinQueue> vecCoinJoinQueue GUARDED_BY(cs_vecqueue);

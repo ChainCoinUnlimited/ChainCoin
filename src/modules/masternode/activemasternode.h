@@ -31,7 +31,7 @@ public:
 
 private:
     // critical section to protect the inner data structures
-    mutable CCriticalSection cs;
+    mutable RecursiveMutex cs;
 
     masternode_type_enum_t eType;
 

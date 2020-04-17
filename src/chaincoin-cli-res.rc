@@ -18,7 +18,7 @@ BEGIN
         BEGIN
             VALUE "CompanyName",        "Chaincoin"
                                         ""
-            VALUE "FileDescription",    "chaincoin-cli (JSON-RPC client for Chaincoin Core)"
+            VALUE "FileDescription",    "chaincoin-cli (JSON-RPC client for Chaincoin)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "chaincoin-cli"
             VALUE "LegalCopyright",     COPYRIGHT_STR

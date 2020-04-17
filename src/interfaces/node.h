@@ -1,4 +1,4 @@
-// Copyright (c) 2018 The Bitcoin Core developers
+// Copyright (c) 2018-2019 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,8 +6,7 @@
 #define BITCOIN_INTERFACES_NODE_H
 
 #include <amount.h>                                 // For CAmount
-#include <cachedb.h>                                // For banmap_t
-#include <modules/masternode/masternode_config.h>   // For CMasternodeConfig::CMasternodeEntry
+#include <modules/masternode/masternode_config.h>   // For MasternodeEntry
 #include <net.h>                                    // For CConnman::NumConnections
 #include <netaddress.h>                             // For Network
 #include <primitives/transaction.h>
@@ -31,6 +30,7 @@ class RPCTimerInterface;
 class UniValue;
 class proxyType;
 struct CNodeStateStats;
+struct NodeContext;
 enum class WalletCreationStatus;
 
 namespace interfaces {
@@ -84,7 +84,7 @@ public:
     virtual void initParameterInteraction() = 0;
 
     //! Get warnings.
-    virtual std::string getWarnings(const std::string& type) = 0;
+    virtual std::string getWarnings() = 0;
 
     // Get log flags.
     virtual uint32_t getLogCategories() = 0;
@@ -130,10 +130,10 @@ public:
     virtual bool unban(const CSubNet& ip) = 0;
 
     //! Disconnect node by address.
-    virtual bool disconnect(const CNetAddr& net_addr) = 0;
+    virtual bool disconnectByAddress(const CNetAddr& net_addr) = 0;
 
     //! Disconnect node by id.
-    virtual bool disconnect(NodeId id) = 0;
+    virtual bool disconnectById(NodeId id) = 0;
 
     //! Get total bytes recv.
     virtual int64_t getTotalBytesRecv() = 0;
@@ -207,7 +207,7 @@ public:
     virtual bool isMasternodelistSynced() = 0;
     virtual bool isModuleDataSynced() = 0;
     virtual int getMasternodeConfigCount() = 0;
-    virtual std::vector<CMasternodeConfig::CMasternodeEntry>& MNgetEntries() = 0;
+    virtual std::vector<MasternodeEntry>& MNgetEntries() = 0;
     virtual bool startMasternodeAlias(const std::string& strAlias, std::string& strErrorRet) = 0;
     virtual bool startAllMasternodes(const std::string& strCommand, std::string&  strErrorRet, int& nCountSuccessful, int& nCountFailed) = 0;
 
@@ -246,10 +246,10 @@ public:
     //! Attempts to load a wallet from file or directory.
     //! The loaded wallet is also notified to handlers previously registered
     //! with handleLoadWallet.
-    virtual std::unique_ptr<Wallet> loadWallet(const std::string& name, std::string& error, std::string& warning) = 0;
+    virtual std::unique_ptr<Wallet> loadWallet(const std::string& name, std::string& error, std::vector<std::string>& warnings) = 0;
 
     //! Create a wallet from file
-    virtual WalletCreationStatus createWallet(const SecureString& passphrase, uint64_t wallet_creation_flags, const std::string& name, std::string& error, std::string& warning, std::unique_ptr<Wallet>& result) = 0;
+    virtual std::unique_ptr<Wallet> createWallet(const SecureString& passphrase, uint64_t wallet_creation_flags, const std::string& name, std::string& error, std::vector<std::string>& warnings, WalletCreationStatus& status) = 0;
 
     //! Register handler for init messages.
     using InitMessageFn = std::function<void(const std::string& message)>;
@@ -308,6 +308,9 @@ public:
     //! Register handler for proposal changed messages.
     using ProposalChangedFn = std::function<void(const uint256& hash, ChangeType status)>;
     virtual std::unique_ptr<Handler> handleProposalChanged(ProposalChangedFn fn) = 0;
+
+    //! Return pointer to internal chain interface, useful for testing.
+    virtual NodeContext* context() { return nullptr; }
 };
 
 struct MasterNodeCount

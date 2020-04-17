@@ -1,69 +1,64 @@
-// Copyright (c) 2014-2017 The Dash Core developers
+// Copyright (c) 2018-2020 PM-Tech
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_MODULES_MASTERNODE_MASTERNODE_CONFIG_H
 #define BITCOIN_MODULES_MASTERNODE_MASTERNODE_CONFIG_H
 
+#include <key_io.h>
+
 #include <string>
 #include <vector>
 
 class CMasternodeConfig;
+
 extern CMasternodeConfig masternodeConfig;
+
+struct MasternodeEntry
+{
+    std::string alias;
+    std::string ip;
+    CKey privKey;
+    COutPoint outpoint;
+
+    MasternodeEntry() {}
+    MasternodeEntry(std::string _alias, std::string _ip, CKey _privKey, COutPoint _outpoint)
+        : alias(_alias)
+        , ip(_ip)
+        , privKey(_privKey)
+        , outpoint(_outpoint)
+    {}
+
+    const std::string& getAlias() const {
+        return alias;
+    }
+
+    const std::string& getIp() const {
+        return ip;
+    }
+
+    const COutPoint& getOutPoint() const {
+        return outpoint;
+    }
+
+    const CKey& getPrivKey() const {
+        return privKey;
+    }
+};
 
 class CMasternodeConfig
 {
 
 public:
-
-    class CMasternodeEntry {
-
-    private:
-        std::string alias;
-        std::string ip;
-        std::string privKey;
-        std::string txHash;
-        std::string outputIndex;
-    public:
-
-        CMasternodeEntry(const std::string& alias, const std::string& ip, const std::string& privKey, const std::string& txHash, const std::string& outputIndex) {
-            this->alias = alias;
-            this->ip = ip;
-            this->privKey = privKey;
-            this->txHash = txHash;
-            this->outputIndex = outputIndex;
-        }
-
-        const std::string& getAlias() const {
-            return alias;
-        }
-
-        const std::string& getOutputIndex() const {
-            return outputIndex;
-        }
-
-        const std::string& getPrivKey() const {
-            return privKey;
-        }
-
-        const std::string& getTxHash() const {
-            return txHash;
-        }
-
-        const std::string& getIp() const {
-            return ip;
-        }
-    };
-
     CMasternodeConfig() {
-        entries = std::vector<CMasternodeEntry>();
+        entries = std::vector<MasternodeEntry>();
     }
 
     void clear();
     bool read(std::string& strErrRet);
     void add(const std::string& alias, const std::string& ip, const std::string& privKey, const std::string& txHash, const std::string& outputIndex);
 
-    std::vector<CMasternodeEntry>& getEntries() {
+    std::vector<MasternodeEntry>& getEntries() {
         return entries;
     }
 
@@ -72,7 +67,7 @@ public:
     }
 
 private:
-    std::vector<CMasternodeEntry> entries;
+    std::vector<MasternodeEntry> entries;
 };
 
 

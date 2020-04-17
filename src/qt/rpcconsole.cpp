@@ -51,10 +51,10 @@ const struct {
     const char *url;
     const char *source;
 } ICON_MAPPING[] = {
-    {"cmd-request", ":/icons/green/tx_input"},
-    {"cmd-reply", ":/icons/green/tx_output"},
-    {"cmd-error", ":/icons/green/tx_output"},
-    {"misc", ":/icons/green/tx_inout"},
+    {"cmd-request", ":/icons/tx_input"},
+    {"cmd-reply", ":/icons/tx_output"},
+    {"cmd-error", ":/icons/tx_output"},
+    {"misc", ":/icons/tx_inout"},
     {nullptr, nullptr}
 };
 
@@ -918,12 +918,8 @@ void RPCConsole::on_lineEdit_returnPressed()
 
         cmdBeforeBrowsing = QString();
 
-        WalletModel* wallet_model{nullptr};
 #ifdef ENABLE_WALLET
-        const int wallet_index = ui->WalletSelector->currentIndex();
-        if (wallet_index > 0) {
-            wallet_model = ui->WalletSelector->itemData(wallet_index).value<WalletModel*>();
-        }
+        WalletModel* wallet_model = ui->WalletSelector->currentData().value<WalletModel*>();
 
         if (m_last_wallet_model != wallet_model) {
             if (wallet_model) {
@@ -949,6 +945,7 @@ void RPCConsole::on_lineEdit_returnPressed()
             history.removeFirst();
         // Set pointer to end of history
         historyPtr = history.size();
+
         // Scroll console view to end
         scrollToEnd();
     }
@@ -1125,16 +1122,17 @@ void RPCConsole::updateNodeDetail(const CNodeCombinedStats *stats)
     ui->peerBytesSent->setText(GUIUtil::formatBytes(stats->nodeStats.nSendBytes));
     ui->peerBytesRecv->setText(GUIUtil::formatBytes(stats->nodeStats.nRecvBytes));
     ui->peerConnTime->setText(GUIUtil::formatDurationStr(GetSystemTimeInSeconds() - stats->nodeStats.nTimeConnected));
-    ui->peerPingTime->setText(GUIUtil::formatPingTime(stats->nodeStats.dPingTime));
-    ui->peerPingWait->setText(GUIUtil::formatPingTime(stats->nodeStats.dPingWait));
-    ui->peerMinPing->setText(GUIUtil::formatPingTime(stats->nodeStats.dMinPing));
+    ui->peerPingTime->setText(GUIUtil::formatPingTime(stats->nodeStats.m_ping_usec));
+    ui->peerPingWait->setText(GUIUtil::formatPingTime(stats->nodeStats.m_ping_wait_usec));
+    ui->peerMinPing->setText(GUIUtil::formatPingTime(stats->nodeStats.m_min_ping_usec));
     ui->timeoffset->setText(GUIUtil::formatTimeOffset(stats->nodeStats.nTimeOffset));
-    ui->peerVersion->setText(QString("%1").arg(QString::number(stats->nodeStats.nVersion)));
+    ui->peerVersion->setText(QString::number(stats->nodeStats.nVersion));
     ui->peerSubversion->setText(QString::fromStdString(stats->nodeStats.cleanSubVer));
     ui->peerDirection->setText(stats->nodeStats.fInbound ? tr("Inbound") : tr("Outbound"));
-    ui->peerHeight->setText(QString("%1").arg(QString::number(stats->nodeStats.nStartingHeight)));
+    ui->peerHeight->setText(QString::number(stats->nodeStats.nStartingHeight));
     ui->peerWhitelisted->setText(stats->nodeStats.m_legacyWhitelisted ? tr("Yes") : tr("No"));
     ui->peerMasternode->setText(stats->nodeStats.fMasternode ? tr("Yes") : tr("No"));
+    ui->peerMappedAS->setText(stats->nodeStats.m_mapped_as != 0 ? QString::number(stats->nodeStats.m_mapped_as) : tr("N/A"));
 
     // This check fails for example if the lock was busy and
     // nodeStateStats couldn't be fetched.
@@ -1208,7 +1206,7 @@ void RPCConsole::disconnectSelectedNode()
         // Get currently selected peer address
         NodeId id = nodes.at(i).data().toLongLong();
         // Find the node, disconnect it and clear the selected node
-        if(m_node.disconnect(id))
+        if(m_node.disconnectById(id))
             clearSelectedNode();
     }
 }
@@ -1233,7 +1231,7 @@ void RPCConsole::banSelectedNode(int bantime)
         const CNodeCombinedStats *stats = clientModel->getPeerTableModel()->getNodeStats(detailNodeRow);
         if (stats) {
             m_node.ban(stats->nodeStats.addr, BanReasonManuallyAdded, bantime);
-            m_node.disconnect(stats->nodeStats.addr);
+            m_node.disconnectByAddress(stats->nodeStats.addr);
         }
     }
     clearSelectedNode();
@@ -1253,7 +1251,7 @@ void RPCConsole::unbanSelectedNode()
         QString strNode = nodes.at(i).data().toString();
         CSubNet possibleSubnet;
 
-        LookupSubNet(strNode.toStdString().c_str(), possibleSubnet);
+        LookupSubNet(strNode.toStdString(), possibleSubnet);
         if (possibleSubnet.IsValid() && m_node.unban(possibleSubnet))
         {
             clientModel->getBanTableModel()->refresh();
@@ -1281,12 +1279,24 @@ void RPCConsole::showOrHideBanTableIfRequired()
 
 void RPCConsole::setTabFocus(enum TabTypes tabType)
 {
-    ui->tabWidget->setCurrentIndex(tabType);
+    ui->tabWidget->setCurrentIndex(int(tabType));
 }
 
 QString RPCConsole::tabTitle(TabTypes tab_type) const
 {
-    return ui->tabWidget->tabText(tab_type);
+    return ui->tabWidget->tabText(int(tab_type));
+}
+
+QKeySequence RPCConsole::tabShortcut(TabTypes tab_type) const
+{
+    switch (tab_type) {
+    case TabTypes::INFO: return QKeySequence(Qt::CTRL + Qt::Key_I);
+    case TabTypes::CONSOLE: return QKeySequence(Qt::CTRL + Qt::Key_T);
+    case TabTypes::GRAPH: return QKeySequence(Qt::CTRL + Qt::Key_N);
+    case TabTypes::PEERS: return QKeySequence(Qt::CTRL + Qt::Key_P);
+    } // no default case, so the compiler can warn about missing cases
+
+    assert(false);
 }
 
 void RPCConsole::updateAlerts(const QString& warnings)
