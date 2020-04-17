@@ -146,6 +146,9 @@ void WalletView::setWalletModel(WalletModel *_walletModel)
 
     if (_walletModel)
     {
+        // Set up advances CoinJoin! UI
+        overviewPage->setupCoinJoin();
+
         // Receive and pass through messages from wallet model
         connect(_walletModel, &WalletModel::message, this, &WalletView::message);
 
