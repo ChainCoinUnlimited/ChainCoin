@@ -1129,6 +1129,7 @@ void CWallet::blockConnected(const CBlock& block, int height)
 {
     const uint256& block_hash = block.GetHash();
     auto locked_chain = chain().lock();
+    coinjoinClient->UpdatedBlockTip(height);
     LOCK(cs_wallet);
 
     m_last_block_processed_height = height;
@@ -1138,7 +1139,6 @@ void CWallet::blockConnected(const CBlock& block, int height)
         SyncTransaction(block.vtx[index], confirm);
         transactionRemovedFromMempool(block.vtx[index]);
     }
-    coinjoinClient->UpdatedBlockTip(height);
 }
 
 void CWallet::blockDisconnected(const CBlock& block, int height)
