@@ -1008,7 +1008,7 @@ bool CCoinJoinClientSession::AddFeesAndLocktime(std::vector<CAmount>& vecAmounts
         }
         // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
         // because we must be at the maximum allowed fee.
-        if (nFeeNeeded < ::minRelayTxFee.GetFee(nBytes))
+        if (nFeeNeeded < m_wallet_session->chain().relayMinFee().GetFee(nBytes))
         {
             LogPrintf("%s CCoinJoinClientSession::AddFeesAndLocktime --- ERROR: Transaction too large for fee policy!\n", m_wallet_session->GetDisplayName());
             return false;

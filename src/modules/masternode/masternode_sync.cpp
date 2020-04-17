@@ -429,7 +429,7 @@ void CMasternodeSync::UpdatedBlockTip(const CBlockIndex *pindexNew, bool fInitia
 void CMasternodeSync::Controller(CScheduler& scheduler, CConnman* connman)
 {
     if (!fLiteMode) {
-        scheduler.scheduleEvery(std::bind(&CMasternodeSync::ProcessTick, this, connman), 1000);
+        scheduler.scheduleEvery(std::bind(&CMasternodeSync::ProcessTick, this, connman), MASTERNODE_SCHEDULE_SECOND);
     }
 }
 

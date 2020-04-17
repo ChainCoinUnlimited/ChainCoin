@@ -261,6 +261,6 @@ void CActiveMasternode::ManageStateRemote()
 void CActiveMasternode::Controller(CScheduler& scheduler, CConnman* connman)
 {
     if (!fLiteMode) {
-        scheduler.scheduleEvery(std::bind(&CActiveMasternode::ManageState, this, connman), MASTERNODE_MIN_MNP_SECONDS*1000);
+        scheduler.scheduleEvery(std::bind(&CActiveMasternode::ManageState, this, connman), MASTERNODE_MIN_MNP_SCHEDULE);
     }
 }

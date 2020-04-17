@@ -1919,8 +1919,8 @@ static UniValue walletpassphrase(const JSONRPCRequest& request)
                     {"passphrase", RPCArg::Type::STR, RPCArg::Optional::NO, "The wallet passphrase"},
                     {"timeout", RPCArg::Type::NUM, RPCArg::Optional::NO, "The time to keep the decryption key in seconds; capped at 100000000 (~3 years)."},
                     {"mixingonly", RPCArg::Type::BOOL, RPCArg::Optional::OMITTED, "Disable sending functions"},
-                     },
-                RPCResults{RPCResult::Type::NONE, "", ""},
+                },
+                RPCResult{RPCResult::Type::NONE, "", ""},
                 RPCExamples{
             "\nUnlock the wallet for 60 seconds\n"
             + HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60") +

@@ -26,7 +26,7 @@ public:
     virtual ~ModuleInterface() {}
 
     // a small helper to initialize current block height in sub-modules on startup
-    void InitializeCurrentBlockTip();
+    void InitializeCurrentBlockTip(const CBlockIndex *pindexNew, bool fInitialDownload);
 
 protected:
     // CValidationInterface

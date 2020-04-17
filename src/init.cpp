@@ -101,12 +101,7 @@ static const bool DEFAULT_PROXYRANDOMIZE = true;
 static const bool DEFAULT_REST_ENABLE = false;
 static const bool DEFAULT_STOPAFTERBLOCKIMPORT = false;
 
-// How often to clean up the CoinJoin! cache
-static constexpr std::chrono::minutes CJ_CLEAN_INTERVAL{60};
-
-
 static ModuleInterface* pModuleNotificationInterface = nullptr;
-
 #ifdef WIN32
 // Win32 LevelDB doesn't use filedescriptors, and the ones used for
 // accessing block files don't count towards the fd_set size limit
@@ -1943,7 +1938,7 @@ bool AppInitMain(NodeContext& node)
     // force UpdatedBlockTip to initialize nCachedBlockHeight for CJ, MN payments and budgets
     // but don't call it directly to prevent triggering of other listeners like zmq etc.
     // GetMainSignals().UpdatedBlockTip(::ChainActive().Tip());
-    pModuleNotificationInterface->InitializeCurrentBlockTip();
+    pModuleNotificationInterface->InitializeCurrentBlockTip(::ChainActive().Tip(), ::ChainstateActive().IsInitialBlockDownload());
 
     // ********************************************************* Step 11d: schedule modules
 

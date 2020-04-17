@@ -18,6 +18,7 @@
 #include <txmempool.h>
 #include <util/system.h>
 #include <util/moneystr.h>
+#include <validation.h>
 
 #include <numeric>
 
@@ -330,7 +331,9 @@ void CCoinJoinServer::CreateFinalTransaction(CConnman* connman)
     CCoinsView viewDummy;
     CCoinsViewCache view(&viewDummy);
     {
-        LOCK2(cs_main, mempool.cs);
+        const CTxMemPool& mempool = *g_module_node->mempool;
+        LOCK(cs_main);
+        LOCK(mempool.cs);
         CCoinsViewCache &viewChain = ::ChainstateActive().CoinsTip();
         CCoinsViewMemPool viewMempool(&viewChain, mempool);
         view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view

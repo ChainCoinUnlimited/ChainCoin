@@ -28,7 +28,7 @@ extern RecursiveMutex cs_mapMasternodeBlocks;
 
 extern CMasternodePayments mnpayments;
 
-/// TODO: all 4 functions do not belong here really, they should be refactored/moved somewhere (main.cpp ?)
+CAmount GetMasternodePayment(const int& nHeight, CAmount blockValue);
 bool IsBlockValueValid(const CBlock& block, int nBlockHeight, CAmount blockReward, std::string& strErrorRet);
 bool IsBlockPayeeValid(const CTransactionRef& txNew, int nBlockHeight, CAmount blockReward);
 void FillBlockPayments(CMutableTransaction& txNew, int nBlockHeight, CAmount blockReward, CTxOut& txoutMasternodeRet, std::vector<CTxOut>& voutSuperblockRet);

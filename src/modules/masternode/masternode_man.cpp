@@ -22,6 +22,7 @@
 #include <util/message.h>
 #include <util/system.h>
 #include <util/translation.h>
+#include <validation.h>
 #include <warnings.h>
 
 #include <boost/algorithm/string/replace.hpp>
@@ -1756,7 +1757,7 @@ void CMasternodeMan::ClientTask(CConnman* connman)
 void CMasternodeMan::Controller(CScheduler& scheduler, CConnman* connman)
 {
     if (!fLiteMode) {
-        scheduler.scheduleEvery(std::bind(&CMasternodeMan::ClientTask, this, connman), 1000);
+        scheduler.scheduleEvery(std::bind(&CMasternodeMan::ClientTask, this, connman), MASTERNODE_SCHEDULE_SECOND);
     }
 }
 

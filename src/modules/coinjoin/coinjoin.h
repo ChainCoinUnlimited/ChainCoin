@@ -14,9 +14,14 @@
 #include <timedata.h>
 #include <tinyformat.h>
 
+#include <chrono>
+
 class CCoinJoin;
 class CConnman;
 class CNode;
+
+// How often to clean up the CoinJoin! cache
+static constexpr std::chrono::minutes CJ_CLEAN_INTERVAL{60};
 
 // denominations
 static const unsigned char COINJOIN_MAX_SHIFT = 0x0b;
@@ -26,11 +31,11 @@ static const CAmount COINJOIN_HIGH_DENOM = COINJOIN_BASE_DENOM << COINJOIN_MAX_S
 static const CAmount COINJOIN_LOW_DENOM = COINJOIN_BASE_DENOM >> COINJOIN_MAX_SHIFT;
 
 // time for all participants to sign
-static const int COINJOIN_SIGNING_TIMEOUT        = 30;
+static constexpr int64_t COINJOIN_SIGNING_TIMEOUT        = 30;
 // timeout for nodes to submit their tx
-static const int COINJOIN_ACCEPT_TIMEOUT         = 60;
+static constexpr int64_t COINJOIN_ACCEPT_TIMEOUT         = 60;
 // timeout for queues in blocks
-static const int COINJOIN_DEFAULT_TIMEOUT        = 4;
+static constexpr int64_t COINJOIN_DEFAULT_TIMEOUT        = 4;
 
 //! minimum peer version accepted by mixing pool
 static const int MIN_COINJOIN_PEER_PROTO_VERSION            = 70017;

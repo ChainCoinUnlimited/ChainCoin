@@ -19,6 +19,7 @@
 #include <util/moneystr.h>
 #include <util/system.h>
 #include <util/translation.h>
+#include <validation.h>
 
 #include <numeric>
 #include <string>

@@ -1241,24 +1241,6 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams, b
     }
 }
 
-CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
-{
-    CAmount ret = blockValue/5; // start at 20%
-
-    int nMNPIBlock = Params().GetConsensus().nMasternodePaymentsIncreaseBlock;
-    int nMNPIPeriod = Params().GetConsensus().nMasternodePaymentsIncreasePeriod;
-
-                                                                      // mainnet:
-    if(nHeight > nMNPIBlock)                  ret += blockValue / 40; // 22.5%
-    if(nHeight > nMNPIBlock+(nMNPIPeriod* 1)) ret += blockValue / 40; // 25,0%
-    if(nHeight > nMNPIBlock+(nMNPIPeriod* 2)) ret += blockValue / 40; // 27.5%
-    if(nHeight > nMNPIBlock+(nMNPIPeriod* 3)) ret += blockValue / 40; // 30.0%
-    if(nHeight > nMNPIBlock+(nMNPIPeriod* 4)) ret += blockValue / 40; // 32.5%
-    if(nHeight > nMNPIBlock+(nMNPIPeriod* 5)) ret += blockValue / 40; // 35.0%
-
-    return ret;
-}
-
 CoinsViews::CoinsViews(
     std::string ldb_name,
     size_t cache_size_bytes,

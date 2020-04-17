@@ -23,6 +23,7 @@
 #include <util/message.h>
 #include <util/system.h>
 #include <walletinitinterface.h>
+#include <validation.h>
 
 #include <string>
 
