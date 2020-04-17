@@ -153,8 +153,11 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     // hide PS frame (helps to preserve saved size)
     // we'll setup and make it visible in updateAdvancedPSUI() later if we are not in litemode
     ui->frameCoinJoin->setVisible(false);
+}
 
-    // Disable any PS UI when autobackup is disabled or failed for whatever reason
+void OverviewPage::setupCoinJoin()
+{
+    // Disable any CJ UI when autobackup is disabled or failed for whatever reason
     if(walletModel->getWalletBackups() <= 0){
         DisableCoinJoinCompletely();
         ui->labelCoinJoinEnabled->setToolTip(tr("Automatic backups are disabled, no mixing available!"));
