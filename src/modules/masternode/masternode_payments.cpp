@@ -989,7 +989,7 @@ void CMasternodePayments::UpdatedBlockTip(const CBlockIndex *pindexNew, bool fIn
 void CMasternodePayments::Controller(CScheduler& scheduler)
 {
     if (!fLiteMode) {
-        scheduler.scheduleEvery(std::bind(&CMasternodePayments::CheckAndRemove, this), MASTERNODE_SCHEDULE_MINUTE);
+        scheduler.scheduleEvery(std::bind(&CMasternodePayments::CheckAndRemove, this), std::chrono::seconds{60});
     }
 }
 

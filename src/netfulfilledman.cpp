@@ -77,6 +77,6 @@ std::string CNetFulfilledRequestManager::ToString() const
 void CNetFulfilledRequestManager::Controller(CScheduler& scheduler)
 {
     if (!fLiteMode) {
-        scheduler.scheduleEvery(std::bind(&CNetFulfilledRequestManager::CheckAndRemove, this), NFM_CLEAN_INTERVAL);
+        scheduler.scheduleEvery(std::bind(&CNetFulfilledRequestManager::CheckAndRemove, this), std::chrono::minutes{60});
     }
 }

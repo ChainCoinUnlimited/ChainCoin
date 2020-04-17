@@ -27,10 +27,6 @@ static constexpr int64_t MASTERNODE_SENTINEL_PING_MAX_SECONDS   =  60 * 60;
 static constexpr int64_t MASTERNODE_EXPIRATION_SECONDS          = 120 * 60;
 static constexpr int64_t MASTERNODE_NEW_START_REQUIRED_SECONDS  = 180 * 60;
 
-static constexpr std::chrono::seconds MASTERNODE_SCHEDULE_SECOND{1};
-static constexpr std::chrono::seconds MASTERNODE_SCHEDULE_MINUTE{60};
-static constexpr std::chrono::seconds MASTERNODE_MIN_MNP_SCHEDULE{600};
-
 static const int MASTERNODE_MAX_MNP_BLOCKS              = 60;
 static const int MASTERNODE_POSE_BAN_MAX_SCORE          =  5;
 

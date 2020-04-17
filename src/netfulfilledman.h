@@ -13,9 +13,6 @@
 class CNetFulfilledRequestManager;
 extern CNetFulfilledRequestManager netfulfilledman;
 
-// How often to clean up the CoinJoin! cache
-static constexpr std::chrono::minutes NFM_CLEAN_INTERVAL{60};
-
 // Fulfilled requests are used to prevent nodes from asking for the same data on sync
 // and from being banned for doing so too often.
 class CNetFulfilledRequestManager

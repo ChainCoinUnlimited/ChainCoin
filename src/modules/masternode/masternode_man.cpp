@@ -1757,7 +1757,7 @@ void CMasternodeMan::ClientTask(CConnman* connman)
 void CMasternodeMan::Controller(CScheduler& scheduler, CConnman* connman)
 {
     if (!fLiteMode) {
-        scheduler.scheduleEvery(std::bind(&CMasternodeMan::ClientTask, this, connman), MASTERNODE_SCHEDULE_SECOND);
+        scheduler.scheduleEvery(std::bind(&CMasternodeMan::ClientTask, this, connman), std::chrono::milliseconds{1000});
     }
 }
 
