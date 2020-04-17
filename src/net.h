@@ -850,8 +850,6 @@ public:
     // There is no final sorting before sending, as they are always sent immediately
     // and in the order requested.
     std::vector<uint256> vInventoryBlockToSend GUARDED_BY(cs_inventory);
-    // List of non-tx/non-block inventory items
-    std::vector<CInv> vInventoryOtherToSend GUARDED_BY(cs_inventory);
     RecursiveMutex cs_inventory;
 
     struct TxRelay {
@@ -869,6 +867,8 @@ public:
         // Set of transaction ids we still have to announce.
         // They are sorted by the mempool before relay, so the order is not important.
         std::set<uint256> setInventoryTxToSend;
+        // List of non-tx/non-block inventory items
+        std::vector<CInv> vInventoryOtherToSend GUARDED_BY(cs_tx_inventory){false};
         // Used for BIP35 mempool sending
         bool fSendMempool GUARDED_BY(cs_tx_inventory){false};
         // Last time a "MEMPOOL" request was serviced.
@@ -1035,12 +1035,11 @@ public:
             LOCK(cs_inventory);
             LogPrint(BCLog::NET, "PushInventory --  block: %s peer=%d\n", inv.ToString(), id);
             vInventoryBlockToSend.push_back(inv.hash);
-        } else {
+        } else if (m_tx_relay != nullptr) {
             LOCK(m_tx_relay->cs_tx_inventory);
             if (!m_tx_relay->filterInventoryKnown.contains(inv.hash)) {
-                LOCK(cs_inventory);
                 LogPrint(BCLog::NET, "PushInventory --  inv: %s peer=%d\n", inv.ToString(), id);
-                vInventoryOtherToSend.push_back(inv);
+                m_tx_relay->vInventoryOtherToSend.push_back(inv);
             }
         }
     }
