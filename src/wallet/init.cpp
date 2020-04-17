@@ -137,9 +137,9 @@ bool WalletInit::ParameterInteraction() const
     if (nLiqProvTmp > 0) {
         gArgs.ForceSetArg("-enableprivatesend", "1");
         LogPrintf("%s: parameter interaction: -liquidityprovider=%d -> setting -enableprivatesend=1\n", __func__, nLiqProvTmp);
-        gArgs.ForceSetArg("-privatesendrounds", itostr(std::numeric_limits<int>::max()));
-        LogPrintf("%s: parameter interaction: -liquidityprovider=%d -> setting -privatesendrounds=%d\n", __func__, nLiqProvTmp, itostr(std::numeric_limits<int>::max()));
-        gArgs.ForceSetArg("-privatesendamount", itostr(MAX_COINJOIN_AMOUNT));
+        gArgs.ForceSetArg("-privatesendrounds", ToString(std::numeric_limits<int>::max()));
+        LogPrintf("%s: parameter interaction: -liquidityprovider=%d -> setting -privatesendrounds=%d\n", __func__, nLiqProvTmp, ToString(std::numeric_limits<int>::max()));
+        gArgs.ForceSetArg("-privatesendamount", ToString(MAX_COINJOIN_AMOUNT));
         LogPrintf("%s: parameter interaction: -liquidityprovider=%d -> setting -privatesendamount=%d\n", __func__, nLiqProvTmp, MAX_COINJOIN_AMOUNT);
     }
 

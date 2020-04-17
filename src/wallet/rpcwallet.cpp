@@ -4269,8 +4269,7 @@ static UniValue prepareproposal(const JSONRPCRequest& request)
     }
 
             RPCHelpMan{"prepareproposal",
-                "\nCreates and submits the collateral transaction for a pre-defined proposal\n" +
-                       HelpRequiringPassphrase(pwallet) + "\n",
+                "\nCreates and submits the collateral transaction for a pre-defined proposal\n",
                 {
                     {"parent-hash", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The parent hash of the proposal\n"
                             "0 if submitted for the first time"},
