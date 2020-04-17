@@ -98,10 +98,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000067c4ffc7eff7472"); // 1942991 // PM-Tech: ChainCoin
+        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000006b0860304422517"); // 2162900 // PM-Tech: ChainCoin
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x000000000002853f21e36da851c71b83f4de6781354c9007527bb443fe1dde6b"); //1942991 // PM-Tech: ChainCoin
+        consensus.defaultAssumeValid = uint256S("0x00000000006de064b98b522b766a70334011fb02b564ca740277b6922510d01b"); //2162900 // PM-Tech: ChainCoin
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -174,10 +174,10 @@ public:
        };
 
        chainTxData = ChainTxData{
-            1490629503  /*1518000378*/, // * UNIX timestamp of last checkpoint block
-            1652928,    // * total number of transactions between genesis and last checkpoint
-                        //   (the tx=... number in the ChainStateFlushed debug.log lines)
-            0.0202417   // * estimated number of transactions per second after that timestamp
+            // Data from RPC: getchaintxstats 27307 00000000006de064b98b522b766a70334011fb02b564ca740277b6922510d01b
+            /* nTime    */ 1587136790,
+            /* nTxCount */ 2559226,
+            /* dTxRate  */ 0.01174758360930778
         };
     }
 };
