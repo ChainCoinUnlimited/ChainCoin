@@ -222,7 +222,7 @@ void PaymentServer::handleURIOrFile(const QString& s)
 
     if (s.startsWith("chaincoin://", Qt::CaseInsensitive))
     {
-        Q_EMIT message(tr("URI handling"), tr("'chaincoin://' is not a valid URI. Use 'bitcoin:' instead."),
+        Q_EMIT message(tr("URI handling"), tr("'chaincoin://' is not a valid URI. Use 'chaincoin:' instead."),
             CClientUIInterface::MSG_ERROR);
     }
     else if (s.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // chaincoin: URI
