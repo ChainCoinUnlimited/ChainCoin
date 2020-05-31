@@ -2058,8 +2058,9 @@ bool AppInitMain(NodeContext& node)
         banman->DumpBanlist();
     }, DUMP_BANS_INTERVAL);
 
-    node.scheduler->scheduleEvery([]{
-        g_analyzer->Flush();
+    CAnalyzer* analyzer = g_analyzer.get();
+    node.scheduler->scheduleEvery([analyzer]{
+        analyzer->Flush();
     }, CJ_CLEAN_INTERVAL);
 
     return true;

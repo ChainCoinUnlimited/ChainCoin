@@ -795,6 +795,7 @@ QString serviceFlagToStr(const quint64 mask, const int bit)
     case NODE_BLOOM:           return "BLOOM";
     case NODE_WITNESS:         return "WITNESS";
     case NODE_NETWORK_LIMITED: return "NETWORK_LIMITED";
+    case NODE_SERVICE:         return "SERVICE";
     // Not using default, so we get warned when a case is missing
     }
     if (bit < 8) {

@@ -25,6 +25,9 @@
      </item>
      <item>
       <widget class="QValidatedLineEdit" name="uriEdit">
+       <property name="text">
+        <string>chaincoin:</string>
+       </property>
        <property name="placeholderText">
         <string notr="true">bitcoin:</string>
        </property>
